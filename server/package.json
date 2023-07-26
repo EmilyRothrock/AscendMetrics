@@ -13,11 +13,13 @@
   "dependencies": {
     "@passport-next/passport-local": "^1.2.1",
     "cors": "^2.8.5",
-    "dotenv": "^16.3.1",
     "express": "^4.18.2",
     "jest": "^29.6.1",
     "mysql2": "^3.5.2",
     "passport": "^0.6.0",
     "sequelize": "^6.32.1"
+  },
+  "devDependencies": {
+    "sequelize-cli": "^6.6.1"
   }
 }

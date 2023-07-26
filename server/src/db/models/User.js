@@ -1,15 +1,31 @@
-const Sequelize = require('sequelize');
-const sequelize = require('../database');
+'use strict';
 
-const User = sequelize.define('user', {
-  id: {
-    type: Sequelize.INTEGER,
-    autoIncrement: true,
-    allowNull: false,
-    primaryKey: true
-  },
-  name: Sequelize.STRING
-  // define more fields
-});
+module.exports = (sequelize, DataTypes) => {
+  const User = sequelize.define('User', {
+    id: {
+      type: DataTypes.INTEGER,
+      primaryKey: true,
+      autoIncrement: true,
+      allowNull: false
+    },
+    username: {
+      type: DataTypes.STRING,
+      allowNull: false
+    },
+    password: {
+      type: DataTypes.STRING,
+      allowNull: false
+    },
+    // include other fields as per your ERD
+  }, {
+    // optional: if you want to disable timestamp fields (createdAt, updatedAt)
+    timestamps: false
+  });
 
-module.exports = User;
+  User.associate = function(models) {
+    // define association here if any
+    // e.g. User.hasMany(models.Session)
+  };
+
+  return User;
+};

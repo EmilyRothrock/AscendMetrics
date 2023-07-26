@@ -2,7 +2,7 @@
 Below you will find details about the directories and files of the **server** module of the AscendMetrics project.
 ## src
 ### controllers
-### middleware
+### middlewares
 ### models - sequalize
 ### routes
 ### services

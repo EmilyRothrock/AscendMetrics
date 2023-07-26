@@ -7,8 +7,8 @@ Contains any static files that will be served as they are e.g. images, icons, an
 Contains static files that the code will reference e.g. images, fonts, or additional CSS files.
 ### components
 Contains all the React components, the building blocks of UI.
-### features
-As opposed to page-based organization, this encourages the flexible reuse of code between pages
+### pages
+Contains sub-directories each associated with single pages. 
 ### services
 Contains code related to making API calls or other services.
 ### utils

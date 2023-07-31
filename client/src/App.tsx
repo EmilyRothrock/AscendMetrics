@@ -1,14 +1,21 @@
-import NavBar from './Homepage/NavBar'
 import Homepage from './pages/Homepage'
 import {BrowserRouter as Router, Routes, Route} from 'react-router-dom'
+import { createGlobalStyle } from 'styled-components'
 
+const GlobalStyle = createGlobalStyle`
+  body {
+    margin: 0;
+    padding: 0;
+    font-family: Poppins;
+  }
+`
 function App() {
   
 
   return (
     
     <Router>
-      <NavBar/>
+      <GlobalStyle/>
       <Routes>
          <Route path = '/' Component= {Homepage} />
          <Route path = 'about us'/>

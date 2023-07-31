@@ -1,12 +1,13 @@
 import React, { useState } from "react";
 
-import {ImageContainer, 
+import {
+  ImageContainer,
   SlideStyles,
   RightArrowStyles,
   LeftArrowStyles,
   DotsContainerStyles,
-  DotStyle
-  } from '../styles/ImageSliderComponents'
+  DotStyle,
+} from "../styles/ImageSliderComponents";
 
 import Training1 from "../assets/Training1.jpg";
 import Training2 from "../assets/Training2.jpg";
@@ -16,11 +17,11 @@ import Training5 from "../assets/Training5.jpg";
 
 const ImageSlider = () => {
   const slides = [
-    { image: Training1, title: "beach" },
-    { image: Training2, title: "boat" },
-    { image: Training3, title: "forest" },
-    { image: Training4, title: "city" },
-    { image: Training5, title: "italy" },
+    { image: Training1, title: "one" },
+    { image: Training2, title: "two" },
+    { image: Training3, title: "three" },
+    { image: Training4, title: "four" },
+    { image: Training5, title: "five" },
   ];
 
   const [currIndex, setCurrIndex] = useState(0);
@@ -47,16 +48,13 @@ const ImageSlider = () => {
       <RightArrowStyles onClick={GoNext}> ❱ </RightArrowStyles>
       <SlideStyles image={currentSlide} />
 
-    <DotsContainerStyles>
+      <DotsContainerStyles>
         {slides.map((slide, slideIndex) => (
-          <DotStyle key={slideIndex}  onClick={() => goToSlide(slideIndex)}>
+          <DotStyle key={slideIndex} onClick={() => goToSlide(slideIndex)}>
             ●
           </DotStyle>
-          ))}
-    </DotsContainerStyles>
-
-
-
+        ))}
+      </DotsContainerStyles>
     </ImageContainer>
   );
 };

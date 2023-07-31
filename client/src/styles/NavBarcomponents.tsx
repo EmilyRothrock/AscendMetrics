@@ -4,13 +4,13 @@ import {Link} from 'react-router-dom'
 export const NavBackground = styled.nav`
     width: 100%;
     height: ${(props) => (props.extendNavBar ? "100vh": "80px")};
-    background-color: lightblue;
+    background-color: #b014d7;
     display: flex;
     flex-direction: column;
     position: fixed;
-    top: 0; /* Position it at the top of the viewport */
+    top: 0; 
     left: 0;
-    z-index: 999999999;
+    z-index: 99;
 
     @media (min-width: 700px) {
         height: 80px;
@@ -21,28 +21,22 @@ export const LeftContainer = styled.div`
     flex: 20%;
     display: flex;
     justify-content:center;
-    border-right: 5px solid #ccc;
     align-items: center;
 
     
 `;
-//remove colors on the left, right 
-//and middle containers once entire nav bar is done
 
 export const MidContainer = styled.div`
     flex: 60%;
     display: flex;
     justify-content: space-evenly;
     align-items: center;
-    //border-left: 5px solid #ccc;   Doesnt need a border because other 2 have one
-    //border-right: 5px solid #ccc;  Doesnt need a border because other 2 have one
 `;
 
 export const RightContainer = styled.div`
     flex: 20%;
     display: flex;
     justify-content: center;
-    border-left: 5px solid #ccc;
     align-items: center;
 `;
 
@@ -54,7 +48,6 @@ export const NavInner = styled.div `
 `;
 
 export const NavLink = styled(Link)`
-    font-family: 'Courier New', Courier, monospace;
     color: black;
     
     text-decoration: none;
@@ -116,7 +109,6 @@ export const NavExtended = styled.div`
 
 
 export const NavLinkExtend = styled(Link)`
-    font-family: 'Courier New', Courier, monospace;
     color: black;
     
     text-decoration: none;
@@ -128,13 +120,14 @@ export const NavLinkExtend = styled(Link)`
 export const SignUpButtonExtended = styled.button`
   
   padding: 10px 20px;
-  font-size: 16px;
+  font-size: 20px;
   background-color: #000000;
   color: #ffffff;
   border: none;
   border-radius: 5px;
   height: 50px;
   cursor: pointer;
+  margin: 10px;
   @media (min-width: 700px) {
         display: none;
     }

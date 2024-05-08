@@ -8,23 +8,30 @@ module.exports = (sequelize, DataTypes) => {
       autoIncrement: true,
       allowNull: false
     },
-    username: {
-      type: DataTypes.STRING,
-      allowNull: false
-    },
     password: {
       type: DataTypes.STRING,
       allowNull: false
     },
-    // include other fields as per your ERD
+    email: {
+      type: DataTypes.STRING,
+      allowNull: false
+    },
+    first: {
+      type: DataTypes.STRING,
+      allowNull: false
+    },
+    last: {
+      type: DataTypes.STRING,
+      allowNull: true
+    }
   }, {
     // optional: if you want to disable timestamp fields (createdAt, updatedAt)
-    timestamps: false
+    timestamps: true,
   });
 
   User.associate = function(models) {
     // define association here if any
-    // e.g. User.hasMany(models.Session)
+    User.hasMany(models.Session, { foreignKey: 'userId', });
   };
 
   return User;

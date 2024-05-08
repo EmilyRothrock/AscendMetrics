@@ -23,3 +23,6 @@ config.json
 *.njsproj
 *.sln
 *.sw?
+
+# Local file for database
+server/src/db/config/config.local.json

@@ -8,7 +8,7 @@ module.exports = (sequelize, DataTypes) => {
       autoIncrement: true,
       allowNull: false
     },
-    password: {
+    passwordHash: {
       type: DataTypes.STRING,
       allowNull: false
     },

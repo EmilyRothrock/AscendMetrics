@@ -2,9 +2,10 @@ var express = require('express');
 var passport = require('passport');
 var LocalStrategy = require('passport-local');
 var crypto = require('crypto');
-const db = require('./models');  // Assuming you are using Sequelize as per your setup
+const db = require('./models'); 
 
-passport.use(new LocalStrategy(function verify(username, password, cb) {
+passport.use( new LocalStrategy( 
+  function verify(username, password, cb) {
     db.get('SELECT * FROM users WHERE username = ?', [ username ], function(err, row) {
       if (err) { return cb(err); }
       if (!row) { return cb(null, false, { message: 'Incorrect username or password.' }); }
@@ -17,4 +18,5 @@ passport.use(new LocalStrategy(function verify(username, password, cb) {
         return cb(null, row);
       });
     });
-  }));
+  }
+));

@@ -16,13 +16,16 @@ const LoginPage = () => {
     const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
         const data = new FormData(event.currentTarget);
-        const email = data.get('email');
-        const password = data.get('password');
-        try {
-            const response = await axios.post('http://localhost:3000/login', { email, password });            console.log('Login successful', response);
-        } catch (error) {
-            console.error('Failed to login', error);
-        }
+        axios.post('/login', { 
+            email: data.get('email'), 
+            password: data.get('password') 
+        })
+        .then(function (response) {
+            console.log(response);
+        })
+        .catch(function (error) {
+            console.log(error);
+        });
     };
   
     return (

@@ -6,8 +6,8 @@ import {
 } from "react-router-dom";
 import App from './App.tsx'
 import ErrorPage from "./components/ErrorPage";
-import LoginPage from './components/LoginPage';
-// import RegisterPage from './components/RegisterPage';
+import SigninPage from './components/SigninPage';
+import SignupPage from './components/SignupPage';
 // import ForgotPasswordPage from './components/ForgotPasswordPage';
 // import ResetPasswordPage from './components/ResetPasswordPage';
 // import SettingsPage from './components/SettingsPage';
@@ -19,12 +19,12 @@ const router = createBrowserRouter([
     errorElement: <ErrorPage/>,
   },
   {
-    path: "/login",
-    element: <LoginPage/>,
+    path: "/signin",
+    element: <SigninPage/>,
   },
   {
-    path: "/register",
-    element: <h1>this is the registration page</h1>,
+    path: "/signup",
+    element: <SignupPage/>,
   },
   {
     path: "/forgot-password",

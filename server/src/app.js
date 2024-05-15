@@ -2,7 +2,7 @@ const express = require('express');
 const session = require('express-session');
 const app = express();
 const port = 5173;
-const auth = require('./middlewares/auth/auth');
+const auth = require('./middlewares/auth/passport');
 const config = require('./config/config.json').development; // TODO: make this adapt to environment
 
 // the express server is created here and configured according to the constituant modules

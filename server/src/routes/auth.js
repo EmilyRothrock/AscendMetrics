@@ -1,21 +1,27 @@
-var passport = require('passport');
-var LocalStrategy = require('passport-local');
-var crypto = require('crypto');
-const db = require('../db/models/database'); 
+// here will define all the callbacks and routing associated with user authentication
+// routes include: sign-in, sign-up, forgot password, password reset
+// other functionality include: session setting
 
-passport.use( new LocalStrategy( 
-  function verify(username, password, cb) {
-    db.get('SELECT * FROM users WHERE username = ?', [ username ], function(err, row) {
-      if (err) { return cb(err); }
-      if (!row) { return cb(null, false, { message: 'Incorrect username or password.' }); }
-  
-      crypto.pbkdf2(password, row.salt, 310000, 32, 'sha256', function(err, hashedPassword) {
-        if (err) { return cb(err); }
-        if (!crypto.timingSafeEqual(row.hashed_password, hashedPassword)) {
-          return cb(null, false, { message: 'Incorrect username or password.' });
-        }
-        return cb(null, row);
+app.post('/register', async (req, res) => {
+  const { email, password, first, last } = req.body;
+  const hash = crypto.scryptSync(password, 'salt', 64).toString('hex');
+
+  try {
+      const user = await User.create({
+          email,
+          passwordHash: hash,
+          first,
+          last
       });
-    });
+      res.status(201).send('User registered');
+  } catch (error) {
+      res.status(400).send('Error registering user');
   }
-));
+});
+
+// Login route
+app.post('/login', passport.authenticate('local', {
+  successRedirect: '/home',
+  failureRedirect: '/login',
+  failureFlash: true
+}));

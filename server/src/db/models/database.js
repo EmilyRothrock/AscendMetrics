@@ -7,7 +7,7 @@ const Sequelize = require('sequelize');  // the Sequelize library
 const process = require('process');  // a global object that provides information about and control over the current Node.js process
 const basename = path.basename(__filename);  // sets basename to the name of this file 'index.js' but extracting the basename from the current file path
 const env = process.env.NODE_ENV || 'development';  // sets the environment variable 'env' (defaulting to development)***
-const config = require(__dirname + '/../config/config.json')[env];  //loads the configuration in the config.json file for the current environment***
+const config = require(__dirname + '/../../config/config.json')[env];  //loads the configuration in the config.json file for the current environment***
 const db = {};  // initialize an empty database object
 
 // create an instance of sequalize according to the configuration settings.***

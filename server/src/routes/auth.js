@@ -1,27 +1,13 @@
-// here will define all the callbacks and routing associated with user authentication
-// routes include: sign-in, sign-up, forgot password, password reset
-// other functionality include: session setting
+// create and export authentication routes
+// signin, singup, forgot password, password reset, etc.
+// create routes by tieing middleware together
 
-app.post('/register', async (req, res) => {
-  const { email, password, first, last } = req.body;
-  const hash = crypto.scryptSync(password, 'salt', 64).toString('hex');
+const express = require('express');
+const authRouter = express.Router();
+const auth = require ('../middlewares/auth/authMiddleware');
 
-  try {
-      const user = await User.create({
-          email,
-          passwordHash: hash,
-          first,
-          last
-      });
-      res.status(201).send('User registered');
-  } catch (error) {
-      res.status(400).send('Error registering user');
-  }
-});
+authRouter.post('/signin', auth.handleSignin);
 
-// Login route
-app.post('/login', passport.authenticate('local', {
-  successRedirect: '/home',
-  failureRedirect: '/login',
-  failureFlash: true
-}));
+authRouter.post('/signup', auth.handleSignup);
+
+module.exports = authRouter;

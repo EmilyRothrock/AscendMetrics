@@ -28,7 +28,7 @@ module.exports = (sequelize, DataTypes) => {
   Session.associate = function(models) {
     // define association here if any
     Session.belongsTo(models.User);
-    Session.hasMany(models.SessionActivity, { foreignKey: sessionId });
+    Session.hasMany(models.SessionActivity, { foreignKey: 'sessionId' });
   };
 
   return Session;

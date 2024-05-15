@@ -9,7 +9,7 @@ module.exports = (sequelize, DataTypes) => {
       allowNull: false
     },
     name: {
-      type: DataTypes.TINYTEXT,
+      type: DataTypes.TEXT('tiny'),
       allowNull: false
     },
     description: {

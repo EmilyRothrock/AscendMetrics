@@ -1,8 +1,7 @@
-var express = require('express');
 var passport = require('passport');
 var LocalStrategy = require('passport-local');
 var crypto = require('crypto');
-const db = require('./models'); 
+const db = require('../db/models/database'); 
 
 passport.use( new LocalStrategy( 
   function verify(username, password, cb) {

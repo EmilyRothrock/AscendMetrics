@@ -24,7 +24,7 @@ async function handleSignup(req, res, next) {
       last: lastName
     });
     // Send the success response
-    res.status(201).send('User registered');
+    res.status(201).send({ message: 'User registered', severity: 'success'}); // severity is used in MUI's alert component in the client
     
     // Optionally call next() if you have subsequent middleware to run
     if (next) {
@@ -34,7 +34,7 @@ async function handleSignup(req, res, next) {
     console.error('Error registering user:', error);
     
     // Send the error response
-    res.status(400).send('Error registering user');
+    res.status(400).send({message: 'Error registering user', severity: 'error'}); // severity is used in MUI's alert component in the client
   }
 }
 

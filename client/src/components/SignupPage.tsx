@@ -1,3 +1,4 @@
+import React, { useState } from 'react';
 import api from '../services/api';
 import Avatar from '@mui/material/Avatar';
 import Button from '@mui/material/Button';
@@ -6,11 +7,15 @@ import TextField from '@mui/material/TextField';
 import Link from '@mui/material/Link';
 import Grid from '@mui/material/Grid';
 import Box from '@mui/material/Box';
+import Alert from '@mui/material/Alert';
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
 
 export default function SignUp() {
+    const [alert, setAlert] = useState({ visible: false, severity: 'success', message: '' });
+    // TODO: fix issues with severity and alert component... stupid TS
+
     // TODO: consider refactoring this function's redundancies with SINGIN to a helper...
     const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
@@ -22,12 +27,27 @@ export default function SignUp() {
             password: data.get('password') 
         })
         .then(function (response) {
-            console.log(response);
+            setAlert({
+                visible: true,
+                severity: response.data.severity,
+                message: response.data.message
+            });
         })
         .catch(function (error) {
-            console.log(error);
+            if (error.response && error.response.data && error.response.data.message) {
+                setAlert({
+                    visible: true,
+                    severity: 'error',
+                    message: error.response.data.message
+                });
+            } else {
+                setAlert({
+                    visible: true,
+                    severity: 'error',
+                    message: 'An unexpected error occurred. Please try again later.'
+                });
+            }
         });
-        console.log("I just tried to signup...");
     };
 
   return (
@@ -100,13 +120,23 @@ export default function SignUp() {
         >
             Sign Up
         </Button>
-        <Grid container justifyContent="flex-end">
+        {alert.visible && (
+            <Alert variant="outlined" severity={alert.severity}>
+                {alert.message}
+                {alert.severity === 'success' && (
+                    <Link href="/signin" variant="body2" sx={{ marginLeft: 1 }}>
+                        Sign in
+                    </Link>
+                )}
+            </Alert>
+        )}
+        {alert.severity != "success" && (<Grid container justifyContent="flex-end">
             <Grid item>
             <Link href="/signin" variant="body2">
                 Already have an account? Sign in
             </Link>
             </Grid>
-        </Grid>
+        </Grid>)}
         </Box>
     </Box>
     </Container>

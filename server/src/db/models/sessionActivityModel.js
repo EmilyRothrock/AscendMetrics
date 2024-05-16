@@ -8,14 +8,6 @@ module.exports = (sequelize, DataTypes) => {
       autoIncrement: true,
       allowNull: false
     },
-    sessionId: {
-      type: DataTypes.INTEGER,
-      allowNull: false
-    },
-    activityId: {
-      type: DataTypes.INTEGER,
-      allowNull: false
-    },
     note: {
       type: DataTypes.TEXT,
       allowNull: true

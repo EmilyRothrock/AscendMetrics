@@ -3,11 +3,6 @@ const LocalStrategy = require('passport-local').Strategy;
 const db = require('../../db/models/database');
 const auth = require('./authMiddleware');
 
-const customFields = {
-    usernameField: 'username',
-    passwordField: 'password'
-};
-
 const verifyCallback = (username, password, done) => {
     db.User.findOne({ username: username })
         .then((user) => {
@@ -21,6 +16,10 @@ const verifyCallback = (username, password, done) => {
 };
 
 // final set-up
+const customFields = {
+    usernameField: 'username',
+    passwordField: 'password'
+};
 const strategy = new LocalStrategy(customFields, verifyCallback);
 passport.use(strategy);
 

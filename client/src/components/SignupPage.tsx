@@ -1,4 +1,4 @@
-import axios from 'axios';
+import api from '../services/api';
 import Avatar from '@mui/material/Avatar';
 import Button from '@mui/material/Button';
 import CssBaseline from '@mui/material/CssBaseline';
@@ -15,7 +15,7 @@ export default function SignUp() {
     const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
         const data = new FormData(event.currentTarget);
-        axios.post('/signup', { 
+        api.post('/signup', { 
             firstName: data.get('firstName'),
             lastName: data.get('lastName'),
             email: data.get('email'), 
@@ -27,6 +27,7 @@ export default function SignUp() {
         .catch(function (error) {
             console.log(error);
         });
+        console.log("I just tried to signup...");
     };
 
   return (

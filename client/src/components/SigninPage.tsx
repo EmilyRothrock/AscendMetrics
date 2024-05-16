@@ -1,4 +1,4 @@
-import axios from 'axios';
+import api from '../services/api';
 import Avatar from '@mui/material/Avatar';
 import Button from '@mui/material/Button';
 import CssBaseline from '@mui/material/CssBaseline';
@@ -16,7 +16,7 @@ const SigninPage = () => {
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     const data = new FormData(event.currentTarget);
-    axios.post('/signin', { 
+    api.post('/signin', { 
       email: data.get('email'), 
       password: data.get('password') 
     })
@@ -28,6 +28,7 @@ const SigninPage = () => {
       // TODO: handle unsuccessful sign-in! incorrect, doesn't exist
       console.log(error);
     });
+    console.log("I just tried to signin...")
 };
 
   return (

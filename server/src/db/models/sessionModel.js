@@ -8,10 +8,6 @@ module.exports = (sequelize, DataTypes) => {
       autoIncrement: true,
       allowNull: false
     },
-    userId: {
-      type: DataTypes.INTEGER,
-      allowNull: false
-    },
     note: {
       type: DataTypes.TEXT,
       allowNull: true
@@ -28,7 +24,7 @@ module.exports = (sequelize, DataTypes) => {
   Session.associate = function(models) {
     // define association here if any
     Session.belongsTo(models.User);
-    Session.hasMany(models.SessionActivity, { foreignKey: 'sessionId' });
+    Session.hasMany(models.SessionActivity);
   };
 
   return Session;

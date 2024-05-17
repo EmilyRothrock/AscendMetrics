@@ -1,23 +1,25 @@
 passport = require('passport');
 const LocalStrategy = require('passport-local').Strategy;
 const db = require('../../db/models/database');
-const auth = require('./authMiddleware');
+const { genPassword, validatePassword } = require('./utils');
 
-const verifyCallback = (username, password, done) => {
-    db.User.findOne({ username: username })
+const verifyCallback = (email, password, done) => {
+    console.log('trying to find user!');
+    db.User.findOne({ where: { email: email }})
         .then((user) => {
+            console.log('found user!');
+            console.log(user);
             if (!user) { return done(null, false); }
-            const isValid = auth.validatePassword(password, user.passwordHash, user.passwordSalt);
-            if(isValid) { return done(null, user) } 
+            const isValid = validatePassword(password, user.passwordHash, user.passwordSalt);
+            if(isValid) { return done(null, user); } 
             else { return done(null, false); }
         })
-        .catch((err) => { done(err); 
-        });
+        .catch((err) => { done(err); });
 };
 
 // final set-up
 const customFields = {
-    usernameField: 'username',
+    usernameField: 'email',
     passwordField: 'password'
 };
 const strategy = new LocalStrategy(customFields, verifyCallback);

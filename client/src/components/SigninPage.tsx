@@ -1,3 +1,4 @@
+import React, { useState } from 'react';
 import api from '../services/api';
 import Avatar from '@mui/material/Avatar';
 import Button from '@mui/material/Button';
@@ -8,11 +9,15 @@ import Checkbox from '@mui/material/Checkbox';
 import Link from '@mui/material/Link';
 import Grid from '@mui/material/Grid';
 import Box from '@mui/material/Box';
+import Alert from '@mui/material/Alert';
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
 
 const SigninPage = () => {
+  const [alert, setAlert] = useState({ visible: false, severity: 'success', message: '' });
+    // TODO: fix issues with severity and alert component... stupid TS
+    
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     const data = new FormData(event.currentTarget);
@@ -21,14 +26,28 @@ const SigninPage = () => {
       password: data.get('password') 
     })
     .then(function (response) {
-      // TODO: handle successful sign-in!
-      console.log(response);
+      setAlert({
+        visible: true,
+        severity: response.data.severity,
+        message: response.data.message
+      });
     })
     .catch(function (error) {
-      // TODO: handle unsuccessful sign-in! incorrect, doesn't exist
-      console.log(error);
+      if (error.response && error.response.data && error.response.data.message) { // TODO: better error handling
+        setAlert({
+          visible: true,
+          severity: 'error',
+          message: error.response.data.message
+        });
+      } else {
+        setAlert({
+          visible: true,
+          severity: 'error',
+          message: 'An unexpected error occurred. Please try again later.'
+        });
+      }
     });
-    console.log("I just tried to signin...")
+    console.log("I just tried to signin...");
 };
 
   return (
@@ -81,18 +100,23 @@ const SigninPage = () => {
           >
             Sign In
           </Button>
-          <Grid container>
-            <Grid item xs>
-              <Link href="#" variant="body2">
-                Forgot password?
-              </Link>
-            </Grid>
-            <Grid item>
-              <Link href="/signup" variant="body2">
-                {"Don't have an account? Sign Up"}
-              </Link>
-            </Grid>
+        {alert.visible && (
+          <Alert variant="outlined" severity={alert.severity}>
+            {alert.message}
+          </Alert>
+        )}
+        <Grid container>
+          <Grid item xs>
+            <Link href="#" variant="body2">
+              Forgot password?
+            </Link>
           </Grid>
+          <Grid item>
+            <Link href="/signup" variant="body2">
+              {"Don't have an account? Sign Up"}
+            </Link>
+          </Grid>
+        </Grid>
         </Box>
       </Box>
     </Container>

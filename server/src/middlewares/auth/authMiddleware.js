@@ -1,12 +1,25 @@
-const crypto = require('crypto');
+const { genPassword, validatePassword } = require('./utils');
 const passport = require('passport');
 require('./localStrategy');
 const db = require('../../db/models/database');
 
 async function handleSignin(req, res, next) {
-  // passport.authenticate('local', { failureRedirect: '/signin' })
   console.log('this is the signIN handler!'); // TODO: remove
-  next();
+  console.log(req.body);
+  passport.authenticate('local', (err, user, info) => {
+    if (err) {
+      return next(err); // Handle error
+    }
+    if (!user) {
+      return res.status(401).json({ message: 'Invalid credentials', severity: 'error' });
+    }
+    req.logIn(user, (err) => {
+      if (err) {
+        return next(err); // Handle error
+      }
+      return res.status(200).json({ message: 'Successfully signed in', severity: 'success' });
+    });
+  })(req, res, next);
 }
 
 async function handleSignup(req, res, next) {
@@ -32,39 +45,12 @@ async function handleSignup(req, res, next) {
     }
   } catch (error) {
     console.error('Error registering user:', error);
-    
     // Send the error response
     res.status(400).send({message: 'Error registering user', severity: 'error'}); // severity is used in MUI's alert component in the client
   }
 }
 
-// Helper Functions for Authentication
-
-function genPassword(password) {
-  var salt = crypto.randomBytes(32).toString('hex');
-  var genHash = myHashify(password, salt);
-  return { hash: genHash, salt: salt };
-}
-
-function validatePassword(password, hash, salt) {
-  var hashVerify = myHashify(password, salt);
-  return hash === hashVerify;
-}
-
-function myHashify(password, salt) {
-  // Key length can be adjusted as needed; 64 bytes is a common length
-  const keyLength = 64;
-  
-  // Use crypto.scryptSync to derive a key from the password and salt
-  const hash = crypto.scryptSync(password, salt, keyLength);
-  
-  // Return the hash as a hexadecimal string
-  return hash.toString('hex');
-}
-
 module.exports = {
   handleSignin,
-  handleSignup,
-  genPassword,
-  validatePassword
+  handleSignup
 }

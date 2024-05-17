@@ -1,6 +1,7 @@
 const express = require('express');
 const session = require('express-session');
 const cors = require('cors');
+const passport = require('passport');
 const app = express();
 const port = 3000;
 const config = require('./config/config.json').development; // TODO: make this adapt to environment
@@ -29,6 +30,8 @@ app.use(session({
   saveUninitialized: false,
   cookie: { secure: true }
 }));
+app.use(passport.initialize());
+app.use(passport.session());
 
 // Routes
 // tie in all router modules from routes folder

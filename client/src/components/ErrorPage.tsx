@@ -4,7 +4,7 @@ export default function ErrorPage() {
   const error = useRouteError();
   console.error(error);
 
-  // not sure how to specify error in a way that satisfy TS
+  // TODO: not sure how to specify error in a way that satisfy TS
   return (
     <div id="error-page">
       <h1>Oops!</h1>

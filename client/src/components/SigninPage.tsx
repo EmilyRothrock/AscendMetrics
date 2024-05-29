@@ -13,11 +13,12 @@ import Alert from '@mui/material/Alert';
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
+import { useNavigate } from 'react-router-dom';
 
 const SigninPage = () => {
   const [alert, setAlert] = useState({ visible: false, severity: 'success', message: '' });
-    // TODO: fix issues with severity and alert component... stupid TS
-    
+  const navigate = useNavigate();
+  // TODO: fix issues with severity and alert component... stupid TS
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     const data = new FormData(event.currentTarget);
@@ -31,6 +32,7 @@ const SigninPage = () => {
         severity: response.data.severity,
         message: response.data.message
       });
+      navigate('/dashboard');
     })
     .catch(function (error) {
       if (error.response && error.response.data && error.response.data.message) { // TODO: better error handling
@@ -47,7 +49,6 @@ const SigninPage = () => {
         });
       }
     });
-    console.log("I just tried to signin...");
 };
 
   return (

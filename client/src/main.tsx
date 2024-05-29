@@ -4,19 +4,21 @@ import {
   createBrowserRouter,
   RouterProvider,
 } from "react-router-dom";
-import App from './App.tsx'
 import ErrorPage from "./components/ErrorPage";
 import SigninPage from './components/SigninPage';
 import SignupPage from './components/SignupPage';
+import Dashboard from './components/Dashboard';
 // import ForgotPasswordPage from './components/ForgotPasswordPage';
 // import ResetPasswordPage from './components/ResetPasswordPage';
 // import SettingsPage from './components/SettingsPage';
 
+// Houses the router for all pages. 
+// TODO: some way to confirm authentication and either redirect to log-in or allow routing to desired page.
+// TODO: components house page-specific UI, processed data fetching, and display of the data
 const router = createBrowserRouter([
   {
-    path: "/",
-    element: <App/>,
-    errorElement: <ErrorPage/>,
+    path: "*",  // Catch-all route for undefined paths
+    element: <ErrorPage/>,
   },
   {
     path: "/signin",
@@ -35,8 +37,8 @@ const router = createBrowserRouter([
     element: <h1>this is the reset password page</h1>,
   },
   {
-    path: "/settings",
-    element: <h1>this is the settings page</h1>,
+    path: "/dashboard",
+    element: <Dashboard/>,
   },
 ]);
 

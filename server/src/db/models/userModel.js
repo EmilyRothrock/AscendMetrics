@@ -36,7 +36,7 @@ module.exports = (sequelize, DataTypes) => {
 
   User.associate = function(models) {
     // define association here if any
-    User.hasMany(models.Session);
+    User.hasMany(models.TrainingSession);
   };
 
   return User;

@@ -1,5 +1,3 @@
-'use strict';
-
 // import necessary modules
 const fs = require('fs');  // file system operations
 const path = require('path');  // utilities for working with file and directory paths
@@ -10,6 +8,7 @@ const env = process.env.NODE_ENV || 'development';  // sets the environment vari
 const config = require(__dirname + '/../../config/config.json')[env];  //loads the configuration in the config.json file for the current environment***
 const db = {};  // initialize an empty database object
 
+//TODO: move database outside models directory...
 // create an instance of sequalize according to the configuration settings.***
 let sequelize;
 if (config.use_env_variable) {

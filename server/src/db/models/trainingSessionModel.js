@@ -1,7 +1,7 @@
 'use strict';
 
 module.exports = (sequelize, DataTypes) => {
-  const Session = sequelize.define('Session', {
+  const TrainingSession = sequelize.define('TrainingSession', {
     id: {
       type: DataTypes.INTEGER,
       primaryKey: true,
@@ -21,11 +21,11 @@ module.exports = (sequelize, DataTypes) => {
     timestamps: true,
   });
 
-  Session.associate = function(models) {
+  TrainingSession.associate = function(models) {
     // define association here if any
-    Session.belongsTo(models.User);
-    Session.hasMany(models.SessionActivity);
+    TrainingSession.belongsTo(models.User);
+    TrainingSession.hasMany(models.SessionActivity);
   };
 
-  return Session;
+  return TrainingSession;
 };

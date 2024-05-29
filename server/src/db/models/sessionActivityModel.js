@@ -39,7 +39,7 @@ module.exports = (sequelize, DataTypes) => {
 
   SessionActivity.associate = function(models) {
     // define association here if any
-    SessionActivity.belongsTo(models.Session);
+    SessionActivity.belongsTo(models.TrainingSession);
     SessionActivity.belongsTo(models.Activity);
   };
 

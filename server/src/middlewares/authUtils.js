@@ -9,9 +9,6 @@ function genPassword(password) {
 
 function validatePassword(password, hash, salt) {
     var hashVerify = myHashify(password, salt);
-    console.log(hash);
-    console.log(hashVerify);
-    console.log(hash === hashVerify);
     return hash === hashVerify;
 }
 

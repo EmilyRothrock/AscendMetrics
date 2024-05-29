@@ -34,6 +34,7 @@ fs
   });
 
 // creates associations from model if there are any defined.
+// note that associations create the necessary foreign keys, so do not redundantly define them.
 Object.keys(db).forEach(modelName => {
   if (db[modelName].associate) {
     db[modelName].associate(db);

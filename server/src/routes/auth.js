@@ -5,7 +5,7 @@ const auth = require('../middlewares/authMiddleware');
 authRouter.post('/signin', auth.handleSignin);
 authRouter.post('/signup', auth.handleSignup);
 
-authRouter.post('/logout', (req, res) => {
+authRouter.post('/signout', (req, res) => {
   req.logout((err) => {
     if (err) { return res.status(500).send('Error logging out'); }
     req.session.destroy((err) => {
@@ -17,7 +17,6 @@ authRouter.post('/logout', (req, res) => {
 
 authRouter.get('/authCheck', (req, res) => {
   const isAuth = req.isAuthenticated();
-  console.log(isAuth); // TODO: remove
   res.send(isAuth);
 });
 

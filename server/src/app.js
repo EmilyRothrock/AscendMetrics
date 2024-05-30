@@ -42,11 +42,6 @@ app.use(passport.session());
 const authRouter = require('./routes/auth');
 app.use('/', authRouter)
 
-app.use((req,res,next) => {
-  console.log(req);
-  next();
-})
-
 app.listen(port, () => {
   console.log(`Server running at http://localhost:${port}`);
 });

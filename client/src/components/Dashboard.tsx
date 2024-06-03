@@ -15,15 +15,14 @@ const Dashboard: React.FC = () => {
         const checkAuth = async () => {
             try {
                 const response = await api.get('/authcheck');
-                console.log(response.data);
-                setIsAuthenticated(!!response.data); // Simplified check
+                setIsAuthenticated(!!response.data);
             } catch (error) {
                 console.error('Error checking authentication', error);
                 navigate('/signin');
             }
         };
         checkAuth();
-    }, []); // Added dependency array to prevent continuous running
+    }, [navigate]);
 
     if (isAuthenticated) {
         return (

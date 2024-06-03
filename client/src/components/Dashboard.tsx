@@ -1,30 +1,29 @@
-import api from '../services/api';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useState, useEffect } from 'react';
+import api from '../services/api'; // Ensure this has typings available or declared
 import SignoutButton from './SignoutButton';
 import { Stack, Typography, Button, Box, Paper, AppBar, Toolbar } from '@mui/material';
 import ReadinessTile from './ReadinessTile';
 import Grid from '@mui/material/Unstable_Grid2'; // Grid version 2
 import AddBoxIcon from '@mui/icons-material/AddBox';
 
-function Dashboard() {
-    const [isAuthenticated, setIsAuthenticated] = useState(null);
+const Dashboard: React.FC = () => {
+    const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
     const navigate = useNavigate();
 
     useEffect(() => {
         const checkAuth = async () => {
-        try {
-            const response = await api.get('/authcheck');
-            console.log(response.data);
-            if (response.data) { setIsAuthenticated(true); } 
-            else {  navigate('/signin'); }
-        } catch (error) {
-            console.error('Error checking authentication', error);
-            navigate('/signin');
-        }
+            try {
+                const response = await api.get('/authcheck');
+                console.log(response.data);
+                setIsAuthenticated(!!response.data); // Simplified check
+            } catch (error) {
+                console.error('Error checking authentication', error);
+                navigate('/signin');
+            }
         };
         checkAuth();
-    });
+    }, []); // Added dependency array to prevent continuous running
 
     if (isAuthenticated) {
         return (
@@ -32,18 +31,17 @@ function Dashboard() {
                 <AppBar position="static">
                     <Toolbar>
                         <Typography sx={{ flexGrow: 1 }}>Welcome to your Dashboard</Typography>
-                        <SignoutButton/>
+                        <SignoutButton />
                     </Toolbar>
                 </AppBar>
-                <Grid container spacing={2} sx={{ marginTop: 1, minHeight: '88vh'}}>
+                <Grid container spacing={2} sx={{ marginTop: 1, minHeight: '88vh' }}>
                     <Grid xs={12} md={4}>
                         <Paper elevation={2} sx={{
                             height: '100%',
                             width: '100%',
                         }}>
                             <Stack direction='column'>
-                                {/* TODO: populate FEEDBACK from database */}
-                                <Button variant='contained' startIcon={<AddBoxIcon/>} sx={{ margin: 1 }}>Log New Training Session</Button>
+                                <Button variant='contained' startIcon={<AddBoxIcon />} sx={{ margin: 1 }}>Log New Training Session</Button>
                                 <ReadinessTile>Fingers and Forearms</ReadinessTile>
                                 <ReadinessTile>Upper Body</ReadinessTile>
                                 <ReadinessTile>Lower Body</ReadinessTile>
@@ -52,17 +50,17 @@ function Dashboard() {
                     </Grid>
                     <Grid xs={12} md={4}>
                         <Paper elevation={2} sx={{
-                        height: '100%',
-                        width: '100%',
-                        overflow: 'auto'
+                            height: '100%',
+                            width: '100%',
+                            overflow: 'auto'
                         }}>
                             <Typography>TODO: populate PAST TRAINING SESSIONS from database</Typography>
                         </Paper>
                     </Grid>
                     <Grid xs={12} md={4}>
                         <Paper elevation={2} sx={{
-                        height: '100%',
-                        width: '100%',
+                            height: '100%',
+                            width: '100%',
                         }}>
                             <Typography>TODO: populate VISUALIZATIONS from database</Typography>
                         </Paper>
@@ -75,7 +73,6 @@ function Dashboard() {
     return (
         <div>
             <h1>You are not authenticated</h1>
-            {/* Optionally add a link or button to redirect to the sign-in page */}
         </div>
     );
 }

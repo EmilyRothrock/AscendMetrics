@@ -33,36 +33,26 @@ const Dashboard: React.FC = () => {
                         <SignoutButton />
                     </Toolbar>
                 </AppBar>
-                <Grid container spacing={2} sx={{ marginTop: 1, minHeight: '88vh' }}>
+                <Grid container spacing={2} sx={{ marginTop: 1, minHeight: '90vh' }}>
                     <Grid xs={12} md={4}>
-                        <Paper elevation={2} sx={{
-                            height: '100%',
-                            width: '100%',
-                        }}>
+                        <DashboardColumn>
                             <Stack direction='column'>
                                 <Button variant='contained' startIcon={<AddBoxIcon />} sx={{ margin: 1 }}>Log New Training Session</Button>
                                 <ReadinessTile>Fingers and Forearms</ReadinessTile>
                                 <ReadinessTile>Upper Body</ReadinessTile>
                                 <ReadinessTile>Lower Body</ReadinessTile>
                             </Stack>
-                        </Paper>
+                        </DashboardColumn>
                     </Grid>
                     <Grid xs={12} md={4}>
-                        <Paper elevation={2} sx={{
-                            height: '100%',
-                            width: '100%',
-                            overflow: 'auto'
-                        }}>
+                        <DashboardColumn>
                             <Typography>TODO: populate PAST TRAINING SESSIONS from database</Typography>
-                        </Paper>
+                        </DashboardColumn>
                     </Grid>
                     <Grid xs={12} md={4}>
-                        <Paper elevation={2} sx={{
-                            height: '100%',
-                            width: '100%',
-                        }}>
+                        <DashboardColumn>
                             <Typography>TODO: populate VISUALIZATIONS from database</Typography>
-                        </Paper>
+                        </DashboardColumn>
                     </Grid>
                 </Grid>
             </div>
@@ -77,3 +67,20 @@ const Dashboard: React.FC = () => {
 }
 
 export default Dashboard;
+
+
+interface DashboardColumnProps {
+    children: React.ReactNode; // Specifying that children must be a string
+}
+
+const DashboardColumn: React.FC<DashboardColumnProps> = ({children}) => {
+    return (
+        <Paper elevation={2} sx={{
+            height: '100%',
+            width: '100%',
+            overflow: 'auto'
+        }}>
+            {children}
+        </Paper>
+    );
+};

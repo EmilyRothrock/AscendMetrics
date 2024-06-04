@@ -2,12 +2,14 @@ import * as React from "react";
 import * as ReactDOM from "react-dom/client";
 import {
   createBrowserRouter,
+  Outlet,
   RouterProvider,
 } from "react-router-dom";
 import ErrorPage from "./components/ErrorPage";
 import SigninPage from './components/SigninPage';
 import SignupPage from './components/SignupPage';
 import Dashboard from './components/Dashboard';
+import ProtectedRoute from "./components/ProtectedRoute";
 // import ForgotPasswordPage from './components/ForgotPasswordPage';
 // import ResetPasswordPage from './components/ResetPasswordPage';
 // import SettingsPage from './components/SettingsPage';
@@ -17,7 +19,7 @@ import Dashboard from './components/Dashboard';
 // TODO: components house page-specific UI, processed data fetching, and display of the data
 const router = createBrowserRouter([
   {
-    path: "*",  // Catch-all route for undefined paths
+    path: "*",  // TODO: landing page
     element: <ErrorPage/>,
   },
   {
@@ -37,8 +39,18 @@ const router = createBrowserRouter([
     element: <h1>this is the reset password page</h1>,
   },
   {
-    path: "/dashboard",
-    element: <Dashboard/>,
+    path: "/",
+    element: <ProtectedRoute><Outlet /></ProtectedRoute>,
+    children: [
+      {
+        path: "dashboard",
+        element: <Dashboard/>,
+      },
+      {
+        path: "sessions",
+        element: <h1>this is the sessions page, where you can see, search, and filter your past sessions. you can click on a session to view it in detail and edit it. or you can navigate to another part of the app</h1>, // Changed to use a proper component
+      },
+    ]
   },
 ]);
 

@@ -1,4 +1,4 @@
-import { redirect } from 'react-router-dom';
+import { redirect, Navigate } from 'react-router-dom';
 import React, { useState, useEffect } from 'react';
 import api from '../services/api'; // Ensure this has typings available or declared
 
@@ -23,7 +23,7 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({children}) => {
     });
 
     if (isAuthenticated) { return children; }
-    else { redirect('/signin'); }
+    else { return <Navigate to="/signin" replace /> }
 };
 
 export default ProtectedRoute;

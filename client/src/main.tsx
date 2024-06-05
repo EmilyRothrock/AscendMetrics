@@ -12,11 +12,9 @@ import Dashboard from './components/Dashboard';
 import ProtectedRoute from "./components/ProtectedRoute";
 // import ForgotPasswordPage from './components/ForgotPasswordPage';
 // import ResetPasswordPage from './components/ResetPasswordPage';
-// import SettingsPage from './components/SettingsPage';
 
 // Houses the router for all pages. 
-// TODO: some way to confirm authentication and either redirect to log-in or allow routing to desired page.
-// TODO: components house page-specific UI, processed data fetching, and display of the data
+// TODO: loaders for data fetching
 const router = createBrowserRouter([
   {
     path: "*",  // TODO: landing page

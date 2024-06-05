@@ -6,6 +6,7 @@ import AddBoxIcon from '@mui/icons-material/AddBox';
 import TrainingSessionTile from './TrainingSessionTile';
 import { BarChart, LineChart } from '@mui/x-charts';
 import MyAppBar from './MyAppBar';
+import { useNavigate } from 'react-router-dom';
 
 const Dashboard: React.FC = () => {
     return (
@@ -15,7 +16,7 @@ const Dashboard: React.FC = () => {
                 <Grid xs={12} md={4}>
                     <DashboardColumn>
                         <Stack direction='column' width={'100%'}>
-                            <Button variant='contained' startIcon={<AddBoxIcon />} sx={{ margin: 1 }}>Log New Training Session</Button>
+                            <NewSessionButton/>
                             <ReadinessTile>Fingers and Forearms</ReadinessTile>
                             <ReadinessTile>Upper Body</ReadinessTile>
                             <ReadinessTile>Lower Body</ReadinessTile>
@@ -76,5 +77,24 @@ const DashboardColumn: React.FC<DashboardColumnProps> = ({children}) => {
         }}>
             {children}
         </Paper>
+    );
+};
+
+const NewSessionButton: React.FC = () => {
+    const navigate = useNavigate();
+
+    const handleButtonClick = () => {
+        navigate('/sessions');
+    };
+
+    return (
+        <Button 
+            variant='contained' 
+            startIcon={<AddBoxIcon />} 
+            sx={{ margin: 1 }}
+            onClick={handleButtonClick}
+        >
+            Log New Training Session
+        </Button>
     );
 };

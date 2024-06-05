@@ -10,6 +10,7 @@ import SigninPage from './components/SigninPage';
 import SignupPage from './components/SignupPage';
 import Dashboard from './components/Dashboard';
 import ProtectedRoute from "./components/ProtectedRoute";
+import TrainingSessionPage from "./components/TrainingSessionPage";
 // import ForgotPasswordPage from './components/ForgotPasswordPage';
 // import ResetPasswordPage from './components/ResetPasswordPage';
 
@@ -46,7 +47,7 @@ const router = createBrowserRouter([
       },
       {
         path: "sessions",
-        element: <h1>this is the sessions page, where you can see, search, and filter your past sessions. you can click on a session to view it in detail and edit it. or you can navigate to another part of the app</h1>, // Changed to use a proper component
+        element: <TrainingSessionPage/>,
       },
     ]
   },

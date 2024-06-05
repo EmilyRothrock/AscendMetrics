@@ -18,7 +18,7 @@ const SignoutButton: React.FC = () => {
     };
 
     return (
-        <Button variant="contained" color="secondary" onClick={handleSignout}>
+        <Button color="inherit" onClick={handleSignout} sx={{ mx:1 }}>
             Signout
         </Button>
     );

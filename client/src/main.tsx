@@ -16,6 +16,19 @@ import TrainingSessionPage from "./components/TrainingSessionPage";
 
 // Houses the router for all pages. 
 // TODO: loaders for data fetching
+import { createTheme, ThemeProvider } from '@mui/material/styles';
+
+const theme = createTheme({
+  palette: {
+    primary: {
+      main: '#3f51b5',
+    },
+    secondary: {
+      main: '#ff5722',
+    },
+  },
+});
+
 const router = createBrowserRouter([
   {
     path: "*",  // TODO: landing page
@@ -55,6 +68,8 @@ const router = createBrowserRouter([
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
-    <RouterProvider router={router} />
+    <ThemeProvider theme={theme}>
+      <RouterProvider router={router} />
+    </ThemeProvider>
   </React.StrictMode>
 );

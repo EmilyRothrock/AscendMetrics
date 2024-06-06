@@ -2,28 +2,30 @@ import React from 'react';
 import MyAppBar from './MyAppBar';
 import Box from '@mui/material/Box';
 import { DataGrid, GridColDef } from '@mui/x-data-grid';
+import NewSessionButton from './NewSessionButton';
 
 const TrainingSessionPage: React.FC = () => {
     return (
-        <>
-            <MyAppBar/>
-            <Box sx={{ height: 400, width: '100%' }}>
-                <DataGrid
-                    rows={rows}
-                    columns={columns}
-                    initialState={{
-                    pagination: {
-                        paginationModel: {
-                        pageSize: 5,
-                        },
-                    },
-                    }}
-                    pageSizeOptions={[5]}
-                    checkboxSelection
-                    disableRowSelectionOnClick
-                />
-            </Box>
-        </>
+      <>
+        <MyAppBar/>
+        <Box sx={{ height: 400, width: '100%', '& > *': { mt: 1 } }}>
+          <NewSessionButton/>
+          <DataGrid
+            rows={rows}
+            columns={columns}
+            initialState={{
+            pagination: {
+              paginationModel: {
+              pageSize: 5,
+              },
+            },
+            }}
+            pageSizeOptions={[5]}
+            checkboxSelection
+            disableRowSelectionOnClick
+          />
+        </Box>
+      </>
     );
 }
 

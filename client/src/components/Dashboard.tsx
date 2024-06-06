@@ -2,11 +2,10 @@ import React from 'react';
 import { Stack, Typography, Button, Paper } from '@mui/material';
 import ReadinessTile from './ReadinessTile';
 import Grid from '@mui/material/Unstable_Grid2'; // Grid version 2
-import AddBoxIcon from '@mui/icons-material/AddBox';
 import TrainingSessionTile from './TrainingSessionTile';
 import { BarChart, LineChart } from '@mui/x-charts';
 import MyAppBar from './MyAppBar';
-import { useNavigate } from 'react-router-dom';
+import NewSessionButton from './NewSessionButton';
 
 const Dashboard: React.FC = () => {
     return (
@@ -77,24 +76,5 @@ const DashboardColumn: React.FC<DashboardColumnProps> = ({children}) => {
         }}>
             {children}
         </Paper>
-    );
-};
-
-const NewSessionButton: React.FC = () => {
-    const navigate = useNavigate();
-
-    const handleButtonClick = () => {
-        navigate('/sessions');
-    };
-
-    return (
-        <Button 
-            variant='contained' 
-            startIcon={<AddBoxIcon />} 
-            sx={{ margin: 1 }}
-            onClick={handleButtonClick}
-        >
-            Log New Training Session
-        </Button>
     );
 };

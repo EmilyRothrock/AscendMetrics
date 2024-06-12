@@ -1,5 +1,5 @@
 import React from 'react';
-import { Stack, Typography, Paper } from '@mui/material';
+import { Stack, Typography, Box } from '@mui/material';
 import ReadinessTile from './ReadinessTile';
 import Grid from '@mui/material/Unstable_Grid2'; // Grid version 2
 import TileTrainingSession from './TileTrainingSession';
@@ -164,7 +164,7 @@ interface DashboardColumnProps {
 
 const DashboardColumn: React.FC<DashboardColumnProps> = ({children}) => {
     return (
-        <Paper elevation={2} sx={{
+        <Box sx={{
             height: '100%',
             width: '100%',
             overflow: 'auto',
@@ -173,6 +173,6 @@ const DashboardColumn: React.FC<DashboardColumnProps> = ({children}) => {
             alignItems: 'center'
         }}>
             {children}
-        </Paper>
+        </Box>
     );
 };

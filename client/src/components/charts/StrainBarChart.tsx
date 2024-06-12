@@ -1,6 +1,6 @@
-import React, { useRef, useEffect, useState } from 'react';
+import React from 'react';
 import * as d3 from 'd3';
-import { Box } from '@mui/material';
+import D3Graph from './D3Graph.tsx';
 import { Strain } from '../../types';
 
 interface StrainBarChartProps {
@@ -8,40 +8,15 @@ interface StrainBarChartProps {
 }
 
 const StrainBarChart: React.FC<StrainBarChartProps> = ({ data }) => {
-  const svgRef = useRef<SVGSVGElement>(null);
-  const [dimensions, setDimensions] = useState({ width: 200, height: 200 });
-
-  // Use useEffect to manage resizing of the bar chart
-  useEffect(() => {
-    const observeTarget = svgRef.current?.parentNode;
-    if (!observeTarget) return;
-
-    const resizeObserver = new ResizeObserver(entries => {
-      if (!entries || entries.length === 0) return;
-      const { width } = entries[0].contentRect;
-      const height = width;
-      setDimensions({ width, height });
-    });
-
-    resizeObserver.observe(observeTarget);
-
-    return () => {
-      resizeObserver.disconnect();
-    };
-  }, [svgRef]);
-
-  useEffect(() => {
-    if (!svgRef.current || data.length === 0) return;
-
+  const renderGraph = (svg: d3.Selection<SVGSVGElement, unknown, null, undefined>, dimensions: { width: number; height: number }) => {
+    const margin = { top: 0, right: 5, bottom: 20, left: 0 };
     const { width, height } = dimensions;
-    const margin = { top: 10, right: 10, bottom: 10, left: 0 };
 
     // Clear SVG contents before redrawing
-    const svg = d3.select(svgRef.current);
     svg.selectAll("*").remove();
 
     // Set SVG dimensions
-    svg
+    const g = svg
       .attr("width", width)
       .attr("height", height)
       .append("g")
@@ -58,16 +33,16 @@ const StrainBarChart: React.FC<StrainBarChartProps> = ({ data }) => {
       .padding(0.3);
 
     // Draw axes
-    svg.append("g")
+    g.append("g")
       .call(d3.axisLeft(y)); // Y-axis
 
     // Customize X-axis ticks to show every 5th label
-    svg.append("g")
+    g.append("g")
       .attr("transform", `translate(0,${height - margin.top - margin.bottom})`)
-      .call(d3.axisBottom(x).tickValues(d3.range(0, d3.max(data, d => d.strain) as number + 1, 5)));
+      .call(d3.axisBottom(x).tickValues(d3.range(5, d3.max(data, d => d.strain) as number + 1, 5)));
 
     // Draw bars
-    svg.selectAll(".bar")
+    g.selectAll(".bar")
       .data(data)
       .enter()
       .append("rect")
@@ -78,7 +53,7 @@ const StrainBarChart: React.FC<StrainBarChartProps> = ({ data }) => {
       .attr("fill", "#69b3a2");
 
     // Add labels to bars
-    svg.selectAll(".label")
+    g.selectAll(".label")
       .data(data)
       .enter()
       .append("text")
@@ -87,27 +62,11 @@ const StrainBarChart: React.FC<StrainBarChartProps> = ({ data }) => {
       .attr("x", 5) // slight offset from the start of the bar
       .attr("dy", "0.35em") // vertically center
       .attr("text-anchor", "start")
+      .style("font-size", "12px")
       .text(d => `${d.part}: ${d.strain}`);
+  };
 
-    // Add title
-    svg.append("text")
-      .attr("x", width / 2)
-      .attr("y", 20)
-      .attr("text-anchor", "middle")
-      .style("font-size", "18px")
-      .text("Strains");
-
-  }, [data, dimensions]);
-
-  return (
-    <Box sx={{
-        display: 'flex',
-        height: '100%', // Ensures the parent container has a defined height
-        width: '100%' // Ensures full width to allow resizing
-      }}>
-      <svg ref={svgRef}></svg>
-    </Box>
-  );
-}
+  return <D3Graph title="Strains" renderGraph={renderGraph} />;
+};
 
 export default StrainBarChart;

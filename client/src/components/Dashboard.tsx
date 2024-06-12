@@ -52,7 +52,7 @@ const Dashboard: React.FC = () => {
             ]
         },
         {
-          id: 1,
+          id: 2,
           dateTime: '2024-03-27T20:00:00',
           name: 'Cardio, Bouldering, Power/Strength Endurance',
           duration: 2,

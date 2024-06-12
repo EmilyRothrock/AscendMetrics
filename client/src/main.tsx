@@ -6,8 +6,8 @@ import {
   RouterProvider,
 } from "react-router-dom";
 import ErrorPage from "./components/ErrorPage";
-import SigninPage from './components/SigninPage';
-import SignupPage from './components/SignupPage';
+import SigninPage from './components/auth/SigninPage';
+import SignupPage from './components/auth/SignupPage';
 import Dashboard from './components/Dashboard';
 import ProtectedRoute from "./components/ProtectedRoute";
 import TrainingSessionPage from "./components/TrainingSessionPage";

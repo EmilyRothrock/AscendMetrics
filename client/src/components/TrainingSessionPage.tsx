@@ -8,7 +8,7 @@ const TrainingSessionPage: React.FC = () => {
     return (
       <>
         <MyAppBar/>
-        <Box sx={{ height: 400, width: '100%', '& > *': { mt: 1 } }}>
+        <Box sx={{ height:'100%', width: '100%', '& > *': { mt: 1 } }}>
           <NewSessionButton/>
           <DataGrid
             rows={rows}
@@ -29,49 +29,83 @@ const TrainingSessionPage: React.FC = () => {
     );
 }
 
-
-
-const columns: GridColDef<(typeof rows)[number]>[] = [
-  { field: 'id', headerName: 'ID', width: 90 },
+const columns: GridColDef<typeof rows[number]>[] = [
   {
-    field: 'firstName',
-    headerName: 'First name',
-    width: 150,
-    editable: true,
+    field:'id',
+    headerName:'ID',
+    width: 90,
+  },
+  { 
+    field: 'dateTime', 
+    headerName: 'Date and Time', 
+    width: 160 
   },
   {
-    field: 'lastName',
-    headerName: 'Last name',
-    width: 150,
-    editable: true,
+    field: 'name',
+    headerName: 'Name',
+    width: 120,
+    editable: false,
   },
   {
-    field: 'age',
-    headerName: 'Age',
+    field: 'notes',
+    headerName: 'Notes',
+    width: 150,
+    editable: false,
+  },
+  {
+    field: 'duration',
+    headerName: 'Duration',
     type: 'number',
     width: 110,
-    editable: true,
+    editable: false,
   },
   {
-    field: 'fullName',
-    headerName: 'Full name',
-    description: 'This column has a value getter and is not sortable.',
-    sortable: false,
+    field: 'fingerLoad',
+    headerName: 'Finger Load',
+    type: 'number',
     width: 160,
-    valueGetter: (value, row) => `${row.firstName || ''} ${row.lastName || ''}`,
+    editable: false,
   },
+  {
+    field: 'upperLoad',
+    headerName: 'Upper Load',
+    type: 'number',
+    width: 160,
+    editable: false,
+  },
+  {
+    field: 'lowerLoad',
+    headerName: 'Lower Load',
+    type: 'number',
+    width: 160,
+    editable: false,
+  },
+  {
+    field: 'fingerStrain',
+    headerName: 'Finger Strain',
+    type: 'number',
+    width: 160,
+    editable: false,
+  },
+  {
+    field: 'upperStrain',
+    headerName: 'Upper Strain',
+    type: 'number',
+    width: 160,
+    editable: false,
+  },
+  {
+    field: 'lowerStrain',
+    headerName: 'Lower Strain',
+    type: 'number',
+    width: 160,
+    editable: false,
+  }
 ];
 
 const rows = [
-  { id: 1, lastName: 'Snow', firstName: 'Jon', age: 14 },
-  { id: 2, lastName: 'Lannister', firstName: 'Cersei', age: 31 },
-  { id: 3, lastName: 'Lannister', firstName: 'Jaime', age: 31 },
-  { id: 4, lastName: 'Stark', firstName: 'Arya', age: 11 },
-  { id: 5, lastName: 'Targaryen', firstName: 'Daenerys', age: null },
-  { id: 6, lastName: 'Melisandre', firstName: null, age: 150 },
-  { id: 7, lastName: 'Clifford', firstName: 'Ferrara', age: 44 },
-  { id: 8, lastName: 'Frances', firstName: 'Rossini', age: 36 },
-  { id: 9, lastName: 'Roxie', firstName: 'Harvey', age: 65 },
+  { id:1, dateTime: '03/17/24 7:00PM', name: 'Bouldering', notes:'slab, cave', duration:2, fingerLoad:6, upperLoad:6, lowerLoad:3, fingerStrain:2, upperStrain:2, lowerStrain:1 },
+  { id:2, dateTime: '03/20/24 8:00PM', name: 'Cardio, Bouldering, Power/Strength Endurance', notes:'Biked to slaughter, felt great on the wall!', duration:2, fingerLoad:8, upperLoad:9, lowerLoad:2, fingerStrain:2, upperStrain:2, lowerStrain:1 },
 ];
 
 export default TrainingSessionPage;

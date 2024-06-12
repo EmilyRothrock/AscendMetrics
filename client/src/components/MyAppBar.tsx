@@ -15,7 +15,7 @@ const MyAppBar: React.FC = () => {
     };
 
     return (
-        <AppBar position="static" sx={{ borderRadius: 1, boxShadow: "none", background: "linear-gradient(45deg, #7e57c2 30%, #3f51b5 90%)" }}>
+        <AppBar position="static" sx={{ marginBottom:1, borderRadius: 1, boxShadow: "none", background: "linear-gradient(45deg, #7e57c2 30%, #3f51b5 90%)" }}>
             <Toolbar>
                 <Typography variant="h6" sx={{ flexGrow: 1 }}>
                     Ascend Metrics

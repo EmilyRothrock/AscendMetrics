@@ -1,5 +1,5 @@
 import React from 'react';
-import { Stack, Typography, Button, Paper } from '@mui/material';
+import { Stack, Typography, Paper } from '@mui/material';
 import ReadinessTile from './ReadinessTile';
 import Grid from '@mui/material/Unstable_Grid2'; // Grid version 2
 import TrainingSessionTile from './TrainingSessionTile';
@@ -11,7 +11,7 @@ const Dashboard: React.FC = () => {
     return (
         <div>
             <MyAppBar/>
-            <Grid container spacing={2} sx={{ marginTop: 1, minHeight: '90vh' }}>
+            <Grid container spacing={2} sx={{ minHeight: '90vh' }}>
                 <Grid xs={12} md={4}>
                     <DashboardColumn>
                         <Stack direction='column' width={'100%'}>

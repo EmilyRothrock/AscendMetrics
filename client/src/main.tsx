@@ -17,6 +17,7 @@ import TrainingSessionPage from "./components/TrainingSessionPage";
 // Houses the router for all pages. 
 // TODO: loaders for data fetching
 import { createTheme, ThemeProvider } from '@mui/material/styles';
+import NewTrainingSessionPage from "./components/NewTrainingSessionPage";
 
 const theme = createTheme({
   palette: {
@@ -62,6 +63,10 @@ const router = createBrowserRouter([
         path: "sessions",
         element: <TrainingSessionPage/>,
       },
+      {
+        path:"sessions/new",
+        element: <NewTrainingSessionPage/>
+      }
     ]
   },
 ]);

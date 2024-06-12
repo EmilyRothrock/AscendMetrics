@@ -7,7 +7,7 @@ const NewSessionButton: React.FC = () => {
     const navigate = useNavigate();
 
     const handleButtonClick = () => {
-        navigate('/sessions');
+        navigate('/sessions/new');
     };
 
     return (

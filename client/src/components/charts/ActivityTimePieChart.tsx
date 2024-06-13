@@ -79,9 +79,7 @@ const ActivityTimePieChart: React.FC<ActivityTimePieChartProps> = ({ activities 
                 const words = text.split(" ");
                 let line = "";
                 const lines: string[] = [];
-                // const maxCharsPerLine = Math.max(10, Math.floor(dimensions.width / 10)); // Adjust this divisor for fine-tuning
                 const maxCharsPerLine = 20; // Adjust this divisor for fine-tuning
-
 
                 for (let i = 0; i < words.length; i++) {
                     if (line.length + words[i].length > maxCharsPerLine) {
@@ -103,6 +101,19 @@ const ActivityTimePieChart: React.FC<ActivityTimePieChartProps> = ({ activities 
                         .attr("dy", i === 0 ? `${initialY}em` : `${lineHeight}em`)
                         .text(line);
                 });
+            } else {
+                centralText.append("tspan")
+                    .attr("x", 0)
+                    .attr("dy", "-0.6em")
+                    .style("fill", "grey")
+                    .style("font-style", "italic")
+                    .text("hover/click");
+                centralText.append("tspan")
+                .attr("x", 0)
+                .attr("dy", "1.2em")
+                .style("fill", "grey")
+                .style("font-style", "italic")
+                .text("for details");
             }
         };
 

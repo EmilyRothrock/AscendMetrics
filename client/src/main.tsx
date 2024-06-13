@@ -9,7 +9,7 @@ import ErrorPage from "./components/ErrorPage";
 import SigninPage from './components/auth/SigninPage';
 import SignupPage from './components/auth/SignupPage';
 import Dashboard from './components/Dashboard';
-import ProtectedRoute from "./components/ProtectedRoute";
+import ProtectedRoute from "./components/auth/ProtectedRoute";
 import TrainingSessionPage from "./components/TrainingSessionPage";
 // import ForgotPasswordPage from './components/ForgotPasswordPage';
 // import ResetPasswordPage from './components/ResetPasswordPage';

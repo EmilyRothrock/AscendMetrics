@@ -2,17 +2,8 @@ import { Autocomplete, TextField, Stack, Grid, Container, Menu, MenuItem, IconBu
 import React, { useState } from "react";
 import ForwardIcon from '@mui/icons-material/Forward';
 import MenuIcon from '@mui/icons-material/Menu';
-
-interface Activity {
-    name: string;
-    startTime: string;
-    endTime: string;
-    fingerIntensity: string;
-    upperIntensity: string;
-    lowerIntensity: string;
-    notes: string;
-    expanded?: boolean;
-}
+import IntensityInput from "./IntensityInput";
+import { Activity, Part } from "../types";
 
 interface ActivitiesInputProps {
     activities: Activity[];
@@ -22,6 +13,7 @@ interface ActivitiesInputProps {
 const ActivitiesInput: React.FC<ActivitiesInputProps> = ({ activities, setActivities }) => {
     const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
     const [currentActivityIndex, setCurrentActivityIndex] = useState<number | null>(null);
+    const [expandedState, setExpandedState] = useState<boolean[]>(activities.map(() => true)); // Initialize all activities as expanded
 
     const handleMenuClick = (event: React.MouseEvent<HTMLButtonElement>, index: number) => {
         setAnchorEl(event.currentTarget);
@@ -36,17 +28,14 @@ const ActivitiesInput: React.FC<ActivitiesInputProps> = ({ activities, setActivi
     const handleDelete = () => {
         if (currentActivityIndex !== null) {
             setActivities(prev => prev.filter((_, i) => i !== currentActivityIndex));
+            setExpandedState(prev => prev.filter((_, i) => i !== currentActivityIndex));
             handleClose();
         }
     };
 
-    const toggleExpand = () => {
-        if (currentActivityIndex !== null) {
-            setActivities(prev => prev.map((activity, i) => 
-                i === currentActivityIndex ? { ...activity, expanded: !activity.expanded } : activity
-            ));
-            handleClose();
-        }
+    const toggleExpand = (index: number) => {
+        setExpandedState(prev => prev.map((expanded, i) => i === index ? !expanded : expanded));
+        handleClose();
     };
 
     const updateActivityField = (index: number, field: keyof Activity, value: string) => {
@@ -64,7 +53,7 @@ const ActivitiesInput: React.FC<ActivitiesInputProps> = ({ activities, setActivi
             {activities.map((activity, index) => (
                 <Container key={index} sx={{ border: '1px solid lightgrey', borderRadius: '5px', padding: 2 }}>
                     {
-                        activity.expanded ? 
+                        expandedState[index] ? 
                         <Grid container spacing={2}>
                             <Grid item xs={10}>
                                 <Autocomplete
@@ -82,7 +71,7 @@ const ActivitiesInput: React.FC<ActivitiesInputProps> = ({ activities, setActivi
                                     onClose={handleClose}
                                 >
                                     <MenuItem onClick={handleDelete}>Delete</MenuItem>
-                                    <MenuItem onClick={toggleExpand}>{activity.expanded ? 'Show Less' : 'Show More'}</MenuItem>
+                                    <MenuItem onClick={() => toggleExpand(index)}>{expandedState[index] ? 'Show Less' : 'Show More'}</MenuItem>
                                 </Menu>
                             </Grid>
                             <Grid item xs={5}>
@@ -110,36 +99,11 @@ const ActivitiesInput: React.FC<ActivitiesInputProps> = ({ activities, setActivi
                                     InputLabelProps={{ shrink: true }}
                                 />
                             </Grid>
-                            <Grid item xs={4}>
-                                <TextField
-                                    label="Finger"
-                                    type="number"
-                                    value={activity.fingerIntensity}
-                                    onChange={(e) => updateActivityField(index, 'fingerIntensity', e.target.value)}
-                                    fullWidth
-                                    variant="standard"
-                                />
-                            </Grid>
-                            <Grid item xs={4}>
-                                <TextField
-                                    label="Upper"
-                                    type="number"
-                                    value={activity.upperIntensity}
-                                    onChange={(e) => updateActivityField(index, 'upperIntensity', e.target.value)}
-                                    fullWidth
-                                    variant="standard"
-                                />
-                            </Grid>
-                            <Grid item xs={4}>
-                                <TextField
-                                    label="Lower"
-                                    type="number"
-                                    value={activity.lowerIntensity}
-                                    onChange={(e) => updateActivityField(index, 'lowerIntensity', e.target.value)}
-                                    fullWidth
-                                    variant="standard"
-                                />
-                            </Grid>
+                            {Object.values(Part).map((part) => (
+                                <Grid item xs={4} key={part}>
+                                    <IntensityInput type={part} />
+                                </Grid>
+                            ))}
                             <Grid item xs={12}>
                                 <TextField
                                     label="Notes"
@@ -164,7 +128,7 @@ const ActivitiesInput: React.FC<ActivitiesInputProps> = ({ activities, setActivi
                                     onClose={handleClose}
                                 >
                                     <MenuItem onClick={handleDelete}>Delete</MenuItem>
-                                    <MenuItem onClick={toggleExpand}>{activity.expanded ? 'Show Less' : 'Show More'}</MenuItem>
+                                    <MenuItem onClick={() => toggleExpand(index)}>{expandedState[index] ? 'Show Less' : 'Show More'}</MenuItem>
                                 </Menu>
                             </Grid>
                         </Grid>

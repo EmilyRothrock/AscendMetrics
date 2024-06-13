@@ -1,5 +1,5 @@
 import React from 'react';
-import { Box, Paper, Typography } from '@mui/material';
+import { Divider, Paper, Typography } from '@mui/material';
 import Grid from '@mui/material/Unstable_Grid2'; // Grid version 2
 import LoadBarChart from './charts/LoadBarChart';
 import ActivityTimePieChart from './charts/ActivityTimePieChart';
@@ -16,24 +16,23 @@ const TileTrainingSession: React.FC<TileTrainingSessionProps> = ({ session }) =>
 
     return (
         <Paper elevation={2} sx={{ margin: 1, padding: 2, alignContent: 'center' }}>
-            <Box sx={{ borderBottom: '2px solid grey', mb:1 }}>
-                <Grid container>
-                    <Grid xs={2}>
-                        <EditIcon sx={{ fontSize:30}}/>
-                    </Grid>
-                    <Grid xs={8} container justifyContent="center">
-                        <Typography variant="body1" fontSize={'18px'} sx={{ textAlign: 'center' }}>{session.name}</Typography>
-                    </Grid>
-                    <Grid xs={2}>
-                    </Grid>
-                    <Grid xs={12} container justifyContent="center">
-                        <Typography variant="subtitle2" sx={{ textAlign: 'center' }}>{formattedDateTime}</Typography>
-                    </Grid>
-                    <Grid xs={12} container justifyContent="center">
-                        <Typography variant="subtitle2" sx={{ textAlign: 'center' }}>Total Duration: {session.duration} hours</Typography>
-                    </Grid>
+            <Grid container>
+                <Grid xs={2}>
+                    <EditIcon sx={{ fontSize:30}}/>
                 </Grid>
-            </Box>
+                <Grid xs={8} container justifyContent="center">
+                    <Typography variant="body1" fontSize={'18px'} sx={{ textAlign: 'center' }}>{session.name}</Typography>
+                </Grid>
+                <Grid xs={2}>
+                </Grid>
+                <Grid xs={12} container justifyContent="center">
+                    <Typography variant="subtitle2" sx={{ textAlign: 'center' }}>{formattedDateTime}</Typography>
+                </Grid>
+                <Grid xs={12} container justifyContent="center">
+                    <Typography variant="subtitle2" sx={{ textAlign: 'center' }}>Total Duration: {session.duration} hours</Typography>
+                </Grid>
+            </Grid>
+            <Divider />
             <Grid container spacing={2} >
                 <Grid xs={6}>
                     <ActivityTimePieChart activities={session.activities}/>

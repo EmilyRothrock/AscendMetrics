@@ -1,6 +1,6 @@
 import { Navigate } from 'react-router-dom';
 import React, { useState, useEffect } from 'react';
-import api from '../services/api'; // Ensure this API service is correctly set up to handle requests
+import api from '../../services/api'; // Ensure this API service is correctly set up to handle requests
 
 interface ProtectedRouteProps {
     children: React.ReactNode;

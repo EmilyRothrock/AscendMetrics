@@ -121,7 +121,7 @@ const Dashboard: React.FC = () => {
                 </Grid>
                 <Grid xs={12} md={4}>
                     <DashboardColumn>
-                        <Typography variant='h6' >PAST TRAINING SESSIONS</Typography>
+                        <Typography variant='h6' sx={{ fontSize: '20px', fontWeight: 'bold' }} >PAST TRAINING SESSIONS</Typography>
                         <Stack width={'100%'}>
                         {sessions.map(session => (
                             <TileTrainingSession key={session.id} session={session} />

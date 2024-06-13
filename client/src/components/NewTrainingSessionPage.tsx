@@ -8,42 +8,35 @@ import { DateTime } from 'luxon';
 import ActivitiesInput from './ActivitiesInput';
 import SaveIcon from '@mui/icons-material/Save';
 import { BarChart, LineChart } from '@mui/x-charts';
-
-interface Activity {
-  name: string;
-  startTime: string;
-  endTime: string;
-  fingerIntensity: string;
-  upperIntensity: string;
-  lowerIntensity: string;
-  notes: string;
-  expanded?: boolean;
-}
+import { Activity } from '../types';
 
 const NewTrainingSessionPage: React.FC = () => {
   const [sessionDate, setSessionDate] = useState<DateTime | null>(DateTime.now());
   const [sessionName, setSessionName] = useState<string>('');
   const [sessionNotes, setSessionNotes] = useState<string>('');
   const [activities, setActivities] = useState<Activity[]>([
-    { name: '', startTime: '', endTime: '', fingerIntensity: '', upperIntensity: '', lowerIntensity: '', notes: '', expanded: true }
+    { name: '', startTime: '', endTime: '', notes: '', intensities: [] }
   ]);
 
   const handleAddActivity = () => {
-    setActivities([...activities, { name: '', startTime: '', endTime: '', fingerIntensity: '', upperIntensity: '', lowerIntensity: '', notes: '', expanded: true }]);
+    setActivities([
+      ...activities,
+      { name: '', startTime: '', endTime: '', notes: '', intensities: [] }
+    ]);
   };
 
   return (
     <>
       <MyAppBar />
       <LocalizationProvider dateAdapter={AdapterLuxon}>
-        <Grid container spacing={2} >
+        <Grid container spacing={2}>
           <Grid xs={12} md={4} container spacing={2}>
             <Grid xs={12} sm={6}>
               <DatePicker
                 label="Training Date"
                 value={sessionDate}
-                onChange={setSessionDate}
-                renderInput={(params) => <TextField {...params}/>} // Ensuring the TextField is fullWidth
+                onChange={(date) => setSessionDate(date)}
+                renderInput={(params) => <TextField {...params} fullWidth />}
               />
             </Grid>
             <Grid xs={12} sm={6}>
@@ -70,10 +63,10 @@ const NewTrainingSessionPage: React.FC = () => {
               <Button onClick={handleAddActivity} variant="contained" fullWidth>Add Activity</Button>
             </Grid>
             <Grid xs={12}>
-              <SaveButton/>
+              <SaveButton />
             </Grid>
           </Grid>
-          <Grid md={8} sx={{ display: { xs:'none', md:'block' } }} direction={'column'}>
+          <Grid md={8} sx={{ display: { xs: 'none', md: 'block' } }} direction={'column'}>
             <BarChart
               xAxis={[{ scaleType: 'band', data: ['group A', 'group B', 'group C'] }]}
               series={[{ data: [4, 3, 5] }, { data: [1, 6, 3] }, { data: [2, 5, 6] }]}
@@ -93,12 +86,14 @@ const NewTrainingSessionPage: React.FC = () => {
 
 export default NewTrainingSessionPage;
 
-const SaveButton = () => {
+const SaveButton: React.FC = () => {
   const handleSave = () => {
     console.log('trying to save!');
   };
 
-  return(
-    <Button variant='contained' startIcon={<SaveIcon/>} fullWidth onClick={handleSave} sx={{ height:'100%' }}>Save</Button>
+  return (
+    <Button variant="contained" startIcon={<SaveIcon />} fullWidth onClick={handleSave} sx={{ height: '100%' }}>
+      Save
+    </Button>
   );
-}
+};

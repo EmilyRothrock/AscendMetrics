@@ -2,6 +2,7 @@ import * as React from "react";
 import * as ReactDOM from "react-dom/client";
 import {
   createBrowserRouter,
+  Navigate,
   RouterProvider,
 } from "react-router-dom";
 // import ForgotPasswordPage from './components/ForgotPasswordPage';
@@ -10,10 +11,8 @@ import {
 // Houses the router for all pages. 
 // TODO: loaders for data fetching
 import { createTheme, ThemeProvider } from '@mui/material/styles';
-import SessionPage from "./components/sessions/SessionsPage";
-import ProtectedLayout from "./components/common/ProtectedLayout";
-import ErrorPage from "./components/ErrorPage";
-import TrainingSessionPage from "./components/TrainingSessionPage";
+import SessionPage from "./components/sessionDetails/SessionsPage";
+import Layout from "./components/common/Layout";
 import ProtectedRoute from "./components/auth/ProtectedRoute";
 import SigninPage from "./components/auth/SigninPage";
 import SignupPage from "./components/auth/SignupPage";
@@ -33,7 +32,7 @@ const theme = createTheme({
 const router = createBrowserRouter([
   {
     path: "*",  // TODO: landing page
-    element: <ErrorPage/>,
+    element: <Navigate to={"/dashboard"} />,
   },
   {
     path: "/signin",
@@ -53,15 +52,15 @@ const router = createBrowserRouter([
   },
   {
     path: "/",
-    element: <ProtectedRoute><ProtectedLayout /></ProtectedRoute>,
+    element: <ProtectedRoute><Layout /></ProtectedRoute>,
     children: [
       {
         path: "dashboard",
         element: <Dashboard/>,
       },
       {
-        path: "sessions",
-        element: <TrainingSessionPage/>,
+        path: "sessions/:sessionId",
+        element: <SessionPage/>,
       },
       {
         path:"sessions/new",

@@ -4,7 +4,7 @@ import { Outlet } from 'react-router-dom';
 import MyAppBar from './MyAppBar';
 import { Box } from '@mui/material';
 
-const ProtectedLayout: React.FC = () => {
+const Layout: React.FC = () => {
   return (
     <Box>
       <MyAppBar />
@@ -15,4 +15,4 @@ const ProtectedLayout: React.FC = () => {
   );
 };
 
-export default ProtectedLayout;
+export default Layout;

@@ -6,6 +6,7 @@ import ActivityList from './ActivityList';
 import { Session } from '../../types';
 import SessionGantt from '../charts/SessionGantt';
 
+// Session creation/editing form - additional visualizations for desktop
 const SessionPage = ({ session }: { session?: Session }) => {
   const navigate = useNavigate();
   const [sessionData, setSessionData] = useState<Session>(session || {
@@ -36,7 +37,7 @@ const SessionPage = ({ session }: { session?: Session }) => {
   return (
     <Grid container spacing={1}>
       <Grid item xs={12} md={4}>
-        <Box component="form" noValidate autoComplete="off">
+        <Box component="form" noValidate autoComplete="off" >
           <Typography variant="h4">{session ? 'Edit Session' : 'New Session'}</Typography>
           <TextField
             label="Date"
@@ -46,6 +47,7 @@ const SessionPage = ({ session }: { session?: Session }) => {
             onChange={handleInputChange}
             fullWidth
             margin="normal"
+            sx={{ mt:'8px', mb:'4px' }}
           />
           <TextField
             label="Name"
@@ -54,6 +56,7 @@ const SessionPage = ({ session }: { session?: Session }) => {
             onChange={handleInputChange}
             fullWidth
             margin="normal"
+            sx={{ mt:'8px', mb:'4px' }}
           />
           <TextField
             label="Session Notes"
@@ -62,6 +65,7 @@ const SessionPage = ({ session }: { session?: Session }) => {
             onChange={handleInputChange}
             fullWidth
             margin="normal"
+            sx={{ mt:'8px', mb:'4px' }}
           />
           <ActivityList activities={sessionData.activities} setActivities={(activities) => setSessionData({ ...sessionData, activities })} />
           <Button onClick={saveSession} variant="contained" color="primary">Save</Button>

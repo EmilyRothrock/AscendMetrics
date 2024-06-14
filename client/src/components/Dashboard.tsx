@@ -7,6 +7,7 @@ import { BarChart, LineChart } from '@mui/x-charts';
 import NewSessionButton from './NewSessionButton';
 import sessions from '../assets/sessions';
 
+// Landing page after logging in - surface level information about your Readiness, Past Sessions, and Visualizations for trends in past month
 const Dashboard: React.FC = () => {
     return (
         <div>
@@ -23,7 +24,7 @@ const Dashboard: React.FC = () => {
                 </Grid>
                 <Grid xs={12} md={4}>
                     <DashboardColumn>
-                        <Typography variant='h6' sx={{ fontSize: '20px', fontWeight: 'bold' }} >PAST TRAINING SESSIONS</Typography>
+                        <Typography variant='h5' >Past Training Sessions</Typography>
                         <Stack width={'100%'}>
                         {sessions.map(session => (
                             <TileTrainingSession key={session.id} session={session} />
@@ -33,7 +34,7 @@ const Dashboard: React.FC = () => {
                 </Grid>
                 <Grid xs={12} md={4}>
                     <DashboardColumn>
-                        <Typography variant='h6' sx={{ fontSize: '20px', fontWeight: 'bold' }}>VISUALIZATIONS</Typography>
+                        <Typography variant='h5'>Visualizations</Typography>
                         <Stack width={'100%'}>
                             <BarChart
                                 xAxis={[{ scaleType: 'band', data: ['group A', 'group B', 'group C'] }]}

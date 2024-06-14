@@ -1,47 +1,80 @@
-import React from 'react';
-import { Divider, Paper, Typography } from '@mui/material';
+import React, { useState } from 'react';
+import { Card, CardContent, IconButton, Typography,  CardHeader, Box } from '@mui/material';
 import Grid from '@mui/material/Unstable_Grid2'; // Grid version 2
 import LoadBarChart from './charts/LoadBarChart';
 import ActivityTimePieChart from './charts/ActivityTimePieChart';
 import { Session } from '../types'; // adjust the path to where your types are defined
 import EditIcon from '@mui/icons-material/Edit';
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import ExpandLessIcon from '@mui/icons-material/ExpandLess';
 import { DateTime } from 'luxon';
+import { useNavigate } from 'react-router-dom';
 
-interface TileTrainingSessionProps {
-    session: Session;
-}
+const TileTrainingSession: React.FC<{ session: Session; }> = ({ session }) => {
+    const [expanded, setExpanded] = useState(false);
+    const navigate = useNavigate();
+    const formattedDateTime = DateTime.fromISO(session.date).toLocaleString(DateTime.DATETIME_MED);
 
-const TileTrainingSession: React.FC<TileTrainingSessionProps> = ({ session }) => {
-    const formattedDateTime = DateTime.fromISO(session.dateTime).toLocaleString(DateTime.DATETIME_MED);
+    const handleExpandClick = () => {
+        setExpanded(!expanded);
+    };
+
+    const handleEditClick = () => {
+        navigate(`/sessions/${session.id}`);
+    };
 
     return (
-        <Paper elevation={2} sx={{ margin: 1, padding: 2, alignContent: 'center' }}>
-            <Grid container>
-                <Grid xs={2}>
-                    <EditIcon sx={{ fontSize:30}}/>
-                </Grid>
-                <Grid xs={8} container justifyContent="center">
-                    <Typography variant="body1" fontSize={'18px'} sx={{ textAlign: 'center' }}>{session.name}</Typography>
-                </Grid>
-                <Grid xs={2}>
-                </Grid>
-                <Grid xs={12} container justifyContent="center">
-                    <Typography variant="subtitle2" sx={{ textAlign: 'center' }}>{formattedDateTime}</Typography>
-                </Grid>
-                <Grid xs={12} container justifyContent="center">
-                    <Typography variant="subtitle2" sx={{ textAlign: 'center' }}>Total Duration: {session.duration} hours</Typography>
-                </Grid>
-            </Grid>
-            <Divider />
-            <Grid container spacing={2} >
-                <Grid xs={6}>
-                    <ActivityTimePieChart activities={session.activities}/>
-                </Grid>
-                <Grid xs={6}>
-                    <LoadBarChart data={session.loads}/>
-                </Grid>
-            </Grid>
-        </Paper>
+        <Card elevation={2} sx={{ margin: 1, padding: 2, alignContent: 'center' }}>
+            <CardHeader
+                action={
+                    <Box display="flex" flexDirection="column">
+                        <IconButton onClick={handleEditClick}>
+                            <EditIcon sx={{ fontSize: 30 }} />
+                        </IconButton>
+                        <IconButton onClick={handleExpandClick}>
+                            {expanded ? <ExpandLessIcon /> : <ExpandMoreIcon />}
+                        </IconButton>
+                    </Box>
+                }
+                title={
+                    <Typography 
+                        sx={{ 
+                            overflow: 'hidden', 
+                            textOverflow: 'ellipsis', 
+                            whiteSpace: 'nowrap',
+                            width: '100%',
+                        }}
+                    >
+                        {session.name}
+                    </Typography>
+                }
+                subheader={<>
+                    <Typography variant="subtitle2" color="textSecondary">
+                        {formattedDateTime}
+                    </Typography>
+                    <Typography variant="subtitle2" color="textSecondary">
+                        Total Duration: {session.duration} hours
+                    </Typography>
+                </>}
+                sx={{ 
+                    '.MuiCardHeader-content': { 
+                        maxWidth: 'calc(100% - 30px)' // Adjust this based on icon widths
+                    } 
+                }}
+            />
+            {expanded && (
+                <CardContent>
+                    <Grid container spacing={2}>
+                        <Grid xs={12} sm={6}>
+                            <ActivityTimePieChart activities={session.activities} />
+                        </Grid>
+                        <Grid xs={12} sm={6}>
+                            <LoadBarChart data={session.loads} />
+                        </Grid>
+                    </Grid>
+                </CardContent>
+            )}
+        </Card>
     );
 };
 

@@ -63,6 +63,7 @@ const intensityMarks = {
   ],
 };
 
+// Handles the input of an intensity - with dialog for slider/tips
 const IntensityInput: React.FC<{ type: Part; value: number; onChange: (value: number) => void; }> = ({ type, value, onChange }) => {
   const [open, setOpen] = useState(false);
   const theme = useTheme();
@@ -129,6 +130,7 @@ const IntensityInput: React.FC<{ type: Part; value: number; onChange: (value: nu
   );
 };
 
+// Handles a single activity's fields
 const ActivityForm = ( {activity}: {activity: Activity} ) => {
   const [formData, setFormData] = useState<Activity>(activity);
 

@@ -5,6 +5,7 @@ import ActivityForm from './ActivityForm';
 import { Activity } from '../../types';
 import { DateTime } from 'luxon';
 
+// List of activities within session form - manages visual appearance
 const ActivityList: React.FC<{ activities: Activity[]; setActivities: (activities: Activity[]) => void; }> = ({ activities, setActivities }) => {
   const [expandedActivities, setExpandedActivities] = useState<Set<number>>(new Set());
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);

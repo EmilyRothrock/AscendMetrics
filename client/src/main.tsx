@@ -2,22 +2,22 @@ import * as React from "react";
 import * as ReactDOM from "react-dom/client";
 import {
   createBrowserRouter,
-  Outlet,
   RouterProvider,
 } from "react-router-dom";
-import ErrorPage from "./components/ErrorPage";
-import SigninPage from './components/auth/SigninPage';
-import SignupPage from './components/auth/SignupPage';
-import Dashboard from './components/Dashboard';
-import ProtectedRoute from "./components/auth/ProtectedRoute";
-import TrainingSessionPage from "./components/TrainingSessionPage";
 // import ForgotPasswordPage from './components/ForgotPasswordPage';
 // import ResetPasswordPage from './components/ResetPasswordPage';
 
 // Houses the router for all pages. 
 // TODO: loaders for data fetching
 import { createTheme, ThemeProvider } from '@mui/material/styles';
-import NewTrainingSessionPage from "./components/NewTrainingSessionPage";
+import SessionPage from "./components/sessions/SessionsPage";
+import ProtectedLayout from "./components/common/ProtectedLayout";
+import ErrorPage from "./components/ErrorPage";
+import TrainingSessionPage from "./components/TrainingSessionPage";
+import ProtectedRoute from "./components/auth/ProtectedRoute";
+import SigninPage from "./components/auth/SigninPage";
+import SignupPage from "./components/auth/SignupPage";
+import Dashboard from "./components/Dashboard";
 
 const theme = createTheme({
   palette: {
@@ -53,7 +53,7 @@ const router = createBrowserRouter([
   },
   {
     path: "/",
-    element: <ProtectedRoute><Outlet /></ProtectedRoute>,
+    element: <ProtectedRoute><ProtectedLayout /></ProtectedRoute>,
     children: [
       {
         path: "dashboard",
@@ -65,7 +65,7 @@ const router = createBrowserRouter([
       },
       {
         path:"sessions/new",
-        element: <NewTrainingSessionPage/>
+        element: <SessionPage/>
       }
     ]
   },

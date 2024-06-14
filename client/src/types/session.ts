@@ -4,7 +4,7 @@ import { Strain } from './strain';
 
 export interface Session {
     id: number;
-    dateTime: string;
+    date: string; // ISO format
     name: string;
     notes: string;
     duration: number;

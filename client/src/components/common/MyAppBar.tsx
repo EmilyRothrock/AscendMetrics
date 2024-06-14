@@ -4,7 +4,7 @@ import React from 'react';
 import DashboardIcon from '@mui/icons-material/Dashboard';
 import SessionIcon from '@mui/icons-material/EventNote'; // Example icon for "Sessions"
 import { useNavigate } from 'react-router-dom';
-import SignoutButton from './auth/SignoutButton';
+import SignoutButton from '../auth/SignoutButton';
 
 const MyAppBar: React.FC = () => {
     const navigate = useNavigate();

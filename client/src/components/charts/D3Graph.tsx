@@ -43,7 +43,7 @@ const D3Graph: React.FC<D3GraphProps> = ({ title, renderGraph }) => {
         <Typography variant="body1" component="div">
           {title}
         </Typography>
-        <svg ref={ref} style={{ width: '100%', height: '100%', aspectRatio:1 }}></svg>
+        <svg ref={ref} style={{ width: '100%', height: '100%' }}></svg>
     </Box>
   );
 };

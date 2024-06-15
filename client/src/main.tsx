@@ -54,7 +54,7 @@ const router = createBrowserRouter([
         element: <Dashboard/>,
       },
       {
-        path: "sessions/:sessionId",
+        path: "sessions/:id",
         element: <SessionPage/>,
       },
       {

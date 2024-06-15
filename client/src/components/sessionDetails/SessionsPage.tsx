@@ -1,24 +1,14 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button, TextField, Typography, Box, Grid } from '@mui/material';
-import { DateTime } from 'luxon';
 import ActivityList from './ActivityList';
-import { Session } from '../../types';
+import { Session, defaultNewSession } from '../../types';
 import SessionGantt from '../charts/SessionGantt';
 
 // Session creation/editing form - additional visualizations for desktop
 const SessionPage = ({ session }: { session?: Session }) => {
   const navigate = useNavigate();
-  const [sessionData, setSessionData] = useState<Session>(session || {
-    id: Date.now(),
-    date: DateTime.now().toISO(),
-    name: '',
-    notes: '',
-    duration: 0,
-    activities: [],
-    loads: [],
-    strains: [],
-  });
+  const [sessionData, setSessionData] = useState<Session>(session || defaultNewSession);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;

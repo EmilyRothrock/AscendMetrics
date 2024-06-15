@@ -5,10 +5,12 @@ import Grid from '@mui/material/Unstable_Grid2'; // Grid version 2
 import TileTrainingSession from './TileTrainingSession';
 import { BarChart, LineChart } from '@mui/x-charts';
 import NewSessionButton from './NewSessionButton';
-import demoData from '../assets/demoData';
+import { useData } from '../components/DataProvider';
 
 // Landing page after logging in - surface level information about your Readiness, Past Sessions, and Visualizations for trends in past month
 const Dashboard: React.FC = () => {
+    const { userDataBundle } = useData();
+
     return (
         <div>
             <Grid container spacing={2} sx={{ minHeight: '90vh' }}>
@@ -26,7 +28,7 @@ const Dashboard: React.FC = () => {
                     <DashboardColumn>
                         <Typography variant='h5' >Past Training Sessions</Typography>
                         <Stack width={'100%'}>
-                        {demoData.sessions.map(session => (
+                        {userDataBundle.sessions.map(session => (
                             <TileTrainingSession key={session.id} session={session} />
                         ))}
                         </Stack>

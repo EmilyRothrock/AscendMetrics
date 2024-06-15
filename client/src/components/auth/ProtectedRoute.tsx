@@ -1,6 +1,7 @@
 import { Navigate } from 'react-router-dom';
 import React, { useState, useEffect } from 'react';
 import api from '../../services/api'; // Ensure this API service is correctly set up to handle requests
+import { DataProvider } from '../DataProvider';
 
 interface ProtectedRouteProps {
     children: React.ReactNode;
@@ -34,7 +35,8 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
     }
 
     // Render children if authenticated
-    return <>{children}</>;
+    // return <>{children}</>;
+    return <DataProvider>{children}</DataProvider>;
 };
 
 export default ProtectedRoute;

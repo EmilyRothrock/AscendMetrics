@@ -13,7 +13,7 @@ import {
 
 } from '@mui/material';
 import { DateTime } from 'luxon';
-import { Activity, Part } from '../../types';
+import { Activity, BodyPartMetrics } from '../../types';
 import ForwardIcon from '@mui/icons-material/Forward';
 
 
@@ -22,7 +22,7 @@ const activityOptions = [
 ];
 
 const intensityMarks = {
-  [Part.Fingers]: [
+  fingers: [
     { value: 0, label: 'Tip for Fingers 0' },
     { value: 1, label: 'Tip for Fingers 1' },
     { value: 2, label: 'Tip for Fingers 2' },
@@ -35,7 +35,7 @@ const intensityMarks = {
     { value: 9, label: 'Tip for Fingers 9' },
     { value: 10, label: 'Tip for Fingers 10' },
   ],
-  [Part.UpperBody]: [
+  upperBody: [
     { value: 0, label: 'Tip for Upper 0' },
     { value: 1, label: 'Tip for Upper 1' },
     { value: 2, label: 'Tip for Upper 2' },
@@ -48,7 +48,7 @@ const intensityMarks = {
     { value: 9, label: 'Tip for Upper 9' },
     { value: 10, label: 'Tip for Upper 10' },
   ],
-  [Part.LowerBody]: [
+  lowerBody: [
     { value: 0, label: 'Tip for Lower 0' },
     { value: 1, label: 'Tip for Lower 1' },
     { value: 2, label: 'Tip for Lower 2' },
@@ -64,7 +64,7 @@ const intensityMarks = {
 };
 
 // Handles the input of an intensity - with dialog for slider/tips
-const IntensityInput: React.FC<{ type: Part; value: number; onChange: (value: number) => void; }> = ({ type, value, onChange }) => {
+const IntensityInput: React.FC<{ bodyPart: keyof BodyPartMetrics ; value: number; onChange: (value: number) => void; }> = ({ bodyPart, value, onChange }) => {
   const [open, setOpen] = useState(false);
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
@@ -84,7 +84,7 @@ const IntensityInput: React.FC<{ type: Part; value: number; onChange: (value: nu
   return (
     <>
       <TextField
-        label={type}
+        label={bodyPart}
         type="number"
         fullWidth
         variant="standard"
@@ -118,7 +118,7 @@ const IntensityInput: React.FC<{ type: Part; value: number; onChange: (value: nu
             max={10}
             step={1}
             onChange={handleSliderChange}
-            marks={intensityMarks[type]}
+            marks={intensityMarks[bodyPart]}
             sx={{ width: "10px" }}
           />
         </DialogContent>
@@ -139,12 +139,12 @@ const ActivityForm = ( {activity}: {activity: Activity} ) => {
     setFormData({ ...formData, [name]: value });
   };
 
-  const handleIntensityChange = (part: string, value: number) => {
+  const handleIntensityChange = (bodyPart: keyof BodyPartMetrics, value: number) => {
     setFormData({
       ...formData,
       intensities: {
         ...formData.intensities,
-        [part]: value,
+        [bodyPart]: value,
       },
     });
   };
@@ -191,17 +191,17 @@ const ActivityForm = ( {activity}: {activity: Activity} ) => {
       />
       <Box display="flex" justifyContent="space-between">
         <IntensityInput
-          type={Part.Fingers}
+          bodyPart={"fingers"}
           value={formData.intensities.fingers}
           onChange={(value) => handleIntensityChange("fingers", value)}
         />
         <IntensityInput
-          type={Part.UpperBody}
+          bodyPart={"upperBody"}
           value={formData.intensities.upperBody}
           onChange={(value) => handleIntensityChange("upperBody", value)}
         />
         <IntensityInput
-          type={Part.LowerBody}
+          bodyPart={"lowerBody"}
           value={formData.intensities.lowerBody}
           onChange={(value) => handleIntensityChange("lowerBody", value)}
         />

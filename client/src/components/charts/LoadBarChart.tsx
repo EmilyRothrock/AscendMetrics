@@ -1,13 +1,9 @@
 import React from 'react';
 import * as d3 from 'd3';
 import D3Graph from './D3Graph.tsx';
-import { Load } from '../../types';
+import { BodyPartMetrics } from '../../types';
 
-interface LoadBarChartProps {
-  data: Load[];
-}
-
-const LoadBarChart: React.FC<LoadBarChartProps> = ({ data }) => {
+const LoadBarChart: React.FC<{ data: BodyPartMetrics; }> = ({ data }) => {
   const renderGraph = (svg: d3.Selection<SVGSVGElement, unknown, null, undefined>, dimensions: { width: number; height: number }) => {
     const margin = { top: 0, right: 5, bottom: 20, left: 0 };
     const { width, height } = dimensions;
@@ -22,14 +18,17 @@ const LoadBarChart: React.FC<LoadBarChartProps> = ({ data }) => {
       .append("g")
       .attr("transform", `translate(${margin.left},${margin.top})`);
 
+    // Convert BodyPartMetrics to array for D3
+    const metricsArray = Object.entries(data).map(([part, load]) => ({ part, load }));
+
     // Set up scales
     const x = d3.scaleLinear()
-      .domain([0, d3.max(data, d => d.load) as number])
+      .domain([0, d3.max(metricsArray, d => d.load) as number])
       .range([0, width - margin.left - margin.right]);
 
     const y = d3.scaleBand()
       .range([0, height - margin.top - margin.bottom])
-      .domain(data.map(d => d.part))
+      .domain(metricsArray.map(d => d.part))
       .padding(0.3);
 
     // Draw axes
@@ -39,11 +38,11 @@ const LoadBarChart: React.FC<LoadBarChartProps> = ({ data }) => {
     // Customize X-axis ticks to show every 5th label
     g.append("g")
       .attr("transform", `translate(0,${height - margin.top - margin.bottom})`)
-      .call(d3.axisBottom(x).tickValues(d3.range(5, d3.max(data, d => d.load) as number + 1, 5)));
+      .call(d3.axisBottom(x).tickValues(d3.range(5, d3.max(metricsArray, d => d.load) as number + 1, 5)));
 
     // Draw bars
     g.selectAll(".bar")
-      .data(data)
+      .data(metricsArray)
       .enter()
       .append("rect")
       .attr("class", "bar")
@@ -54,7 +53,7 @@ const LoadBarChart: React.FC<LoadBarChartProps> = ({ data }) => {
 
     // Add labels to bars
     g.selectAll(".label")
-      .data(data)
+      .data(metricsArray)
       .enter()
       .append("text")
       .attr("class", "label")

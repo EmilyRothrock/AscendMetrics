@@ -5,11 +5,6 @@ import {
   Navigate,
   RouterProvider,
 } from "react-router-dom";
-// import ForgotPasswordPage from './components/ForgotPasswordPage';
-// import ResetPasswordPage from './components/ResetPasswordPage';
-
-// Houses the router for all pages. 
-// TODO: loaders for data fetching
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import SessionPage from "./components/sessionDetails/SessionsPage";
 import Layout from "./components/common/Layout";
@@ -31,7 +26,7 @@ const theme = createTheme({
 
 const router = createBrowserRouter([
   {
-    path: "*",  // TODO: landing page
+    path: "*",
     element: <Navigate to={"/dashboard"} />,
   },
   {

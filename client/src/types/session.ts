@@ -1,14 +1,12 @@
 import { Activity } from './activity';
-import { Load } from './load';
-import { Strain } from './strain';
+import { BodyPartMetrics } from './bodyPartMetrics';
 
 export interface Session {
     id: number;
     date: string; // ISO format
     name: string;
-    notes: string;
-    duration: number;
+    notes?: string;
+    duration: number; // hours
     activities: Activity[];
-    loads: Load[];
-    strains: Strain[];
+    loads: BodyPartMetrics;
 }

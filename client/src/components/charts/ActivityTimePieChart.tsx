@@ -1,23 +1,18 @@
 import React, { useState } from 'react';
 import * as d3 from 'd3';
-import { Activity, getActivityDuration } from '../../types';
-import D3Graph from './D3Graph.tsx';
+import { Activity } from '../../types';
+import D3Graph from './D3Graph';
 
-interface ActivityTimePieChartProps {
-    activities: Activity[];
-}
-
-const ActivityTimePieChart: React.FC<ActivityTimePieChartProps> = ({ activities }) => {
+const ActivityTimePieChart: React.FC<{ activities: Activity[]; }> = ({ activities }) => {
     const [selectedActivity, setSelectedActivity] = useState<{ activity: string, totalDuration: number } | null>(null);
 
     // Prepare data
     const data: { activity: string, totalDuration: number }[] = activities.reduce((acc, activity) => {
-        const duration = getActivityDuration(activity);
         const existing = acc.find(a => a.activity === activity.name);
         if (existing) {
-            existing.totalDuration += duration;
+            existing.totalDuration += activity.duration;
         } else {
-            acc.push({ activity: activity.name, totalDuration: duration });
+            acc.push({ activity: activity.name, totalDuration: activity.duration });
         }
         return acc;
     }, [] as { activity: string, totalDuration: number }[]);
@@ -75,7 +70,7 @@ const ActivityTimePieChart: React.FC<ActivityTimePieChartProps> = ({ activities 
         const updateCentralText = (data: { activity: string, totalDuration: number } | null) => {
             centralText.selectAll("tspan").remove();
             if (data) {
-                const text = `${data.activity}: ${data.totalDuration}`;
+                const text = `${data.activity}: ${data.totalDuration} min.`;
                 const words = text.split(" ");
                 let line = "";
                 const lines: string[] = [];

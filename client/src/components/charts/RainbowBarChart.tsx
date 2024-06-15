@@ -1,18 +1,5 @@
-import React from 'react';
-import * as d3 from 'd3';
-import D3Graph from './D3Graph.tsx';
-import { Load } from '../../types';
-
-interface RainbowBarChartProps {
-  data: Load[];
-}
-
-const RainbowBarChart: React.FC<RainbowBarChartProps> = ({ data }) => {
-  const renderGraph = (svg: d3.Selection<SVGSVGElement, unknown, null, undefined>, dimensions: { width: number; height: number }) => {
-    
-  };
-
-  return <D3Graph title="Loads" renderGraph={renderGraph} />;
-};
-
-export default RainbowBarChart;
+// Displays weekly trends of training time and intensity
+// each week has a bar, height equal to total time logged that week
+// each bar is a stack of segments for each intensity 1 to 10 which are color coded - each segment's height is the time spent at that intensity that week
+// an average intensity line overlaps the weeks
+// users can click to see the same information but for different parts - fingers, upper, lower, or average

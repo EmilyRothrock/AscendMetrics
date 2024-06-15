@@ -72,7 +72,27 @@ const ActivityList: React.FC<{ activities: Activity[]; setActivities: (activitie
           )}
         </Box>
       ))}
-      <Button onClick={() => setActivities([...activities, { id: Date.now(), name: '', startTime: DateTime.now().toISO(), endTime: DateTime.now().toISO(), notes: '', intensities: { fingers: 0, upperBody: 0, lowerBody: 0 } }])}>
+      <Button onClick={() => setActivities([
+        ...activities,
+        {
+          id: Date.now(), // unique identifier based on the current timestamp
+          name: '', // empty name to be filled out
+          startTime: DateTime.now().toISO(), // current date and time in ISO format
+          endTime: DateTime.now().toISO(), // current date and time in ISO format, can be adjusted later
+          notes: '', // empty notes
+          duration: 0, // default duration set to 0, to be updated
+          intensities: {
+            fingers: 0,
+            upperBody: 0,
+            lowerBody: 0
+          },
+          loads: {
+            fingers: 0, // default load for fingers
+            upperBody: 0, // default load for upper body
+            lowerBody: 0 // default load for lower body
+          }
+        }
+      ])}>
         Add Activity
       </Button>
     </Box>

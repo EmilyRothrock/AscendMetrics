@@ -1,12 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { Button, TextField, Typography, Box, Grid, FormHelperText, ButtonGroup, Divider } from '@mui/material';
+import { Button, TextField, Typography, Box, Grid, FormHelperText, ButtonGroup } from '@mui/material';
 import { DateTime } from 'luxon';
 import { useSelector } from 'react-redux';
 import { RootState } from '../../store/store';
 import ActivityList from './ActivityList';
 import WarningDialog from './WarningDialog';
 import { Activity, Session, defaultNewSession } from '../../types';
+import { deleteSession as apiDeleteSession, createSession, updateSession } from '../../services/sessionService';
 
 const SessionPage = () => {
   const { id } = useParams();
@@ -45,10 +46,10 @@ const SessionPage = () => {
     const newErrors: { [key: string]: string } = {};
     const newWarnings: string[] = [];
 
-    if (!sessionData.date) {
+    if (!sessionData.completedOn) {
       newErrors.date = 'Session date is required';
     } else {
-      const sessionDate = DateTime.fromISO(sessionData.date);
+      const sessionDate = DateTime.fromISO(sessionData.completedOn);
       if (sessionDate > DateTime.now()) {
         newErrors.date = 'Date cannot exceed today';
       } else {
@@ -106,13 +107,29 @@ const SessionPage = () => {
 
   useEffect(() => {
     if (saveConfirmed) {
-      // Save session logic
-      // send the session to DB - get ids back
-      // dispatch session to Redux w/ new ids
-      setSaveConfirmed(false);
-      navigate('/dashboard');
+      const saveSession = async () => {
+        try {
+          if (sessionData.id < 0) {
+            const createdSession = await createSession(sessionData);
+            console.log(createdSession);
+            // dispatch(addSession(createdSession));
+          } else {
+            const updatedSession = await updateSession(sessionData.id, sessionData);
+            console.log(updatedSession);
+            // dispatch(updateSessionInStore(updatedSession));
+          }
+          navigate('/dashboard');
+        } catch (error) {
+          console.error('Error saving session:', error);
+          // Handle error, e.g., show an error message
+        } finally {
+          setSaveConfirmed(false);
+        }
+      };
+
+      saveSession();
     }
-  }, [saveConfirmed, navigate, sessionData]);
+  }, [saveConfirmed, sessionData, navigate]);
 
   const saveSession = () => {
     setErrors({});
@@ -128,7 +145,8 @@ const SessionPage = () => {
   };
 
   const deleteSession = () => {
-    // Delete session logic
+    // TODO: confirmation!
+    apiDeleteSession(Number(id));
     navigate(-1);
   };
 
@@ -146,7 +164,7 @@ const SessionPage = () => {
               label="Date"
               name="date"
               type="date"
-              value={DateTime.fromISO(sessionData.date).toFormat('yyyy-MM-dd')}
+              value={DateTime.fromISO(sessionData.completedOn).toFormat('yyyy-MM-dd')}
               onChange={handleInputChange}
               fullWidth
               margin="normal"

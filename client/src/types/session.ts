@@ -4,7 +4,7 @@ import { BodyPartMetrics } from './bodyPartMetrics';
 
 export interface Session {
     id: number;
-    date: string; // ISO format
+    completedOn: string; // ISO format
     name?: string;
     notes?: string;
     duration: number; // hours
@@ -20,7 +20,7 @@ export interface Session {
  */
 export const defaultNewSession = (): Session => ({
     id: -Number(DateTime.now()),                 // A temporary ID that cannot conflict with database given IDs
-    date: DateTime.now().toISO(),              // Current date and time in ISO format
+    completedOn: DateTime.now().toISO(),              // Current date and time in ISO format
     name: '',                                  // Default empty name
     notes: '',                                 // Default empty notes
     duration: 0,                               // Default duration of zero

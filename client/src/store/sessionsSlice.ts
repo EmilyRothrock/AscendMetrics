@@ -10,7 +10,7 @@ const initialState: SessionsState = {
   sessions: [
     {
       id: 1,
-      date: '2024-03-17T19:00:00', // ISO format
+      completedOn: '2024-03-17T19:00:00', // ISO format
       name: 'Bouldering',
       duration: 2,
       notes: 'slab, cave',
@@ -60,7 +60,7 @@ const initialState: SessionsState = {
     },
     {
       id: 2,
-      date: '2024-03-27T20:00:00', // ISO format
+      completedOn: '2024-03-27T20:00:00', // ISO format
       name: 'Cardio, Bouldering, Power/Strength Endurance',
       duration: 2,
       notes: 'At Slaughter Recreation Center',

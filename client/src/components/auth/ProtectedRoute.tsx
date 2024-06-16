@@ -1,40 +1,24 @@
 import { Navigate } from 'react-router-dom';
 import React, { useState, useEffect } from 'react';
-import api from '../../services/api'; // Ensure this API service is correctly set up to handle requests
+import { checkAuthentication } from '../../services/authService';
 
-interface ProtectedRouteProps {
-    children: React.ReactNode;
-}
-
-const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
+const ProtectedRoute: React.FC<{ children: React.ReactNode; }> = ({ children }) => {
     const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null); // null initially to indicate loading state
 
     useEffect(() => {
-        async function checkAuthentication() {
-            try {
-                const response = await api.get('/auth/check');
-                setIsAuthenticated(response.data); // Assume response.data directly gives a boolean for authentication status
-            } catch (error) {
-                console.error('Error checking authentication:', error);
-                setIsAuthenticated(false); // Assume not authenticated if there's an error
-            }
+        async function checkAuth() {
+            const authStatus = await checkAuthentication();
+            setIsAuthenticated(authStatus);
         }
 
-        checkAuthentication();
+        checkAuth();
     }, []); // Empty dependency array ensures this runs only once after the component mounts
 
-    // Handling the initial loading state
     if (isAuthenticated === null) {
-        return null; // Optionally, replace with a loading spinner or similar indicator
+        return <div>Loading...</div>;
     }
 
-    // Navigate to signin if not authenticated
-    if (!isAuthenticated) {
-        return <Navigate to="/auth/signin" replace />;
-    }
-
-    // Render children if authenticated
-    return <>{children}</>;
+    return isAuthenticated ? <>{children}</> : <Navigate to="/signin" />;
 };
 
 export default ProtectedRoute;

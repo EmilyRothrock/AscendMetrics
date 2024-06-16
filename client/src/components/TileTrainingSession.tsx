@@ -13,7 +13,7 @@ import { useNavigate } from 'react-router-dom';
 const TileTrainingSession: React.FC<{ session: Session; }> = ({ session }) => {
     const [expanded, setExpanded] = useState(false);
     const navigate = useNavigate();
-    const formattedDateTime = DateTime.fromISO(session.date).toLocaleString(DateTime.DATETIME_MED);
+    const formattedDateTime = DateTime.fromISO(session.completedOn).toLocaleString(DateTime.DATETIME_MED);
 
     const handleExpandClick = () => {
         setExpanded(!expanded);

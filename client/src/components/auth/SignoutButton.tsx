@@ -1,14 +1,14 @@
 import React from 'react';
 import Button from '@mui/material/Button';
-import api from '../../services/api';
 import { useNavigate } from 'react-router-dom';
+import { signout } from '../../services/authService';
 
 const SignoutButton: React.FC = () => {
     const navigate = useNavigate();
 
     const handleSignout = async () => {
         try {
-            await api.post('/auth/signout');
+            await signout();
             navigate('/signin');
         } catch (error) {
             console.error('Signout failed', error);

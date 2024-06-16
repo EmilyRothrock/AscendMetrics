@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import api from '../../services/api';
 import Avatar from '@mui/material/Avatar';
 import Button from '@mui/material/Button';
 import CssBaseline from '@mui/material/CssBaseline';
@@ -11,43 +10,26 @@ import Alert from '@mui/material/Alert';
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
+import { signup } from '../../services/authService';
 
 export default function SignUp() {
     const [alert, setAlert] = useState({ visible: false, severity: 'success', message: '' });
-    // TODO: fix issues with severity and alert component... stupid TS
 
-    // TODO: consider refactoring this function's redundancies with SINGIN to a helper...
-    const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+    const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
         const data = new FormData(event.currentTarget);
-        api.post('/auth/signup', { 
-            firstName: data.get('firstName'),
-            lastName: data.get('lastName'),
-            email: data.get('email'), 
-            password: data.get('password') 
-        })
-        .then(function (response) {
-            setAlert({
-                visible: true,
-                severity: response.data.severity,
-                message: response.data.message
-            });
-        })
-        .catch(function (error) {
-            if (error.response && error.response.data && error.response.data.message) {
-                setAlert({
-                    visible: true,
-                    severity: 'error',
-                    message: error.response.data.message
-                });
-            } else {
-                setAlert({
-                    visible: true,
-                    severity: 'error',
-                    message: 'An unexpected error occurred. Please try again later.'
-                });
-            }
-        });
+
+        try {
+            const response = await signup(
+                data.get('firstName') as string,
+                data.get('lastName') as string,
+                data.get('email') as string,
+                data.get('password') as string
+            );
+            setAlert({ visible: true, severity: 'success', message: response.message });
+        } catch (error) {
+            setAlert({ visible: true, severity: 'error', message: error });
+        }
     };
 
   return (

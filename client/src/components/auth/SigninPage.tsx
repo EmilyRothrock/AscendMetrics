@@ -13,7 +13,7 @@ import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
 import { useNavigate } from 'react-router-dom';
-import api from '../../services/api';
+import { signin } from '../../services/authService';
 
 const SigninPage = () => {
   const [alert, setAlert] = useState({ visible: false, severity: 'success', message: '' });
@@ -22,34 +22,15 @@ const SigninPage = () => {
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     const data = new FormData(event.currentTarget);
-    api.post('/auth/signin', { 
-      email: data.get('email'), 
-      password: data.get('password') 
-    })
-    .then(function (response) {
-      setAlert({
-        visible: true,
-        severity: response.data.severity,
-        message: response.data.message
-      });
-      navigate('/dashboard');
-    })
-    .catch(function (error) {
-      if (error.response && error.response.data && error.response.data.message) { // TODO: better error handling
-        setAlert({
-          visible: true,
-          severity: 'error',
-          message: error.response.data.message
-        });
-      } else {
-        setAlert({
-          visible: true,
-          severity: 'error',
-          message: 'An unexpected error occurred. Please try again later.'
-        });
-      }
-    });
-};
+
+    try {
+        const response = await signin(data.get('email') as string, data.get('password') as string);
+        setAlert({ visible: true, severity: 'success', message: response.message });
+        navigate('/dashboard');
+    } catch (error) {
+        setAlert({ visible: true, severity: 'error', message: error });
+    }
+  };
 
   return (
     <Container component="main" maxWidth="xs">

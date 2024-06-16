@@ -25,15 +25,31 @@ const verifySessionOwnership = async (sessionId, userId) => {
  */
 const createActivities = async (activities, sessionId, transaction) => {
     return await Promise.all(activities.map(async activity => {
-        const { note, start, end, fingerIntensity, upperIntensity, lowerIntensity } = activity;
-        return await db.SessionActivity.create({
+        const { name, note, startTime, endTime, intensities } = activity;
+        const { fingers, upperBody, lowerBody } = intensities;
+
+        // Ensure start and end are valid date strings
+        const sqlStartTime = DateTime.fromISO(startTime).toSQL({ includeOffset: false });
+        const sqlEndTime = DateTime.fromISO(endTime).toSQL({ includeOffset: false });
+
+        // Fetch the activity from the database based on the name
+        const dbActivity = await db.Activity.findOne({ where: { name }, transaction });
+
+        if (!dbActivity) {
+            throw new Error(`Activity with name ${name} not found`);
+        }
+
+        // Set the ActivityId to the ID of the fetched activity
+        const activityId = dbActivity.id;
+         return await db.SessionActivity.create({
+            ActivityId: activityId,
             TrainingSessionId: sessionId,
             note,
-            start,
-            end,
-            fingerIntensity,
-            upperIntensity,
-            lowerIntensity
+            startTime: sqlStartTime,
+            endTime: sqlEndTime,
+            fingerIntensity: fingers,
+            upperIntensity: upperBody,
+            lowerIntensity: lowerBody
         }, { transaction });
     }));
 };
@@ -47,14 +63,20 @@ const createActivities = async (activities, sessionId, transaction) => {
  */
 const updateOrCreateActivities = async (activities, sessionId, transaction) => {
     return await Promise.all(activities.map(async activity => {
-        const { id, note, start, end, fingerIntensity, upperIntensity, lowerIntensity } = activity;
+        const { name, note, startTime, endTime, intensities } = activity;
+        const { fingers, upperBody, lowerBody } = intensities;
+
+        // Ensure start and end are valid date strings
+        const sqlStartTime = DateTime.fromISO(startTime).toSQL({ includeOffset: false });
+        const sqlEndTime = DateTime.fromISO(endTime).toSQL({ includeOffset: false });
+
         if (id < 0) {
             // Create new activity
             return await db.SessionActivity.create({
                 TrainingSessionId: sessionId,
                 note,
-                start,
-                end,
+                startTime: sqlStartTime,
+                endTime: sqlEndTime,
                 fingerIntensity,
                 upperIntensity,
                 lowerIntensity
@@ -65,8 +87,8 @@ const updateOrCreateActivities = async (activities, sessionId, transaction) => {
             if (existingActivity && existingActivity.TrainingSessionId === sessionId) {
                 return await existingActivity.update({
                     note,
-                    start,
-                    end,
+                    startTime,
+                    endTime,
                     fingerIntensity,
                     upperIntensity,
                     lowerIntensity
@@ -198,6 +220,15 @@ const getSessions = async (req, res) => {
 const createSession = async (req, res) => {
     const newSession = req.body;
     const userId = req.user.id;
+    console.log("Logging Request: ", {
+        method: req.method,
+        url: req.url,
+        headers: req.headers,
+        body: req.body,
+        activities: req.body.activities,
+        params: req.params,
+        query: req.query,
+    });
 
     const { completedOn, name, note, activities } = newSession;
 

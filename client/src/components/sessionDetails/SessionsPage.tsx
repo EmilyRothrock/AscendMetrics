@@ -3,14 +3,14 @@ import { useNavigate } from 'react-router-dom';
 import { Button, TextField, Typography, Box, Grid } from '@mui/material';
 import ActivityList from './ActivityList';
 import { Session, defaultNewSession } from '../../types';
-import SessionGantt from '../charts/SessionGantt';
-import { useData } from '../DataProvider';
 import { useParams } from 'react-router-dom';
 import { DateTime } from 'luxon';
+import { RootState } from '../../store/store'; 
+import { useSelector } from 'react-redux';
 
 const SessionPage = () => {
   const { id } = useParams(); // Get the session ID from URL
-  const { userDataBundle } = useData(); 
+  const sessions = useSelector((state: RootState) => state.sessions.sessions);
 
   const navigate = useNavigate();
   const [sessionData, setSessionData] = useState<Session>(defaultNewSession());
@@ -20,11 +20,10 @@ const SessionPage = () => {
       setSessionData(defaultNewSession());
     } else {
       const numericId = Number(id);
-      console.log(userDataBundle.sessions);
-      const session = userDataBundle.sessions.find(s => s.id === numericId);
+      const session = sessions.find(s => s.id === numericId); // TODO: find with loader to reduce runtime
       setSessionData(session);
     }
-  }, [id, userDataBundle.sessions]);
+  }, [id, sessions]);
   
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;

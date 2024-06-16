@@ -5,11 +5,13 @@ import Grid from '@mui/material/Unstable_Grid2'; // Grid version 2
 import TileTrainingSession from './TileTrainingSession';
 import { BarChart, LineChart } from '@mui/x-charts';
 import NewSessionButton from './NewSessionButton';
-import { useData } from '../components/DataProvider';
+import { RootState } from '../store/store'; 
+import { Session } from '../types';
+import { useSelector } from 'react-redux';
 
 // Landing page after logging in - surface level information about your Readiness, Past Sessions, and Visualizations for trends in past month
 const Dashboard: React.FC = () => {
-    const { userDataBundle } = useData();
+    const sessions = useSelector((state: RootState) => state.sessions.sessions);
 
     return (
         <div>
@@ -28,7 +30,7 @@ const Dashboard: React.FC = () => {
                     <DashboardColumn>
                         <Typography variant='h5' >Past Training Sessions</Typography>
                         <Stack width={'100%'}>
-                        {userDataBundle.sessions.map(session => (
+                        {sessions.map((session: Session) => (
                             <TileTrainingSession key={session.id} session={session} />
                         ))}
                         </Stack>

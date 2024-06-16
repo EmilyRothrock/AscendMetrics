@@ -12,6 +12,8 @@ import ProtectedRoute from "./components/auth/ProtectedRoute";
 import SigninPage from "./components/auth/SigninPage";
 import SignupPage from "./components/auth/SignupPage";
 import Dashboard from "./components/Dashboard";
+import { Provider } from "react-redux";
+import store from './store/store';
 
 const theme = createTheme({
   palette: {
@@ -57,18 +59,16 @@ const router = createBrowserRouter([
         path: "sessions/:id",
         element: <SessionPage/>,
       },
-      {
-        path:"sessions/new",
-        element: <SessionPage/>
-      }
     ]
   },
 ]);
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
-    <ThemeProvider theme={theme}>
-      <RouterProvider router={router} />
-    </ThemeProvider>
+    <Provider store={store}>
+      <ThemeProvider theme={theme}>
+        <RouterProvider router={router} />
+      </ThemeProvider>
+    </Provider>
   </React.StrictMode>
 );

@@ -6,7 +6,7 @@ const app = express();
 const port = 3000;
 const config = require('./config/config.json').development; // TODO: make this adapt to environment
 const SequelizeStore = require('connect-session-sequelize')(session.Store);
-const db = require('./db/models/database');
+const db = require('./db/database');
 
 // Global middlewares that run on every request
 // TODO: move to config? CORS Configuration

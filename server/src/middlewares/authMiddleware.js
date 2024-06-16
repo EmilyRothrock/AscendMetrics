@@ -1,7 +1,7 @@
 const { genPassword, validatePassword } = require('./authUtils');
 const passport = require('passport');
 require('./localStrategy');
-const db = require('../db/models/database');
+const db = require('../db/database');
 
 async function handleSignin(req, res, next) {
   passport.authenticate('local', (err, user, info) => {

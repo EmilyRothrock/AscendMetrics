@@ -5,15 +5,7 @@ const auth = require('../middlewares/authMiddleware');
 authRouter.post('/signin', auth.handleSignin);
 authRouter.post('/signup', auth.handleSignup);
 
-authRouter.post('/signout', (req, res) => {
-  req.logout((err) => {
-    if (err) { return res.status(500).send('Error logging out'); }
-    req.session.destroy((err) => {
-      if (err) { return res.status(500).send('Error destroying session'); }
-      res.sendStatus(204); // 204 No Content
-    });
-  });
-});
+authRouter.post('/signout', auth.handleSignout);
 
 authRouter.get('/authCheck', (req, res) => {
   const isAuth = req.isAuthenticated();

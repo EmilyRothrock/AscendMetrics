@@ -39,6 +39,16 @@ async function handleSignup(req, res, next) {
   }
 }
 
+async function handleSignout(req,res,next) {
+    req.logout((err) => {
+      if (err) { return res.status(500).send('Error logging out'); }
+      req.session.destroy((err) => {
+        if (err) { return res.status(500).send('Error destroying session'); }
+        res.sendStatus(204); // 204 No Content
+      });
+    });
+}
+
 module.exports = {
   handleSignin,
   handleSignup

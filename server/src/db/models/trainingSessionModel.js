@@ -8,13 +8,17 @@ module.exports = (sequelize, DataTypes) => {
       autoIncrement: true,
       allowNull: false
     },
-    note: {
-      type: DataTypes.TEXT,
-      allowNull: true
-    },
     completedOn: {
       type: DataTypes.DATEONLY,
       allowNull: false
+    },
+    name: {
+      type: DataTypes.TEXT('tiny'),
+      allowNull: true
+    },
+    note: {
+      type: DataTypes.TEXT,
+      allowNull: true
     },
   }, {
     // optional: if you want to disable timestamp fields (createdAt, updatedAt)

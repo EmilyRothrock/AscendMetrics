@@ -4,7 +4,7 @@ import { BodyPartMetrics } from './bodyPartMetrics';
 
 export interface Session {
     id: number;
-    date: string; // ISO format
+    completedAt:string; // ISO format
     name: string;
     notes?: string;
     duration: number; // hours

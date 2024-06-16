@@ -25,6 +25,8 @@ const myStore = new SequelizeStore({
   expiration: 24 * 60 * 60 * 1000,  // Sessions expire after 24 hours
 });
 
+db.syncDatabase;
+
 app.use(session({
   secret: config.secret,
   store: myStore,

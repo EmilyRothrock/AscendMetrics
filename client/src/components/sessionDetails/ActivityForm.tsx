@@ -1,24 +1,11 @@
-import React, { useState } from 'react';
-import {
-  Box,
-  TextField,
-  Button,
-  Dialog,
-  DialogContent,
-  Slider,
-  useMediaQuery,
-  useTheme,
-  DialogActions,
-  Autocomplete,
-
-} from '@mui/material';
+import React, { useState, useEffect } from 'react';
+import { Box, TextField, Slider, Autocomplete, useMediaQuery, useTheme, Dialog, DialogContent, DialogActions, Button } from '@mui/material';
 import { DateTime } from 'luxon';
 import { Activity, BodyPartMetrics } from '../../types';
 import ForwardIcon from '@mui/icons-material/Forward';
 
-
 const activityOptions = [
-    'Performance', 'Power', 'Finger Health', 'Power/Strength Endurance', 'PumpCap/AnCap', 'Strength', 'AeroCap', 'Warm-Up', 'Routesetting', 'Cross Training', 'Board Climbing', 'Bouldering', 'Routes', 'Cardio', 'Mobility/Stability', 'Stretching', 'Movement Practice', 'Work Capacity', 'Outdoor Bouldering', 'Outdoor Routes', 'Other'
+  'Performance', 'Power', 'Finger Health', 'Power/Strength Endurance', 'PumpCap/AnCap', 'Strength', 'AeroCap', 'Warm-Up', 'Routesetting', 'Cross Training', 'Board Climbing', 'Bouldering', 'Routes', 'Cardio', 'Mobility/Stability', 'Stretching', 'Movement Practice', 'Work Capacity', 'Outdoor Bouldering', 'Outdoor Routes', 'Other'
 ];
 
 const intensityMarks = {
@@ -63,8 +50,7 @@ const intensityMarks = {
   ],
 };
 
-// Handles the input of an intensity - with dialog for slider/tips
-const IntensityInput: React.FC<{ bodyPart: keyof BodyPartMetrics ; value: number; onChange: (value: number) => void; }> = ({ bodyPart, value, onChange }) => {
+const IntensityInput: React.FC<{ bodyPart: keyof BodyPartMetrics; value: number; onChange: (value: number) => void; }> = ({ bodyPart, value, onChange }) => {
   const [open, setOpen] = useState(false);
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
@@ -130,34 +116,45 @@ const IntensityInput: React.FC<{ bodyPart: keyof BodyPartMetrics ; value: number
   );
 };
 
-// Handles a single activity's fields
-const ActivityForm = ( {activity}: {activity: Activity} ) => {
+const ActivityForm: React.FC<{ activity: Activity; onActivityChange: (activity: Activity) => void; }> = ({ activity, onActivityChange }) => {
   const [formData, setFormData] = useState<Activity>(activity);
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  useEffect(() => {
+    setFormData(activity);
+  }, [activity]);
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
-    setFormData({ ...formData, [name]: value });
+    const updatedActivity = { ...formData, [name]: value };
+    setFormData(updatedActivity);
+    onActivityChange(updatedActivity);
   };
 
   const handleIntensityChange = (bodyPart: keyof BodyPartMetrics, value: number) => {
-    setFormData({
+    const updatedActivity = {
       ...formData,
       intensities: {
         ...formData.intensities,
         [bodyPart]: value,
       },
-    });
+    };
+    setFormData(updatedActivity);
+    onActivityChange(updatedActivity);
   };
 
   return (
     <Box sx={{ border: '1px solid lightgrey', borderRadius: '5px', padding: 2 }}>
-        <Autocomplete
-            options={activityOptions}
-            value={formData.name}
-            onChange={(event, value) => setFormData({ ...formData, name: value || '' })}
-            renderInput={(params) => <TextField {...params} label="Activity Name" variant="standard" fullWidth />}
-            sx={{ pr:4 }}
-        />
+      <Autocomplete
+        options={activityOptions}
+        value={formData.name}
+        onChange={(event, value) => {
+          const updatedActivity = { ...formData, name: value || '' };
+          setFormData(updatedActivity);
+          onActivityChange(updatedActivity);
+        }}
+        renderInput={(params) => <TextField {...params} label="Activity Name" variant="standard" fullWidth />}
+        sx={{ pr: 4 }}
+      />
       <TextField
         label="Start Time"
         name="startTime"
@@ -168,7 +165,7 @@ const ActivityForm = ( {activity}: {activity: Activity} ) => {
         variant="standard"
         margin="normal"
       />
-        <ForwardIcon fontSize="large" />
+      <ForwardIcon fontSize="large" />
       <TextField
         label="End Time"
         name="endTime"
@@ -191,19 +188,19 @@ const ActivityForm = ( {activity}: {activity: Activity} ) => {
       />
       <Box display="flex" justifyContent="space-between">
         <IntensityInput
-          bodyPart={"fingers"}
+          bodyPart="fingers"
           value={formData.intensities.fingers}
-          onChange={(value) => handleIntensityChange("fingers", value)}
+          onChange={(value) => handleIntensityChange('fingers', value)}
         />
         <IntensityInput
-          bodyPart={"upperBody"}
+          bodyPart="upperBody"
           value={formData.intensities.upperBody}
-          onChange={(value) => handleIntensityChange("upperBody", value)}
+          onChange={(value) => handleIntensityChange('upperBody', value)}
         />
         <IntensityInput
-          bodyPart={"lowerBody"}
+          bodyPart="lowerBody"
           value={formData.intensities.lowerBody}
-          onChange={(value) => handleIntensityChange("lowerBody", value)}
+          onChange={(value) => handleIntensityChange('lowerBody', value)}
         />
       </Box>
     </Box>

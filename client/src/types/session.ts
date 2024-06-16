@@ -19,7 +19,7 @@ export interface Session {
  * @returns {Session} A new session object with default values.
  */
 export const defaultNewSession = (): Session => ({
-    id: -Number(DateTime.now().toISO()),                 // A temporary ID that cannot conflict with database given IDs
+    id: -Number(DateTime.now()),                 // A temporary ID that cannot conflict with database given IDs
     date: DateTime.now().toISO(),              // Current date and time in ISO format
     name: '',                                  // Default empty name
     notes: '',                                 // Default empty notes

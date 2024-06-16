@@ -1,12 +1,16 @@
 import React, { useState } from 'react';
-import { Box, Button, Typography, IconButton, Menu, MenuItem } from '@mui/material';
+import { Box, Button, Typography, IconButton, Menu, MenuItem, FormHelperText } from '@mui/material';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import ActivityForm from './ActivityForm';
 import { Activity } from '../../types';
 import { DateTime } from 'luxon';
 
-// List of activities within session form - manages visual appearance
-const ActivityList: React.FC<{ activities: Activity[]; setActivities: (activities: Activity[]) => void; }> = ({ activities, setActivities }) => {
+const ActivityList: React.FC<{
+  activities: Activity[];
+  setActivities: (activities: Activity[]) => void;
+  onActivityChange: (activity: Activity) => void;
+  errors: { [key: string]: string };
+}> = ({ activities, setActivities, onActivityChange, errors }) => {
   const [expandedActivities, setExpandedActivities] = useState<Set<number>>(new Set());
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [currentActivityId, setCurrentActivityId] = useState<number | null>(null);
@@ -40,15 +44,15 @@ const ActivityList: React.FC<{ activities: Activity[]; setActivities: (activitie
   return (
     <Box>
       <Typography variant="h6">Activities</Typography>
-      {activities.map(activity => (
+      {activities.map((activity, index) => (
         <Box key={activity.id} my={2} position="relative">
           <IconButton
             aria-label="more"
             aria-controls={`menu-${activity.id}`}
             aria-haspopup="true"
             onClick={(e) => handleMenuOpen(e, activity.id)}
-            style={{ position: 'absolute', top: '50%', transform: 'translateY(-50%)', right: 0 }}
-            >
+            style={{ position: 'absolute', right: 5, top: 10}}
+          >
             <MoreVertIcon />
           </IconButton>
           <Menu
@@ -64,15 +68,30 @@ const ActivityList: React.FC<{ activities: Activity[]; setActivities: (activitie
             <MenuItem onClick={() => handleDeleteActivity(activity.id)}>Delete</MenuItem>
           </Menu>
           {expandedActivities.has(activity.id) ? (
-            <ActivityForm activity={activity} />
+            <ActivityForm activity={activity} onActivityChange={onActivityChange} />
           ) : (
             <Box sx={{ border: '1px solid lightgrey', borderRadius: '5px', padding: 2 }}>
               <Typography>{activity.name || 'No name selected'}</Typography>
             </Box>
           )}
+          {errors[`activity-name-${index}`] && (
+            <FormHelperText error>{errors[`activity-name-${index}`]}</FormHelperText>
+          )}
+          {errors[`activity-startTime-${index}`] && (
+            <FormHelperText error>{errors[`activity-startTime-${index}`]}</FormHelperText>
+          )}
+          {errors[`activity-endTime-${index}`] && (
+            <FormHelperText error>{errors[`activity-endTime-${index}`]}</FormHelperText>
+          )}
+          {errors[`activity-time-${index}`] && (
+            <FormHelperText error>{errors[`activity-time-${index}`]}</FormHelperText>
+          )}
+          {errors[`activity-intensities-${index}`] && (
+            <FormHelperText error>{errors[`activity-intensities-${index}`]}</FormHelperText>
+          )}
         </Box>
       ))}
-      <Button onClick={() => setActivities([
+      <Button fullWidth variant="outlined" onClick={() => setActivities([
         ...activities,
         {
           id: Date.now(), // unique identifier based on the current timestamp
@@ -95,6 +114,9 @@ const ActivityList: React.FC<{ activities: Activity[]; setActivities: (activitie
       ])}>
         Add Activity
       </Button>
+      {errors.activities && (
+        <FormHelperText error>{errors.activities}</FormHelperText>
+      )}
     </Box>
   );
 };

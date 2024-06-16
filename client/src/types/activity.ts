@@ -47,7 +47,7 @@ export function calculateActivityMetrics(activity: Omit<Activity, 'duration' | '
  * @returns {Activity} A new activity object with default values.
  */
 export const defaultNewActivity = (): Activity => ({
-  id:  -Number(DateTime.now().toISO()),            // A temporary ID that cannot conflict with database-assigned IDs
+  id:  -Number(DateTime.now()),            // A temporary ID that cannot conflict with database-assigned IDs
   name: '',                             // Default empty name
   startTime: DateTime.now().toISOTime(),    // Default start time in ISO format
   endTime: DateTime.now().toISOTime(),      // Default end time in ISO format

@@ -20,7 +20,7 @@ export default function SignUp() {
     const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
         const data = new FormData(event.currentTarget);
-        api.post('/signup', { 
+        api.post('/auth/signup', { 
             firstName: data.get('firstName'),
             lastName: data.get('lastName'),
             email: data.get('email'), 

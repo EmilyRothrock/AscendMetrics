@@ -8,7 +8,7 @@ const SignoutButton: React.FC = () => {
 
     const handleSignout = async () => {
         try {
-            await api.post('/signout');
+            await api.post('/auth/signout');
             navigate('/signin');
         } catch (error) {
             console.error('Signout failed', error);

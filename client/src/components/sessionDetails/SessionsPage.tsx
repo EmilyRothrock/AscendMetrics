@@ -107,8 +107,9 @@ const SessionPage = () => {
   useEffect(() => {
     if (saveConfirmed) {
       // Save session logic
+      // send the session to DB - get ids back
+      // dispatch session to Redux w/ new ids
       setSaveConfirmed(false);
-      // Example: console.log("Session saved:", sessionData);
       navigate('/dashboard');
     }
   }, [saveConfirmed, navigate, sessionData]);

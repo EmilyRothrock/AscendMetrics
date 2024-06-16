@@ -22,7 +22,7 @@ const SigninPage = () => {
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     const data = new FormData(event.currentTarget);
-    api.post('/signin', { 
+    api.post('/auth/signin', { 
       email: data.get('email'), 
       password: data.get('password') 
     })
@@ -113,7 +113,7 @@ const SigninPage = () => {
             </Link>
           </Grid>
           <Grid item>
-            <Link href="/signup" variant="body2">
+            <Link href="/auth/signup" variant="body2">
               {"Don't have an account? Sign Up"}
             </Link>
           </Grid>

@@ -3,6 +3,13 @@ const passport = require('passport');
 require('./localStrategy');
 const db = require('../db/database');
 
+/**
+ * Handle user sign-in using Passport local strategy.
+ * 
+ * @param {Object} req - Express request object.
+ * @param {Object} res - Express response object.
+ * @param {Function} next - Express next middleware function.
+ */
 async function handleSignin(req, res, next) {
   passport.authenticate('local', (err, user, info) => {
     if (err) { return next(err); }
@@ -16,6 +23,13 @@ async function handleSignin(req, res, next) {
   })(req, res, next);
 }
 
+/**
+ * Handle user sign-up by creating a new user in the database.
+ * 
+ * @param {Object} req - Express request object.
+ * @param {Object} res - Express response object.
+ * @param {Function} next - Express next middleware function.
+ */
 async function handleSignup(req, res, next) {
   const { firstName, lastName, email, password } = req.body;
   const saltHash = genPassword(password); // Ensure genPassword returns an object with salt and hash
@@ -39,17 +53,25 @@ async function handleSignup(req, res, next) {
   }
 }
 
-async function handleSignout(req,res,next) {
-    req.logout((err) => {
-      if (err) { return res.status(500).send('Error logging out'); }
-      req.session.destroy((err) => {
-        if (err) { return res.status(500).send('Error destroying session'); }
-        res.sendStatus(204); // 204 No Content
-      });
+/**
+ * Handle user sign-out by logging out and destroying the session.
+ * 
+ * @param {Object} req - Express request object.
+ * @param {Object} res - Express response object.
+ * @param {Function} next - Express next middleware function.
+ */
+async function handleSignout(req, res, next) {
+  req.logout((err) => {
+    if (err) { return res.status(500).send('Error logging out'); }
+    req.session.destroy((err) => {
+      if (err) { return res.status(500).send('Error destroying session'); }
+      res.sendStatus(204); // 204 No Content
     });
+  });
 }
 
 module.exports = {
   handleSignin,
-  handleSignup
+  handleSignup,
+  handleSignout
 };

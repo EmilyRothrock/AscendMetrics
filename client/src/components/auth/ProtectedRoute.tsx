@@ -12,7 +12,7 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
     useEffect(() => {
         async function checkAuthentication() {
             try {
-                const response = await api.get('/authcheck');
+                const response = await api.get('/auth/check');
                 setIsAuthenticated(response.data); // Assume response.data directly gives a boolean for authentication status
             } catch (error) {
                 console.error('Error checking authentication:', error);
@@ -30,7 +30,7 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
 
     // Navigate to signin if not authenticated
     if (!isAuthenticated) {
-        return <Navigate to="/signin" replace />;
+        return <Navigate to="/auth/signin" replace />;
     }
 
     // Render children if authenticated

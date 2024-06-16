@@ -42,8 +42,26 @@ app.use(passport.session());
 
 // Routes: ties in all router modules from routes directory
 const authRouter = require('./routes/auth');
-app.use('/', authRouter)
+app.use('/auth', authRouter);
+
+const sessionRoutes = require('./routes/session');
+const metricsRoutes = require('./routes/metrics');
+app.use('/sessions', sessionRoutes);
+app.use('/metrics', metricsRoutes);
+
 
 app.listen(port, () => {
   console.log(`Server running at http://localhost:${port}`);
 });
+
+// Notes for optimization needs
+
+// Pagination and Lazy Loading: Instead of fetching large date ranges in a single request, 
+// consider implementing pagination and lazy loading. Fetch data in smaller chunks as the 
+// user navigates through the application. This reduces the response size and server load.
+
+// Efficient Querying: Optimize your database queries to fetch only the necessary data. 
+// Use indexes and other optimization techniques to improve query performance.
+
+// Pre-calculated Metrics: Consider pre-calculating and storing metrics periodically 
+// (e.g., daily) in the database. This reduces the computational load during real-time requests, as you can retrieve pre-calculated metrics instead of calculating them on-the-fly.

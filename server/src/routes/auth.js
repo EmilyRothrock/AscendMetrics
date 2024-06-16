@@ -1,13 +1,13 @@
 const express = require('express');
 const authRouter = express.Router();
-const auth = require('../middlewares/authMiddleware');
+const { handleSignin, handleSignup, handleSignout } = require('../middlewares/authMiddleware');
 
-authRouter.post('/signin', auth.handleSignin);
-authRouter.post('/signup', auth.handleSignup);
+authRouter.post('/signin', handleSignin);
+authRouter.post('/signup', handleSignup);
 
-authRouter.post('/signout', auth.handleSignout);
+authRouter.post('/signout', handleSignout);
 
-authRouter.get('/authCheck', (req, res) => {
+authRouter.get('/check', (req, res) => {
   const isAuth = req.isAuthenticated();
   res.send(isAuth);
 });

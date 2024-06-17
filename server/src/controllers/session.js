@@ -1,159 +1,16 @@
 const { DateTime } = require('luxon');
 const db = require('../db/database');
+const {
+    calculateDurationInMinutes,
+    calculateActivityLoads,
+    formatSessionResponse,
+    verifySessionOwnership,
+    createActivities,
+    updateOrCreateActivities
+} = require('./helpers');
 
 /**
- * Verify that a session belongs to the authenticated user.
- * @param {number} sessionId - The ID of the session to verify.
- * @param {number} userId - The ID of the authenticated user.
- * @returns {Promise<Object>} - The session if verification is successful.
- * @throws {Error} - If the session is not found or the user is unauthorized.
- */
-const verifySessionOwnership = async (sessionId, userId) => {
-    const session = await db.TrainingSession.findByPk(sessionId);
-    if (!session || session.UserId !== userId) {
-        throw new Error('Session not found or unauthorized');
-    }
-    return session;
-};
-
-/**
- * Create activities in the database within a transaction.
- * @param {Array} activities - The activities to create.
- * @param {number} sessionId - The ID of the session to associate the activities with.
- * @param {Object} transaction - The database transaction object.
- * @returns {Promise<Array>} - The created activities.
- */
-const createActivities = async (activities, sessionId, transaction) => {
-    return await Promise.all(activities.map(async activity => {
-        const { name, note, startTime, endTime, intensities } = activity;
-        const { fingers, upperBody, lowerBody } = intensities;
-
-        // Ensure start and end are valid date strings
-        const sqlStartTime = DateTime.fromISO(startTime).toSQL({ includeOffset: false });
-        const sqlEndTime = DateTime.fromISO(endTime).toSQL({ includeOffset: false });
-
-        // Fetch the activity from the database based on the name
-        const dbActivity = await db.Activity.findOne({ where: { name }, transaction });
-
-        if (!dbActivity) {
-            throw new Error(`Activity with name ${name} not found`);
-        }
-
-        // Set the ActivityId to the ID of the fetched activity
-        const activityId = dbActivity.id;
-         return await db.SessionActivity.create({
-            ActivityId: activityId,
-            TrainingSessionId: sessionId,
-            note,
-            startTime: sqlStartTime,
-            endTime: sqlEndTime,
-            fingerIntensity: fingers,
-            upperIntensity: upperBody,
-            lowerIntensity: lowerBody
-        }, { transaction });
-    }));
-};
-
-/**
- * Update or create activities in the database within a transaction.
- * @param {Array} activities - The activities to update or create.
- * @param {number} sessionId - The ID of the session to associate the activities with.
- * @param {Object} transaction - The database transaction object.
- * @returns {Promise<Array>} - The updated or created activities.
- */
-const updateOrCreateActivities = async (activities, sessionId, transaction) => {
-    return await Promise.all(activities.map(async activity => {
-        const { name, note, startTime, endTime, intensities } = activity;
-        const { fingers, upperBody, lowerBody } = intensities;
-
-        // Ensure start and end are valid date strings
-        const sqlStartTime = DateTime.fromISO(startTime).toSQL({ includeOffset: false });
-        const sqlEndTime = DateTime.fromISO(endTime).toSQL({ includeOffset: false });
-
-        if (id < 0) {
-            // Create new activity
-            return await db.SessionActivity.create({
-                TrainingSessionId: sessionId,
-                note,
-                startTime: sqlStartTime,
-                endTime: sqlEndTime,
-                fingerIntensity,
-                upperIntensity,
-                lowerIntensity
-            }, { transaction });
-        } else {
-            // Update existing activity
-            const existingActivity = await db.SessionActivity.findByPk(id);
-            if (existingActivity && existingActivity.TrainingSessionId === sessionId) {
-                return await existingActivity.update({
-                    note,
-                    startTime,
-                    endTime,
-                    fingerIntensity,
-                    upperIntensity,
-                    lowerIntensity
-                }, { transaction });
-            }
-        }
-    }));
-};
-
-/**
- * Calculate the duration of an activity in minutes.
- * @param {string} startTime - The start time of the activity in ISO format.
- * @param {string} endTime - The end time of the activity in ISO format.
- * @returns {number} - The duration of the activity in minutes.
- */
-const calculateDurationInMinutes = (startTime, endTime) => {
-    const start = DateTime.fromISO(startTime);
-    const end = DateTime.fromISO(endTime);
-    return end.diff(start, 'minutes').minutes;
-};
-
-/**
- * Calculate the loads of an activity based on its duration and intensities.
- * @param {number} durationInMinutes - The duration of the activity in minutes.
- * @param {Object} intensities - The intensities of the activity.
- * @returns {Object} - The calculated loads for fingers, upper body, and lower body.
- */
-const calculateActivityLoads = (durationInMinutes, intensities) => {
-    const durationInHours = durationInMinutes / 60;
-    return {
-        fingers: durationInHours * intensities.fingers,
-        upperBody: durationInHours * intensities.upperBody,
-        lowerBody: durationInHours * intensities.lowerBody
-    };
-};
-
-/**
- * Format the session response.
- * @param {Object} session - The session object.
- * @param {Array} activities - The activities associated with the session.
- * @returns {Object} - The formatted session response.
- */
-const formatSessionResponse = (session, activities) => {
-    const sessionDurationInMinutes = activities.reduce((acc, activity) => acc + activity.duration, 0);
-    const sessionDurationInHours = sessionDurationInMinutes / 60;
-    const sessionLoads = activities.reduce((acc, activity) => {
-        acc.fingers += activity.loads.fingers;
-        acc.upperBody += activity.loads.upperBody;
-        acc.lowerBody += activity.loads.lowerBody;
-        return acc;
-    }, { fingers: 0, upperBody: 0, lowerBody: 0 });
-
-    return {
-        id: session.id,
-        date: session.completedOn,
-        name: session.name,
-        notes: session.note,
-        duration: sessionDurationInHours, // in hours
-        activities: activities,
-        loads: sessionLoads
-    };
-};
-
-/**
- * Get sessions within a specified date range for the authenticated user.
+ * Get sessions within a specified date range for the authenticated user. Does NOT also supply metrics calculations for that date range.
  * @param {Object} req - The request object.
  * @param {Object} res - The response object.
  */

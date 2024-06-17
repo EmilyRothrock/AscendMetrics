@@ -11,7 +11,7 @@ import Layout from "./components/common/Layout";
 import ProtectedRoute from "./components/auth/ProtectedRoute";
 import SigninPage from "./components/auth/SigninPage";
 import SignupPage from "./components/auth/SignupPage";
-import Dashboard from "./components/Dashboard";
+import Dashboard from "./components/dashboard/Dashboard";
 import { Provider } from "react-redux";
 import store from './store/store';
 

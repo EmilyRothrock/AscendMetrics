@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
 import { Card, CardContent, IconButton, Typography,  CardHeader, Box } from '@mui/material';
 import Grid from '@mui/material/Unstable_Grid2'; // Grid version 2
-import LoadBarChart from './charts/LoadBarChart';
-import ActivityTimePieChart from './charts/ActivityTimePieChart';
-import { Session } from '../types'; // adjust the path to where your types are defined
+import LoadBarChart from '../charts/LoadBarChart';
+import ActivityTimePieChart from '../charts/ActivityTimePieChart';
+import { Session } from '../../types'; // adjust the path to where your types are defined
 import EditIcon from '@mui/icons-material/Edit';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import ExpandLessIcon from '@mui/icons-material/ExpandLess';

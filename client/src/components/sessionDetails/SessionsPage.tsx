@@ -7,7 +7,9 @@ import { RootState } from '../../store/store';
 import ActivityList from './ActivityList';
 import WarningDialog from './WarningDialog';
 import { Activity, Session, defaultNewSession } from '../../types';
-import { deleteSession as apiDeleteSession, createSession, updateSession } from '../../services/sessionService';
+import { deleteSession as deleteSessionInAPI, createSession, updateSession } from '../../services/sessionService';
+import { createSession as createSessionInStore, updateSession as updateSessionInStore, deleteSession as deleteSessionInStore } from '../../store/sessionsSlice';
+import { useDispatch } from 'react-redux';
 
 const SessionPage = () => {
   const { id } = useParams();
@@ -18,6 +20,7 @@ const SessionPage = () => {
   const [warnings, setWarnings] = useState<string[]>([]);
   const [showWarningDialog, setShowWarningDialog] = useState(false);
   const [saveConfirmed, setSaveConfirmed] = useState(false);
+  const dispatch = useDispatch();
 
   useEffect(() => {
     if (id === 'new') {
@@ -112,16 +115,16 @@ const SessionPage = () => {
           if (sessionData.id < 0) {
             const createdSession = await createSession(sessionData);
             console.log(createdSession);
-            // dispatch(addSession(createdSession));
+            dispatch(createSessionInStore(createdSession));
           } else {
             const updatedSession = await updateSession(sessionData.id, sessionData);
             console.log(updatedSession);
-            // dispatch(updateSessionInStore(updatedSession));
+            dispatch(updateSessionInStore(updatedSession));
           }
           navigate('/dashboard');
         } catch (error) {
           console.error('Error saving session:', error);
-          // Handle error, e.g., show an error message
+          // TODO: display error to the user
         } finally {
           setSaveConfirmed(false);
         }
@@ -129,7 +132,7 @@ const SessionPage = () => {
 
       saveSession();
     }
-  }, [saveConfirmed, sessionData, navigate]);
+  }, [saveConfirmed, sessionData, navigate, dispatch]);
 
   const saveSession = () => {
     setErrors({});
@@ -146,7 +149,9 @@ const SessionPage = () => {
 
   const deleteSession = () => {
     // TODO: confirmation!
-    apiDeleteSession(Number(id));
+    deleteSessionInAPI(Number(id));
+    deleteSessionInStore(Number(id));
+    // TODO: error handling
     navigate(-1);
   };
 

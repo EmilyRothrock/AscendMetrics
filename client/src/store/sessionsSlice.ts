@@ -1,6 +1,6 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { Activity, BodyPartMetrics, Session } from '../types'; 
-import { DateTime } from 'luxon';
+import { Session } from '../types'; 
+import { updateSessionCalculations } from '../utils/metricCalculations';
 
 interface SessionsState {
   sessions: Session[];
@@ -133,13 +133,13 @@ const sessionsSlice = createSlice({
   name: 'sessions',
   initialState,
   reducers: {
-    addSession(state, action: PayloadAction<Session>) { // receive session w/o defined duration or loads nor activity duration or loads
+    createSession(state, action: PayloadAction<Session>) { // receive session w/o defined duration or loads nor activity duration or loads
       const newSession = action.payload;
       updateSessionCalculations(newSession);
       state.sessions.push(newSession);
       // logic for updating metricsSlice
     },
-    editSession(state, action: PayloadAction<Session>) { // receive session w/o defined duration or loads nor activity duration or loads
+    updateSession(state, action: PayloadAction<Session>) { // receive session w/o defined duration or loads nor activity duration or loads
       const index = state.sessions.findIndex(session => session.id === action.payload.id);
       if (index !== -1) {
         updateSessionCalculations(action.payload);
@@ -147,47 +147,12 @@ const sessionsSlice = createSlice({
       }
       // logic for updating metricsSlice
     },
-    deleteSession(state, action: PayloadAction<Session>) {
-      state.sessions = state.sessions.filter(session => session.id !== action.payload.id); // payload is the id
-      // logic for updating metricsSlice - all metrics on and after this session's date - lazy load it?
+    deleteSession(state, action: PayloadAction<number>) {
+      state.sessions = state.sessions.filter(session => session.id !== action.payload);
+      // logic for updating metricsSlice - all metrics on and after this session's date
     },
   },
 });
 
-export const { addSession, editSession, deleteSession } = sessionsSlice.actions;
+export const { createSession, updateSession, deleteSession } = sessionsSlice.actions;
 export default sessionsSlice.reducer;
-
-function calculateActivityDuration(startTime: string, endTime: string): number {
-  // Assuming startTime and endTime are ISO 8601 strings
-  const start = DateTime.fromISO(startTime);
-  const end = DateTime.fromISO(endTime);
-  return end.diff(start, 'hours').hours;
-}
-
-function calculateActivityLoad(activity: Activity): BodyPartMetrics {
-  const intensities = activity.intensities;
-  const duration = activity.duration;
-  const newActivityLoads = {
-    fingers: intensities.fingers * duration,
-    upperBody: intensities.upperBody * duration,
-    lowerBody: intensities.lowerBody * duration,
-  }
-  return newActivityLoads;
-}
-
-function updateSessionCalculations(session: Session) {
-  session.duration = session.activities.reduce((total, activity) => {
-    const activityDuration = calculateActivityDuration(activity.startTime, activity.endTime);
-    activity.duration = activityDuration; // Update the activity duration
-    return total + activityDuration;
-  }, 0);
-
-  // loads must be done after durations have been done for activites.
-  session.loads = session.activities.reduce((totalLoads, activity) => {
-    const activityLoads = calculateActivityLoad(activity);
-    totalLoads.fingers += activityLoads.fingers;
-    totalLoads.upperBody += activityLoads.upperBody;
-    totalLoads.lowerBody += activityLoads.lowerBody;
-    return totalLoads;
-  }, { fingers: 0, upperBody: 0, lowerBody: 0 });
-}

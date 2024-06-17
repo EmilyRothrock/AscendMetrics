@@ -1,9 +1,8 @@
 import axios from 'axios';
 
-axios.defaults.withCredentials = true;
-
 const api = axios.create({
-  baseURL: 'http://localhost:3000/' // set this to the server's url
+  baseURL: 'http://localhost:3000/', // set this to the server's url
+  withCredentials: true
 });
 
 export default api;

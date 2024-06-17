@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Box, Button, Typography, IconButton, Menu, MenuItem, FormHelperText } from '@mui/material';
+import { Box, Button, Typography, IconButton, Menu, MenuItem, FormHelperText, Alert, Stack } from '@mui/material';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import ActivityForm from './ActivityForm';
 import { Activity } from '../../types';
@@ -9,8 +9,7 @@ const ActivityList: React.FC<{
   activities: Activity[];
   setActivities: (activities: Activity[]) => void;
   onActivityChange: (activity: Activity) => void;
-  errors: { [key: string]: string };
-}> = ({ activities, setActivities, onActivityChange, errors }) => {
+  errors: { [key: string]: string }; }> = ({ activities, setActivities, onActivityChange, errors }) => {
   const [expandedActivities, setExpandedActivities] = useState<Set<number>>(new Set());
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [currentActivityId, setCurrentActivityId] = useState<number | null>(null);
@@ -74,21 +73,23 @@ const ActivityList: React.FC<{
               <Typography>{activity.name || 'No name selected'}</Typography>
             </Box>
           )}
+          <Stack spacing={1} pt={1}>
           {errors[`activity-name-${index}`] && (
-            <FormHelperText error>{errors[`activity-name-${index}`]}</FormHelperText>
+            <Alert severity="error">{errors[`activity-name-${index}`]}</Alert>
           )}
           {errors[`activity-startTime-${index}`] && (
-            <FormHelperText error>{errors[`activity-startTime-${index}`]}</FormHelperText>
+            <Alert severity="error">{errors[`activity-startTime-${index}`]}</Alert>
           )}
           {errors[`activity-endTime-${index}`] && (
-            <FormHelperText error>{errors[`activity-endTime-${index}`]}</FormHelperText>
+            <Alert severity="error">{errors[`activity-endTime-${index}`]}</Alert>
           )}
           {errors[`activity-time-${index}`] && (
-            <FormHelperText error>{errors[`activity-time-${index}`]}</FormHelperText>
+            <Alert severity="error">{errors[`activity-time-${index}`]}</Alert>
           )}
           {errors[`activity-intensities-${index}`] && (
-            <FormHelperText error>{errors[`activity-intensities-${index}`]}</FormHelperText>
+            <Alert severity="error">{errors[`activity-intensities-${index}`]}</Alert>
           )}
+          </Stack>
         </Box>
       ))}
       <Button fullWidth variant="outlined" onClick={() => setActivities([

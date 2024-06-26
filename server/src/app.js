@@ -41,13 +41,13 @@ app.use(passport.initialize());
 app.use(passport.session());
 
 // Routes: ties in all router modules from routes directory
-const authRouter = require('./routes/auth');
+const authRouter = require('./routes/authRoutes');
 app.use('/auth', authRouter);
 
-const sessionRoutes = require('./routes/session');
-const metricsRoutes = require('./routes/metrics');
-app.use('/sessions', sessionRoutes);
-app.use('/metrics', metricsRoutes);
+const sessionsRouter = require('./routes/sessionsRoutes');
+const metricsRouter = require('./routes/metricsRoutes');
+app.use('/sessions', sessionsRouter);
+app.use('/metrics', metricsRouter);
 
 
 app.listen(port, () => {

@@ -1,4 +1,4 @@
-const { genPassword, validatePassword } = require('./authUtils');
+const { genPassword } = require('./authUtils');
 const passport = require('passport');
 require('./localStrategy');
 const db = require('../db/database');

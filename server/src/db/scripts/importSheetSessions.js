@@ -35,7 +35,7 @@ async function importSessionData(userEmail, csvFileName) {
 
             // Group entries by date
             const entriesByDate = dataEntries.reduce((acc, entry) => {
-                const date = DateTime.fromFormat(entry.Date, 'M/d/yy').toISODate();
+                const date = DateTime.fromFormat(entry.Date, 'M/d/yyyy').toISODate();
                 if (!acc[date]) {
                 acc[date] = [];
                 }
@@ -52,21 +52,21 @@ async function importSessionData(userEmail, csvFileName) {
                 }, { transaction });
 
                 for (const entry of entries) {
-                    const startTime = DateTime.fromFormat(`${entry.Date} ${entry['Start Time']}`, 'M/d/yy h:mm a').toISO();
-                    const endTime = DateTime.fromFormat(`${entry.Date} ${entry['End Time']}`, 'M/d/yy h:mm a').toISO();
+                    const startTime = DateTime.fromFormat(`${entry.Date} ${entry['Start Time']}`, 'M/d/yyyy h:mm a').toISO();
+                    const endTime = DateTime.fromFormat(`${entry.Date} ${entry['End Time']}`, 'M/d/yyyy h:mm a').toISO();
 
                     // Find or create the Activity
                     const activity = await Activity.findOne({ where: { name: entry.Activity } });
                         if (!activity) {
                         throw new Error(`Activity with name ${entry.Activity} not found`);
                     }
-
+                    console.log(`Inserting SessionActivity with start: ${startTime}, end: ${endTime}`);
                     // Create the Session Activity
                     const combinedNotes = [entry.Notes, entry['(Sets + Rest) x (Reps + Rest) w/ Load']].filter(Boolean).join('; ');
                     await SessionActivity.create({
                         note: combinedNotes,
-                        start: startTime,
-                        end: endTime,
+                        startTime: startTime,
+                        endTime: endTime,
                         fingerIntensity: parseFloat(entry['F-RPE']),
                         upperIntensity: parseFloat(entry['U-RPE']),
                         lowerIntensity: parseFloat(entry['L-RPE']),

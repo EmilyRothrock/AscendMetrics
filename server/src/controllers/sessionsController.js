@@ -1,68 +1,93 @@
-const { DateTime } = require('luxon');
 const db = require('../db/database');
 const {
     calculateDurationInMinutes,
     calculateActivityLoads,
-    formatSessionResponse,
+    calculateSessionDurationAndLoads,
     verifySessionOwnership,
+    processSessionStats,
     createActivities,
-    updateOrCreateActivities
-} = require('./helpers');
+    updateOrCreateActivities,
+    fetchUserSessionsWithActivities
+} = require('../helpers/sessionsHelpers');
 
 /**
- * Get sessions within a specified date range for the authenticated user. Does NOT also supply metrics calculations for that date range.
+ * Get a single session by ID for the authenticated user. Confirms that the user requesting it is the one who completed it.
  * @param {Object} req - The request object.
  * @param {Object} res - The response object.
  */
-const getSessions = async (req, res) => {
-    const { startDate, endDate } = req.query;
-    const userId = req.user.id;  // Assuming Passport sets req.user
+const getSessionById = async (req, res) => {
+    const { sessionId } = req.params;
+    const userId = req.user.id;
 
     try {
-        // Fetch sessions from the database within the date range
-        const sessions = await db.TrainingSession.findAll({
+        // Fetch the session from the database by ID and user ID
+        const session = await db.TrainingSession.findOne({
             where: {
-                UserId: userId,
-                completedOn: {
-                    [db.Sequelize.Op.between]: [startDate, endDate]
-                }
+                id: sessionId,
+                UserId: userId
             },
             include: {
                 model: db.SessionActivity
             }
         });
 
-        // Process sessions and calculate durations and loads
-        const formattedSessions = sessions.map(session => {
-            const activities = session.SessionActivities.map(activity => {
-                const durationInMinutes = calculateDurationInMinutes(activity.start, activity.end);
-                const loads = calculateActivityLoads(durationInMinutes, {
+        // Check if the session exists
+        if (!session) {
+            return res.status(404).json({ error: 'Session not found or unauthorized' });
+        }
+
+        // Process the session and calculate durations and loads
+        const activities = session.SessionActivities.map(activity => {
+            const durationInMinutes = calculateDurationInMinutes(activity.start, activity.end);
+            const loads = calculateActivityLoads(durationInMinutes, {
+                fingers: activity.fingerIntensity,
+                upperBody: activity.upperIntensity,
+                lowerBody: activity.lowerIntensity
+            });
+
+            return {
+                id: activity.id,
+                name: activity.name,
+                startTime: activity.start,
+                endTime: activity.end,
+                notes: activity.note,
+                duration: durationInMinutes, // in minutes
+                intensities: {
                     fingers: activity.fingerIntensity,
                     upperBody: activity.upperIntensity,
                     lowerBody: activity.lowerIntensity
-                });
-
-                return {
-                    id: activity.id,
-                    name: activity.name,
-                    startTime: activity.start,
-                    endTime: activity.end,
-                    notes: activity.note,
-                    duration: durationInMinutes, // in minutes
-                    intensities: {
-                        fingers: activity.fingerIntensity,
-                        upperBody: activity.upperIntensity,
-                        lowerBody: activity.lowerIntensity
-                    },
-                    loads: loads
-                };
-            });
-
-            return formatSessionResponse(session, activities);
+                },
+                loads: loads
+            };
         });
 
-        // Send formatted sessions back in the response
-        res.json(formattedSessions);
+        const completeSession = calculateSessionDurationAndLoads(session, activities);
+
+        res.json(completeSession);
+    } catch (error) {
+        console.error('Error fetching session:', error);
+        res.status(500).json({ error: 'Failed to fetch session' });
+    }
+};
+
+/**
+ * Get sessions within a specified date range for the authenticated user. Does NOT also supply metrics calculations for that date range.
+ * @param {Object} req - The request object.
+ * @param {Object} res - The response object.
+ */
+const getSessionsForDateRange = async (req, res) => {
+    const { startDate, endDate } = req.query;
+    const userId = req.user.id;
+
+    try {
+        // Fetch sessions from the database within the date range
+        const sessions = fetchUserSessionsWithActivities(userId, startDate, endDate);
+
+        // Process sessions and calculate durations and loads
+        const completedSessions = processSessionStats(sessions);
+        
+        // sessions are formatted as an unsorted list of sessions with unsorted activities list of objects
+        res.json(completedSessions);
     } catch (error) {
         console.error('Error fetching sessions:', error);
         res.status(500).json({ error: 'Failed to fetch sessions' });
@@ -92,7 +117,6 @@ const createSession = async (req, res) => {
     const transaction = await db.sequelize.transaction();
 
     try {
-        // Create the session in the database
         const createdSession = await db.TrainingSession.create({
             completedOn,
             name,
@@ -100,19 +124,14 @@ const createSession = async (req, res) => {
             UserId: userId
         }, { transaction });
 
-        // Create activities
         const createdActivities = await createActivities(activities, createdSession.id, transaction);
 
-        // Commit the transaction
         await transaction.commit();
 
-        // Attach the created activities to the created session
-        createdSession.activities = createdActivities;
+        createdSession.SessionActivities = createdActivities;
 
-        // Send the created session back in the response, including the new activity IDs
         res.status(201).json(createdSession);
     } catch (error) {
-        // Rollback the transaction in case of an error
         await transaction.rollback();
         console.error('Error creating session:', error);
         res.status(500).json({ error: 'Failed to create session' });
@@ -197,4 +216,4 @@ const deleteSession = async (req, res) => {
     }
 };
 
-module.exports = { getSessions, createSession, updateSession, deleteSession };
+module.exports = { getSessionById, getSessionsForDateRange, createSession, updateSession, deleteSession };

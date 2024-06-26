@@ -2,8 +2,7 @@ import React, { useState } from 'react';
 import { Box, Button, Typography, IconButton, Menu, MenuItem, FormHelperText, Alert, Stack } from '@mui/material';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import ActivityForm from './ActivityForm';
-import { Activity } from '../../types';
-import { DateTime } from 'luxon';
+import { Activity, defaultNewActivity } from '../../types';
 
 const ActivityList: React.FC<{
   activities: Activity[];
@@ -94,24 +93,7 @@ const ActivityList: React.FC<{
       ))}
       <Button fullWidth variant="outlined" onClick={() => setActivities([
         ...activities,
-        {
-          id: Date.now(), // unique identifier based on the current timestamp
-          name: '', // empty name to be filled out
-          startTime: DateTime.now().toISO(), // current date and time in ISO format
-          endTime: DateTime.now().toISO(), // current date and time in ISO format, can be adjusted later
-          notes: '', // empty notes
-          duration: 0, // default duration set to 0, to be updated
-          intensities: {
-            fingers: 0,
-            upperBody: 0,
-            lowerBody: 0
-          },
-          loads: {
-            fingers: 0, // default load for fingers
-            upperBody: 0, // default load for upper body
-            lowerBody: 0 // default load for lower body
-          }
-        }
+        defaultNewActivity()
       ])}>
         Add Activity
       </Button>

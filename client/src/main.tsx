@@ -12,8 +12,10 @@ import ProtectedRoute from "./components/auth/ProtectedRoute";
 import SigninPage from "./components/auth/SigninPage";
 import SignupPage from "./components/auth/SignupPage";
 import Dashboard from "./components/dashboard/Dashboard";
-import { Provider } from "react-redux";
+import { Provider as StoreProvider } from "react-redux";
 import store from './store/store';
+import dashboardLoader from "./loaders/dashboardLoader";
+import { sessionLoader } from "./loaders/sessionsLoader";
 
 const theme = createTheme({
   palette: {
@@ -54,10 +56,12 @@ const router = createBrowserRouter([
       {
         path: "dashboard",
         element: <Dashboard/>,
+        loader: dashboardLoader,
       },
       {
         path: "sessions/:id",
         element: <SessionPage/>,
+        loader: sessionLoader,
       },
     ]
   },
@@ -65,10 +69,10 @@ const router = createBrowserRouter([
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
-    <Provider store={store}>
+    <StoreProvider store={store}>
       <ThemeProvider theme={theme}>
         <RouterProvider router={router} />
       </ThemeProvider>
-    </Provider>
+    </StoreProvider>
   </React.StrictMode>
 );

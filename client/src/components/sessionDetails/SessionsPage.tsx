@@ -2,17 +2,16 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { Button, TextField, Typography, Box, Grid, FormHelperText, ButtonGroup } from '@mui/material';
 import { DateTime } from 'luxon';
-import { useSelector } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
 import { RootState } from '../../store/store';
 import ActivityList from './ActivityList';
 import WarningDialog from './WarningDialog';
 import { Activity, Session, defaultNewSession } from '../../types';
-import { deleteSession as deleteSessionInAPI, createSession, updateSession } from '../../services/sessionService';
+import { deleteSession as deleteSessionInAPI, createSession as createSessionInAPI, updateSession as updateSessionInAPI } from '../../services/sessionService';
 import { createSession as createSessionInStore, updateSession as updateSessionInStore, deleteSession as deleteSessionInStore } from '../../store/sessionsSlice';
-import { useDispatch } from 'react-redux';
 
 const SessionPage = () => {
-  const { id } = useParams();
+  const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const sessions = useSelector((state: RootState) => state.sessions.sessions);
   const [sessionData, setSessionData] = useState<Session>(defaultNewSession());
@@ -26,7 +25,7 @@ const SessionPage = () => {
     if (id === 'new') {
       setSessionData(defaultNewSession());
     } else {
-      const session = sessions.find(s => s.id === Number(id));
+      const session = sessions[Number(id)];
       if (session) setSessionData(session);
     }
   }, [id, sessions]);
@@ -113,11 +112,11 @@ const SessionPage = () => {
       const saveSession = async () => {
         try {
           if (sessionData.id < 0) {
-            const createdSession = await createSession(sessionData);
+            const createdSession = await createSessionInAPI(sessionData);
             console.log(createdSession);
             dispatch(createSessionInStore(createdSession));
           } else {
-            const updatedSession = await updateSession(sessionData.id, sessionData);
+            const updatedSession = await updateSessionInAPI(sessionData);
             console.log(updatedSession);
             dispatch(updateSessionInStore(updatedSession));
           }
@@ -150,7 +149,7 @@ const SessionPage = () => {
   const deleteSession = () => {
     // TODO: confirmation!
     deleteSessionInAPI(Number(id));
-    deleteSessionInStore(Number(id));
+    dispatch(deleteSessionInStore(Number(id)));
     // TODO: error handling
     navigate(-1);
   };
@@ -167,7 +166,7 @@ const SessionPage = () => {
             <Typography variant="h4">{id === 'new' ? 'New Session' : 'Edit Session'}</Typography>
             <TextField
               label="Date"
-              name="date"
+              name="completedOn"
               type="date"
               value={DateTime.fromISO(sessionData.completedOn).toFormat('yyyy-MM-dd')}
               onChange={handleInputChange}
@@ -210,7 +209,7 @@ const SessionPage = () => {
                 ))}
               </Box>
             )}
-            <ButtonGroup variant="contained" fullWidth sx={{ marginTop:1 }}>
+            <ButtonGroup variant="contained" fullWidth sx={{ marginTop: 1 }}>
               <Button onClick={saveSession} color="primary">Save</Button>
               {id === 'new' ? (
                 <Button onClick={() => navigate(-1)} color="secondary">Cancel</Button>

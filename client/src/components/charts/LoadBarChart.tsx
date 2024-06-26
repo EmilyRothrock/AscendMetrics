@@ -62,7 +62,7 @@ const LoadBarChart: React.FC<{ data: BodyPartMetrics; }> = ({ data }) => {
       .attr("dy", "0.35em") // vertically center
       .attr("text-anchor", "start")
       .style("font-size", "12px")
-      .text(d => `${d.part}: ${d.load}`);
+      .text(d => `${d.part}: ${d.load.toFixed(2)}`);
   };
 
   return <D3Graph title="Loads" renderGraph={renderGraph} />;

@@ -53,7 +53,7 @@ const TileTrainingSession: React.FC<{ session: Session; }> = ({ session }) => {
                         {formattedDateTime}
                     </Typography>
                     <Typography variant="subtitle2" color="textSecondary">
-                        Total Duration: {session.duration} hours
+                        Total Duration: {session.duration.toFixed(2)} hours
                     </Typography>
                 </>}
                 sx={{ 

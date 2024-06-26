@@ -70,7 +70,7 @@ const ActivityTimePieChart: React.FC<{ activities: Activity[]; }> = ({ activitie
         const updateCentralText = (data: { activity: string, totalDuration: number } | null) => {
             centralText.selectAll("tspan").remove();
             if (data) {
-                const text = `${data.activity}: ${data.totalDuration} min.`;
+                const text = `${data.activity}: ${data.totalDuration.toFixed(0)} min.`;
                 const words = text.split(" ");
                 let line = "";
                 const lines: string[] = [];

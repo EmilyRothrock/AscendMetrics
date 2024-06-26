@@ -1,5 +1,5 @@
 import React from 'react';
-import { Stack, Typography, Box } from '@mui/material';
+import { Stack, Typography, Box, Button } from '@mui/material';
 import ReadinessTile from './ReadinessTile';
 import Grid from '@mui/material/Unstable_Grid2'; // Grid version 2
 import TileTrainingSession from './TileTrainingSession';
@@ -7,11 +7,14 @@ import { BarChart, LineChart } from '@mui/x-charts';
 import NewSessionButton from './NewSessionButton';
 import { RootState } from '../../store/store'; 
 import { useSelector } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
+import SessionIcon from '@mui/icons-material/EventNote'; // Example icon for "Sessions"
 
 // Landing page after logging in - surface level information about your Readiness, Past Sessions, and Visualizations for trends in past month
 const Dashboard: React.FC = () => {
     const sessions = useSelector((state: RootState) => state.sessions.sessions);
     const sessionIds = useSelector((state: RootState) => state.sessions.sessionIds);
+    const navigate = useNavigate();
 
     return (
         <div>
@@ -28,9 +31,11 @@ const Dashboard: React.FC = () => {
                 </Grid>
                 <Grid xs={12} md={4}>
                     <DashboardColumn>
-                        <Typography variant='h5' >Past Training Sessions</Typography>
                         <Stack width={'100%'}>
-                        {sessionIds.map((id: number) => {
+                        <Button variant='contained' startIcon={<SessionIcon />} onClick={() => navigate('/sessions')}>
+                            Past Sessions
+                        </Button>
+                        {sessionIds.slice(0, 3).map((id: number) => {
                             const session = sessions[id];
                             return <TileTrainingSession key={id} session={session} />;
                         })}

@@ -150,24 +150,47 @@ function formatFetchedSession(fetchedSession) {
 /* Session and Activity Statistics */
 function calculateSessionStats(session) {
     initializeSessionStats(session);
-    let earliestActivityStart = new Date(8640000000000000); // Set to a far future date.
-    let latestActivityEnd = new Date(-8640000000000000); // Set to a far past date.
-    const newActivities = []
+    
+    const newActivities = [];
+
+    // Using Luxon to handle extreme values more easily
+    let earliestActivityStart = DateTime.fromISO('9999-12-31T23:59:59.999');
+    let latestActivityEnd = DateTime.fromISO('0001-01-01T00:00:00.000');
 
     session.activities.forEach(activity => {
         const newActivity = calculateActivityStats(activity);
         newActivities.push(newActivity);
         incrementLoads(session.loads, newActivity.loads);
-        if (newActivity.startTime < earliestActivityStart) {
-            earliestActivityStart = newActivity.startTime;
+
+        const activityStart = DateTime.fromJSDate(newActivity.startTime);
+        const activityEnd = DateTime.fromJSDate(newActivity.endTime);
+
+        if (activityStart < earliestActivityStart) {
+            earliestActivityStart = activityStart;
         }
-        if (newActivity.endTime > latestActivityEnd) {
-            latestActivityEnd = newActivity.endTime;
+        if (activityEnd > latestActivityEnd) {
+            latestActivityEnd = activityEnd;
         }
     });
 
     session.activities = newActivities;
-    session.duration = calculateDurationInMinutes(earliestActivityStart, latestActivityEnd) / 60;
+
+    if (earliestActivityStart <= latestActivityEnd) {
+        session.duration = latestActivityEnd.diff(earliestActivityStart, 'hours').hours;
+    } else {
+        session.duration = 0;
+    }
+
+    // Parsing the completedOn ISO string using Luxon and combining it with the time from earliestActivityStart
+    const completedOnDate = DateTime.fromISO(session.completedOn);
+    const combinedDateTime = completedOnDate.set({
+        hour: earliestActivityStart.hour,
+        minute: earliestActivityStart.minute,
+        second: earliestActivityStart.second,
+        millisecond: earliestActivityStart.millisecond
+    });
+
+    session.completedOn = combinedDateTime.toISO();
 
     return session;
 }

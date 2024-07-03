@@ -1,13 +1,9 @@
 const db = require('../db/database');
 const {
-    calculateDurationInMinutes,
-    calculateActivityLoads,
-    calculateSessionDurationAndLoads,
-    verifySessionOwnership,
-    processSessionStats,
-    createActivities,
-    updateOrCreateActivities,
-    fetchUserSessionsWithActivities
+    createActivity,
+    updateOrCreateActivity,
+    fetchSessionsForDateRange,
+    fetchSessionById
 } = require('../helpers/sessionsHelpers');
 
 /**
@@ -20,50 +16,10 @@ const getSessionById = async (req, res) => {
     const userId = req.user.id;
 
     try {
-        // Fetch the session from the database by ID and user ID
-        const session = await db.TrainingSession.findOne({
-            where: {
-                id: sessionId,
-                UserId: userId
-            },
-            include: {
-                model: db.SessionActivity
-            }
-        });
+        const session = await fetchSessionById(sessionId, userId);
 
-        // Check if the session exists
-        if (!session) {
-            return res.status(404).json({ error: 'Session not found or unauthorized' });
-        }
-
-        // Process the session and calculate durations and loads
-        const activities = session.SessionActivities.map(activity => {
-            const durationInMinutes = calculateDurationInMinutes(activity.start, activity.end);
-            const loads = calculateActivityLoads(durationInMinutes, {
-                fingers: activity.fingerIntensity,
-                upperBody: activity.upperIntensity,
-                lowerBody: activity.lowerIntensity
-            });
-
-            return {
-                id: activity.id,
-                name: activity.name,
-                startTime: activity.start,
-                endTime: activity.end,
-                notes: activity.note,
-                duration: durationInMinutes, // in minutes
-                intensities: {
-                    fingers: activity.fingerIntensity,
-                    upperBody: activity.upperIntensity,
-                    lowerBody: activity.lowerIntensity
-                },
-                loads: loads
-            };
-        });
-
-        const completeSession = calculateSessionDurationAndLoads(session, activities);
-
-        res.json(completeSession);
+        console.log(session);
+        res.json(session);
     } catch (error) {
         console.error('Error fetching session:', error);
         res.status(500).json({ error: 'Failed to fetch session' });
@@ -80,14 +36,9 @@ const getSessionsForDateRange = async (req, res) => {
     const userId = req.user.id;
 
     try {
-        // Fetch sessions from the database within the date range
-        const sessions = fetchUserSessionsWithActivities(userId, startDate, endDate);
-
-        // Process sessions and calculate durations and loads
-        const completedSessions = processSessionStats(sessions);
-        
-        // sessions are formatted as an unsorted list of sessions with unsorted activities list of objects
-        res.json(completedSessions);
+        const sessions = fetchSessionsForDateRange(userId, startDate, endDate);        
+        console.log(sessions);
+        res.json(sessions);
     } catch (error) {
         console.error('Error fetching sessions:', error);
         res.status(500).json({ error: 'Failed to fetch sessions' });
@@ -102,15 +53,6 @@ const getSessionsForDateRange = async (req, res) => {
 const createSession = async (req, res) => {
     const newSession = req.body;
     const userId = req.user.id;
-    console.log("Logging Request: ", {
-        method: req.method,
-        url: req.url,
-        headers: req.headers,
-        body: req.body,
-        activities: req.body.activities,
-        params: req.params,
-        query: req.query,
-    });
 
     const { completedOn, name, note, activities } = newSession;
 
@@ -123,14 +65,16 @@ const createSession = async (req, res) => {
             note,
             UserId: userId
         }, { transaction });
-
-        const createdActivities = await createActivities(activities, createdSession.id, transaction);
+        
+        await Promise.all(activities.map(activity =>
+            createActivity(activity, createdSession.id, transaction)
+        ));
 
         await transaction.commit();
 
-        createdSession.SessionActivities = createdActivities;
+        const fetchedSession = await fetchSessionById(createdSession.id);
 
-        res.status(201).json(createdSession);
+        res.status(201).json(fetchedSession);
     } catch (error) {
         await transaction.rollback();
         console.error('Error creating session:', error);
@@ -145,37 +89,30 @@ const createSession = async (req, res) => {
  */
 const updateSession = async (req, res) => {
     const { sessionId } = req.params;
-    const updatedSession = req.body;
+    const { completedOn, name, note, activities } = req.body;
     const userId = req.user.id;
-
-    const { completedOn, name, note, activities } = updatedSession;
 
     const transaction = await db.sequelize.transaction();
 
     try {
-        // Verify session ownership
-        const session = await verifySessionOwnership(sessionId, userId);
+        const session = await fetchSessionById(sessionId, userId);
 
-        // Update session details
         await session.update({
             completedOn,
             name,
             note
         }, { transaction });
 
-        // Update or create activities
-        const updatedActivities = await updateOrCreateActivities(activities, session.id, transaction);
+        await Promise.all(activities.map(activity =>
+            updateOrCreateActivity(activity, sessionId, transaction)
+        ));
 
-        // Commit the transaction
         await transaction.commit();
 
-        // Attach the updated activities to the updated session
-        session.activities = updatedActivities;
+        const updatedSessionData = await fetchSessionById(sessionId, userId);
 
-        // Send the updated session back in the response
-        res.json(session);
+        res.status(200).json(updatedSessionData);
     } catch (error) {
-        // Rollback the transaction in case of an error
         await transaction.rollback();
         console.error('Error updating session:', error);
         res.status(500).json({ error: 'Failed to update session' });
@@ -194,19 +131,23 @@ const deleteSession = async (req, res) => {
     const transaction = await db.sequelize.transaction();
 
     try {
-        // Verify session ownership
-        await verifySessionOwnership(sessionId, userId);
+        const result = await db.TrainingSession.destroy({
+            where: { id: sessionId, UserId: userId },
+            transaction
+        });
 
-        // Delete associated activities
-        await db.SessionActivity.destroy({ where: { TrainingSessionId: sessionId }, transaction });
+        if (result === 0) {
+            await transaction.rollback();
+            return res.status(404).json({ error: 'Session not found or user mismatch' });
+        }
 
-        // Delete the session
-        await db.TrainingSession.destroy({ where: { id: sessionId }, transaction });
+        await db.SessionActivity.destroy({
+            where: { TrainingSessionId: sessionId },
+            transaction
+        });
 
-        // Commit the transaction
         await transaction.commit();
 
-        // Send no content status
         res.status(204).send();
     } catch (error) {
         // Rollback the transaction in case of an error

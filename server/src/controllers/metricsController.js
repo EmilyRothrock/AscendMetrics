@@ -1,5 +1,5 @@
-const { calculateMetricsForDateRange, processSession } = require("../helpers/metricsHelpers");
-const { fetchUserSessionsWithActivities } = require("../helpers/sessionsHelpers");
+const { calculateMetricsForDateRange } = require("../helpers/metricsHelpers");
+const { fetchSessionsForDateRange } = require("../helpers/sessionsHelpers");
 const { DateTime } = require('luxon');
 
 /**
@@ -9,21 +9,17 @@ const { DateTime } = require('luxon');
  */
 const getMetricsWithSessionsForDateRange = async (req, res) => {
     try {
-        const { startDate, endDate } = req.query;
         const userId = req.user.id;
+        const { startDate, endDate } = req.query;
         const sessionStartDate = DateTime.fromISO(startDate).minus({ months: 1 }).toISO();
 
-        const sessions = await fetchUserSessionsWithActivities(userId, sessionStartDate, endDate);
-        const dailyLoads = {};
-        const fatigues = {};
+        const sessions = await fetchSessionsForDateRange(userId, sessionStartDate, endDate);
 
-        for (const session of sessions) {
-            processSession(session, dailyLoads, fatigues);
-        }
+        const metricsTable = calculateMetricsForDateRange(startDate, endDate, sessions);
 
-        const metricsTable = calculateMetricsForDateRange(startDate, endDate, dailyLoads, fatigues);
         console.log("Sessions: ", sessions);
-        console.log("Metrics Table: ", metricsTable);
+        // console.log("Metrics Table: ", metricsTable);
+
         res.json({ sessions, metricsTable });
     } catch (error) {
         console.error('Failed to calculate metrics:', error);

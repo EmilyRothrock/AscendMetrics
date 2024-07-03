@@ -1,20 +1,28 @@
-const { calculateDurationInMinutes, calculateActivityLoads } = require("../helpers/sessionsHelpers");
 const { DateTime } = require("luxon");
 
-function getMetricValue(values, dateString, part) {
-    values[dateString] = values[dateString] ?? { fingers: 0, upperBody: 0, lowerBody: 0}
-    return values[dateString][part];
-}
-
 /** Metrics Calculations */
-function calculateMetricsForDateRange(startDate, endDate, dailyLoads, fatigues) {
+function calculateMetricsForDateRange(startDate, endDate, sessions) {
+    //  Calculations related to sessions - stats, daily loads, fatigues
+    const dailyLoads = {};
+    const fatigues = {};
+    for (const session of sessions) {
+        session.activities.forEach(activity => {
+            incrementDailyLoads(dailyLoads, session.completedOn, activity.loads);
+            incrementFatigues(fatigues, session.completedOn, activity.intensities, activity.duration / 60 );
+        });
+    }
+
+    // Calculations derived from daily loads and fatigues
     const alpha7 = 2 / (8);  // 7+1 for smoothing
     const alpha28 = 2 / (29);  // 28+1 for smoothing
+
     const bodyParts = ['fingers', 'upperBody', 'lowerBody'];
-    let metricsTable = {};
+
     const start = DateTime.fromISO(startDate).minus({ days: 28 });
     const earlyStart = DateTime.fromISO(startDate);
     const end = DateTime.fromISO(endDate);
+
+    let metricsTable = {};
     let EWMA = {
         WL: {},
         ML: {},
@@ -100,8 +108,18 @@ function calculateMetricsForDateRange(startDate, endDate, dailyLoads, fatigues) 
     return metricsTable;
 }
 
-function updateEWMA(alpha, value, previousEWMA ) {
+/**
+ * Updates the Exponentially Weighted Moving Average (EWMA) for a given value.
+ */
+function updateEWMA(alpha, value, previousEWMA) {
     return alpha * value + (1 - alpha) * previousEWMA;
+}
+
+/**
+ * Gets the value for a specific metric on a specific day, defaulting to zero if not found.
+ */
+function getMetricValue(metrics, date, part) {
+    return metrics[date]?.[part] ?? 0;
 }
 
 function calculateBurnoutRiskIndex(dailyLoads, metricsTable, date, bodyParts, weeklyLoad) {
@@ -171,30 +189,10 @@ function incrementFatigues(fatigues, date, intensities, durationInHours) {
     }
 }
 
-function processSession(session, dailyLoads, fatigues) {
-    session.duration = 0;
-    session.loads = { fingers: 0, upperBody: 0, lowerBody: 0 };
-
-    session.activities.forEach(activity => {
-        const durationInMinutes = calculateDurationInMinutes(activity.startTime, activity.endTime);
-        activity.duration = durationInMinutes;
-        const durationInHours = durationInMinutes / 60;
-        session.duration += durationInHours;
-
-        activity.intensities = { fingers: activity.fingerIntensity, upperBody: activity.upperIntensity, lowerBody: activity.lowerIntensity};
-        const loads = calculateActivityLoads(durationInMinutes, activity.intensities);
-        activity.loads = loads;
-        incrementLoads(session.loads, loads);
-        incrementDailyLoads(dailyLoads, session.completedOn, loads);
-        incrementFatigues(fatigues, session.completedOn, activity.intensities, durationInHours);
-    });
-}
-
 module.exports = {
     calculateMetricsForDateRange,
     fatigue,
     incrementDailyLoads,
     incrementFatigues,
     incrementLoads,
-    processSession
 }

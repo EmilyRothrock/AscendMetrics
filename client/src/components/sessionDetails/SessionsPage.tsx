@@ -9,6 +9,7 @@ import WarningDialog from './WarningDialog';
 import { Activity, Session, defaultNewSession } from '../../types';
 import { deleteSession as deleteSessionInAPI, createSession as createSessionInAPI, updateSession as updateSessionInAPI } from '../../services/sessionService';
 import { createSession as createSessionInStore, updateSession as updateSessionInStore, deleteSession as deleteSessionInStore } from '../../store/sessionsSlice';
+import SessionGantt from '../charts/SessionGantt';
 
 const SessionPage = () => {
   const { id } = useParams<{ id: string }>();
@@ -220,7 +221,7 @@ const SessionPage = () => {
           </Box>
         </Grid>
         <Grid item md={8} sx={{ display: { xs: 'none', md: 'block' } }}>
-          {/* <SessionGantt data={sessionData.activities} /> */}
+          <SessionGantt activities={sessionData.activities} />
         </Grid>
       </Grid>
       <WarningDialog

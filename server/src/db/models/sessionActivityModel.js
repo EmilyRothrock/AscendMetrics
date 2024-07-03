@@ -33,12 +33,10 @@ module.exports = (sequelize, DataTypes) => {
       allowNull: false
     },
   }, {
-    // optional: if you want to disable timestamp fields (createdAt, updatedAt)
     timestamps: true,
   });
 
   SessionActivity.associate = function(models) {
-    // define association here if any
     SessionActivity.belongsTo(models.TrainingSession);
     SessionActivity.belongsTo(models.Activity);
   };

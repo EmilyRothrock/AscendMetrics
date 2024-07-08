@@ -19,5 +19,3 @@ const dashboardLoader = async () => {
 };
 
 export default dashboardLoader;
-
-// TODO: Factor out when other feature needs it

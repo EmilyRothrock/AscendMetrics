@@ -140,7 +140,7 @@ const sessionsSlice = createSlice({
         state.error = null;
       })
       .addCase(fetchSessionById.fulfilled, (state, action) => {
-        const newSession = action.payload.session;
+        const newSession = action.payload;
         state.sessions[newSession.id] = newSession;
         insertSessionId(state, newSession);
         state.loading = false;

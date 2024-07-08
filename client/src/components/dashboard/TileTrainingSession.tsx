@@ -3,7 +3,7 @@ import { Card, CardContent, IconButton, Typography,  CardHeader, Box } from '@mu
 import Grid from '@mui/material/Unstable_Grid2'; // Grid version 2
 import LoadBarChart from '../charts/LoadBarChart';
 import ActivityTimePieChart from '../charts/ActivityTimePieChart';
-import { Session } from '../../types'; // adjust the path to where your types are defined
+import { Session, generateDisplayName } from '../../types'; // adjust the path to where your types are defined
 import EditIcon from '@mui/icons-material/Edit';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import ExpandLessIcon from '@mui/icons-material/ExpandLess';
@@ -45,7 +45,7 @@ const TileTrainingSession: React.FC<{ session: Session; }> = ({ session }) => {
                             width: '100%',
                         }}
                     >
-                        {session.name}
+                        {session.name || generateDisplayName(session)}
                     </Typography>
                 }
                 subheader={<>

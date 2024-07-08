@@ -31,3 +31,25 @@ export const defaultNewSession = (): Session => ({
       lowerBody: 0,                            // Default load for the lower body
     }
 });
+
+
+export const generateDisplayName = (session:Session): string => {
+  if (!session.activities || session.activities.length === 0) {
+    return 'Session with no activities';  // Default text when there are no activities
+  }
+
+  // Initialize a Set to keep track of unique names
+  const uniqueNames = new Set();
+  
+  // Iterate over the activities and add unique names to the Set
+  session.activities.forEach(activity => {
+    if (activity.name) {
+      uniqueNames.add(activity.name);
+    }
+  });
+
+  // Join unique names into a string separated by commas
+  const names = Array.from(uniqueNames).join(', ');
+  
+  return names || 'Unnamed activities';  // Fallback text if all activities are unnamed
+};

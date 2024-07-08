@@ -43,7 +43,7 @@ const ActivityList: React.FC<{
     <Box>
       <Typography variant="h6">Activities</Typography>
       {activities.map((activity, index) => (
-        <Box key={activity.id} my={2} position="relative">
+        <Box key={activity.id} position="relative">
           <IconButton
             aria-label="more"
             aria-controls={`menu-${activity.id}`}

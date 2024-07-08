@@ -202,7 +202,7 @@ const SessionPage = () => {
               errors={errors}
             />
             {warnings.length > 0 && (
-              <Box my={2}>
+              <Box>
                 {warnings.map((warning, index) => (
                   <FormHelperText key={index} error>
                     {warning}
@@ -220,7 +220,7 @@ const SessionPage = () => {
             </ButtonGroup>
           </Box>
         </Grid>
-        <Grid item md={8} sx={{ display: { xs: 'none', md: 'block' } }}>
+        <Grid item md={8} sx={{ display: { xs: 'none', lg: 'block' } }}>
           <SessionGantt activities={sessionData.activities} />
         </Grid>
       </Grid>

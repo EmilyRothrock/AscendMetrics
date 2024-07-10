@@ -3,15 +3,23 @@ const db = require('../db/database');
 const { incrementLoads } = require('./metricsHelpers')
 
 /* Creation Utitilities */
-async function createActivity(activity, sessionId, transaction) {
+async function createActivity(activity, sessionDate, sessionId, transaction) {
     const dbActivity = await fetchActivityByName(activity.name, transaction);
+    console.log("Treing to create activity:", activity);
+    console.log("SessionDate: ", sessionDate);
+
+    const sessionDateOnly = DateTime.fromISO(sessionDate).toISODate();
+
+    const startTime = DateTime.fromISO(`${sessionDateOnly}T${activity.startTime}`).toSQL();
+    const endTime = DateTime.fromISO(`${sessionDateOnly}T${activity.endTime}`).toSQL();
+    console.log(startTime, endTime);
 
     return await db.SessionActivity.create({
         ActivityId: dbActivity.id,
         TrainingSessionId: sessionId,
         note: activity.note,
-        startTime: activity.startTime,
-        endTime: activity.endTime,
+        startTime: startTime,
+        endTime: endTime,
         fingerIntensity: activity.intensities.fingers,
         upperIntensity: activity.intensities.upperBody,
         lowerIntensity: activity.intensities.lowerBody
@@ -56,7 +64,6 @@ async function fetchActivityByName(name, transaction) {
             where: { name },
             transaction
         });
-        console.log("Fetched Activity:", dbActivity);
 
         if (!dbActivity) {
             console.error(`Activity with name '${name}' not found`);
@@ -90,8 +97,8 @@ async function fetchSessionById(sessionId, userId) {
         const formattedSession = formatFetchedSession(session);
         const completedSession = calculateSessionStats(formattedSession);
 
-        return completedSession
-    } catch {
+        return completedSession;
+    } catch (error) { 
         console.error('Error fetching user session:', error.message, { sessionId, userId });
         throw new Error(`Failed to fetch session: ${error.message}`);
     }

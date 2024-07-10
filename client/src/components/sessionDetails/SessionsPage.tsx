@@ -111,12 +111,15 @@ const SessionPage = () => {
   useEffect(() => {
     if (saveConfirmed) {
       const saveSession = async () => {
+        console.log("Save Confirmed for Session: ", sessionData);
         try {
           if (sessionData.id < 0) {
+            console.log("creating new session!");
             const createdSession = await createSessionInAPI(sessionData);
             console.log(createdSession);
             dispatch(createSessionInStore(createdSession));
           } else {
+            console.log("updating existing session!");
             const updatedSession = await updateSessionInAPI(sessionData);
             console.log(updatedSession);
             dispatch(updateSessionInStore(updatedSession));

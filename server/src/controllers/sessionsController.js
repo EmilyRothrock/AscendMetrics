@@ -1,3 +1,4 @@
+const { DateTime } = require('luxon');
 const db = require('../db/database');
 const {
     createActivity,
@@ -67,12 +68,12 @@ const createSession = async (req, res) => {
         }, { transaction });
         
         await Promise.all(activities.map(activity =>
-            createActivity(activity, createdSession.id, transaction)
+            createActivity(activity, completedOn, createdSession.id, transaction)
         ));
 
         await transaction.commit();
 
-        const fetchedSession = await fetchSessionById(createdSession.id);
+        const fetchedSession = await fetchSessionById(createdSession.id, userId);
 
         res.status(201).json(fetchedSession);
     } catch (error) {

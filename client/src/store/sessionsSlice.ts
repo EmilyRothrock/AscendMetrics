@@ -147,7 +147,7 @@ const sessionsSlice = createSlice({
       })
       .addCase(fetchSessionById.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.error;  // Use action.error which is SerializedError type
+        state.error = action.error;
       });
     builder
       .addCase(fetchSessionsForDateRange.pending, (state) => {
@@ -161,7 +161,7 @@ const sessionsSlice = createSlice({
       })
       .addCase(fetchSessionsForDateRange.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.error;  // Use action.error which is SerializedError type
+        state.error = action.error;
       });
     builder
       .addCase(fetchMetricsWithSessionsForDateRange.pending, (state) => {

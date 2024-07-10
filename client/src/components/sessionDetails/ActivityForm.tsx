@@ -155,27 +155,23 @@ const ActivityForm: React.FC<{ activity: Activity; onActivityChange: (activity: 
         renderInput={(params) => <TextField {...params} label="Activity Name" variant="standard" fullWidth />}
         sx={{ pr: 4 }}
       />
-      <TextField
-        label="Start Time"
-        name="startTime"
-        type="time"
-        value={DateTime.fromISO(formData.startTime).toFormat('HH:mm')}
-        onChange={handleInputChange}
-        fullWidth
-        variant="standard"
-        margin="normal"
-      />
-      <ForwardIcon fontSize="large" />
-      <TextField
-        label="End Time"
-        name="endTime"
-        type="time"
-        value={DateTime.fromISO(formData.endTime).toFormat('HH:mm')}
-        onChange={handleInputChange}
-        fullWidth
-        variant="standard"
-        margin="normal"
-      />
+      <Box display="flex" alignItems="center" justifyContent="space-between">
+        <TextField
+          label="Start Time"
+          name="startTime"
+          type="time"
+          value={DateTime.fromISO(formData.startTime).toFormat('HH:mm')}
+          onChange={handleInputChange}
+        />
+        <ForwardIcon fontSize="large" />
+        <TextField
+          label="End Time"
+          name="endTime"
+          type="time"
+          value={DateTime.fromISO(formData.endTime).toFormat('HH:mm')}
+          onChange={handleInputChange}
+        />
+      </Box>
       <TextField
         label="Notes"
         name="notes"

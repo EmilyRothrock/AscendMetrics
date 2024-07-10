@@ -11,14 +11,16 @@ interface SessionLoaderParams {
 export const sessionLoader = async ({ params } : LoaderFunctionArgs<SessionLoaderParams['params']>) => {
   if (!params.id) {
     throw new Error('Session ID is required');
-  }
+  } else if (params.id === "new") {
+    return null;
+  } else {
+    const sessionId = Number(params.id);
 
-  const sessionId = Number(params.id);
+    const session = selectSessionById(store.getState(), sessionId);
 
-  const session = selectSessionById(store.getState(), sessionId);
-
-  if (!session) {
-    await store.dispatch(fetchSessionById(sessionId));
+    if (!session) {
+      await store.dispatch(fetchSessionById(sessionId));
+    }
   }
 
   return null;

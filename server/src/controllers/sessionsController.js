@@ -17,10 +17,12 @@ const getSessionById = async (req, res) => {
     const userId = req.user.id;
 
     try {
-        const session = await fetchSessionById(sessionId, userId);
+        const dbSession = await fetchSessionById(sessionId, userId);
+        const formattedSession = formatFetchedSession(dbSession);
+        const fetchedSession = calculateSessionStats(formattedSession);
 
-        console.log(session);
-        res.json(session);
+        console.log(fetchedSession);
+        res.json(fetchedSession);
     } catch (error) {
         console.error('Error fetching session:', error);
         res.status(500).json({ error: 'Failed to fetch session' });
@@ -37,9 +39,12 @@ const getSessionsForDateRange = async (req, res) => {
     const userId = req.user.id;
 
     try {
-        const sessions = fetchSessionsForDateRange(userId, startDate, endDate);        
-        console.log(sessions);
-        res.json(sessions);
+        const sessions = fetchSessionsForDateRange(userId, startDate, endDate); 
+        const formattedSessions = sessions.map(session => formatFetchedSession(session));
+        const completedSessions = formattedSessions.map(session => calculateSessionStats(session));
+
+        console.log(completedSessions);
+        res.json(completedSessions);
     } catch (error) {
         console.error('Error fetching sessions:', error);
         res.status(500).json({ error: 'Failed to fetch sessions' });
@@ -73,9 +78,11 @@ const createSession = async (req, res) => {
 
         await transaction.commit();
 
-        const fetchedSession = await fetchSessionById(createdSession.id, userId);
+        const fetchedSession = await fetchSessionById(sessionId, userId);
+        const formattedSession = formatFetchedSession(fetchedSession);
+        const createdSessionData = calculateSessionStats(formattedSession);
 
-        res.status(201).json(fetchedSession);
+        res.status(201).json(createdSessionData);
     } catch (error) {
         await transaction.rollback();
         console.error('Error creating session:', error);
@@ -97,7 +104,6 @@ const updateSession = async (req, res) => {
 
     try {
         const session = await fetchSessionById(sessionId, userId);
-
         await session.update({
             completedOn,
             name,
@@ -110,7 +116,9 @@ const updateSession = async (req, res) => {
 
         await transaction.commit();
 
-        const updatedSessionData = await fetchSessionById(sessionId, userId);
+        const fetchedSession = await fetchSessionById(sessionId, userId);
+        const formattedSession = formatFetchedSession(fetchedSession);
+        const updatedSessionData = calculateSessionStats(formattedSession);
 
         res.status(200).json(updatedSessionData);
     } catch (error) {

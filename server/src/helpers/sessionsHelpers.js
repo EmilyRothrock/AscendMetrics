@@ -94,10 +94,7 @@ async function fetchSessionById(sessionId, userId) {
             throw new Error('Session not found');
         }
 
-        const formattedSession = formatFetchedSession(session);
-        const completedSession = calculateSessionStats(formattedSession);
-
-        return completedSession;
+        return session;
     } catch (error) { 
         console.error('Error fetching user session:', error.message, { sessionId, userId });
         throw new Error(`Failed to fetch session: ${error.message}`);
@@ -113,7 +110,7 @@ async function fetchSessionById(sessionId, userId) {
  */
 async function fetchSessionsForDateRange(userId, startDate, endDate) {
     try {
-        const sessions = await db.TrainingSession.findAll({
+        const dbSessions = await db.TrainingSession.findAll({
             where: {
             userId: userId,
             completedOn: { [db.Sequelize.Op.between]: [startDate, endDate] }
@@ -123,9 +120,7 @@ async function fetchSessionsForDateRange(userId, startDate, endDate) {
                 include: [db.Activity]
             }]
         });
-        const formattedSessions = sessions.map(session => formatFetchedSession(session));
-        const completedSessions = formattedSessions.map(session => calculateSessionStats(session));
-        return completedSessions;
+        return dbSessions;
     } catch (error) {
         console.error('Error fetching user sessions:', error);
         throw error;

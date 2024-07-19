@@ -117,6 +117,7 @@ const SessionPage = () => {
             console.log("creating new session!");
             const createdSession = await createSessionInAPI(sessionData);
             console.log(createdSession);
+            setSessionData(prevState => ({ ...prevState, id: createdSession.id }));
             dispatch(createSessionInStore(createdSession));
           } else {
             console.log("updating existing session!");

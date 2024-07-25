@@ -28,14 +28,16 @@ async function createActivity(activity, sessionDate, sessionId, transaction) {
 
 async function updateOrCreateActivity(activity, sessionId, transaction) {
     const dbActivity = await fetchActivityByName(activity.name, transaction);
+    const startTime = DateTime.fromISO(activity.startTime).toFormat("HH:MM:ss");
+    const endTime = DateTime.fromISO(activity.endTime).toFormat("HH:MM:ss");
 
     if (!activity.id || activity.id < 0) {
         return await db.SessionActivity.create({
             TrainingSessionId: sessionId,
             ActivityId: dbActivity.id,
             note: activity.note,
-            startTime: activity.startTime,
-            endTime: activity.endTime,
+            startTime: startTime,
+            endTime: endTime,
             fingerIntensity: activity.intensities.fingers,
             upperIntensity: activity.intensities.upperBody,
             lowerIntensity: activity.intensities.lowerBody
@@ -46,8 +48,8 @@ async function updateOrCreateActivity(activity, sessionId, transaction) {
             return await existingActivity.update({
                 ActivityId: dbActivity.id,
                 note: activity.note,
-                startTime: activity.startTime,
-                endTime: activity.endTime,
+                startTime: startTime,
+                endTime: endTime,
                 fingerIntensity: activity.intensities.fingers,
                 upperIntensity: activity.intensities.upperBody,
                 lowerIntensity: activity.intensities.lowerBody
@@ -154,19 +156,20 @@ function calculateSessionStats(session) {
     initializeSessionStats(session);
     
     const newActivities = [];
-
+    
+    const sessionDate = DateTime.fromISO(session.completedOn).toISODate();
     // Using Luxon to handle extreme values more easily
-    let earliestActivityStart = DateTime.fromISO('9999-12-31T23:59:59.999');
-    let latestActivityEnd = DateTime.fromISO('0001-01-01T00:00:00.000');
+    let earliestActivityStart = DateTime.fromISO(`${sessionDate}T23:59:59.999`);
+    let latestActivityEnd = DateTime.fromISO(`${sessionDate}T00:00:00.000`);
 
     session.activities.forEach(activity => {
         const newActivity = calculateActivityStats(activity);
         newActivities.push(newActivity);
         incrementLoads(session.loads, newActivity.loads);
 
-        const activityStart = DateTime.fromJSDate(newActivity.startTime);
-        const activityEnd = DateTime.fromJSDate(newActivity.endTime);
-
+        const activityStart = DateTime.fromISO(`${sessionDate}T${newActivity.startTime}`);
+        const activityEnd = DateTime.fromISO(`${sessionDate}T${newActivity.endTime}`);
+       
         if (activityStart < earliestActivityStart) {
             earliestActivityStart = activityStart;
         }
@@ -176,6 +179,11 @@ function calculateSessionStats(session) {
     });
 
     session.activities = newActivities;
+
+    // Adjust for crossing midnight: if the end is before the start, add one day
+    if (latestActivityEnd < earliestActivityStart) {
+        latestActivityEnd = latestActivityEnd.plus({ days: 1 });
+    }
 
     if (earliestActivityStart <= latestActivityEnd) {
         session.duration = latestActivityEnd.diff(earliestActivityStart, 'hours').hours;
@@ -222,11 +230,21 @@ function calculateActivityStats(activity) {
     return activity;
 }
 
+
 function calculateDurationInMinutes(startTime, endTime) {
-    const start = DateTime.fromJSDate(startTime);
-    const end = DateTime.fromJSDate(endTime);
+    // Assuming the same date for both times since only times are provided
+    const dateContext = '2024-01-01'; // Use any arbitrary date
+
+    const start = DateTime.fromISO(`${dateContext}T${startTime}`);
+    let end = DateTime.fromISO(`${dateContext}T${endTime}`);
+
+    // Handling cases where endTime might be on the next day (cross midnight scenario)
+    if (end < start) {
+        end = end.plus({ days: 1 });
+    }
+
     return end.diff(start, 'minutes').minutes;
-};
+}
 
 function calculateLoads(durationInHours, intensities) {
     return {
@@ -244,5 +262,6 @@ module.exports = {
     createActivity,
     updateOrCreateActivity,
     fetchSessionById,
-    fetchSessionsForDateRange
+    fetchSessionsForDateRange,
+    formatFetchedSession
 };

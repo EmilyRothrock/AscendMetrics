@@ -4,7 +4,9 @@ const {
     createActivity,
     updateOrCreateActivity,
     fetchSessionsForDateRange,
-    fetchSessionById
+    fetchSessionById,
+    formatFetchedSession,
+    calculateSessionStats
 } = require('../helpers/sessionsHelpers');
 
 /**
@@ -21,7 +23,6 @@ const getSessionById = async (req, res) => {
         const formattedSession = formatFetchedSession(dbSession);
         const fetchedSession = calculateSessionStats(formattedSession);
 
-        console.log(fetchedSession);
         res.json(fetchedSession);
     } catch (error) {
         console.error('Error fetching session:', error);

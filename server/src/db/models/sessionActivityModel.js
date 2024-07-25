@@ -13,11 +13,11 @@ module.exports = (sequelize, DataTypes) => {
       allowNull: true
     },
     startTime: {
-      type: DataTypes.DATE,
+      type: DataTypes.TIME,
       allowNull: false
     },
     endTime: {
-      type: DataTypes.DATE,
+      type: DataTypes.TIME,
       allowNull: false
     },
     fingerIntensity: {

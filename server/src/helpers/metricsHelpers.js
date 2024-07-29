@@ -7,8 +7,9 @@ function calculateMetricsForDateRange(startDate, endDate, sessions) {
     const fatigues = {};
     for (const session of sessions) {
         session.activities.forEach(activity => {
-            incrementDailyLoads(dailyLoads, session.completedOn, activity.loads);
-            incrementFatigues(fatigues, session.completedOn, activity.intensities, activity.duration / 60 );
+            const date = DateTime.fromISO(session.completedOn).toISODate();
+            incrementDailyLoads(dailyLoads, date, activity.loads);
+            incrementFatigues(fatigues, date, activity.intensities, activity.duration / 60 );
         });
     }
 
@@ -18,8 +19,8 @@ function calculateMetricsForDateRange(startDate, endDate, sessions) {
 
     const bodyParts = ['fingers', 'upperBody', 'lowerBody'];
 
-    const start = DateTime.fromISO(startDate).minus({ days: 28 });
-    const earlyStart = DateTime.fromISO(startDate);
+    const earlyStart = DateTime.fromISO(startDate).minus({ days: 28 });
+    const start = DateTime.fromISO(startDate);
     const end = DateTime.fromISO(endDate);
 
     let metricsTable = {};
@@ -94,6 +95,7 @@ function calculateMetricsForDateRange(startDate, endDate, sessions) {
                 averageLoadSeverity: EWMA.WLS[dateString],
                 weeklyLoadChange: weeklyLoadChange,
                 averageWeeklyLoadChange: EWMA.WLChange[dateString],
+                fatigue: fatigues[dateString],
                 dailyStrain: dailyStrain,
                 weeklyStrain: EWMA.WS[dateString],
                 monthlyStrain: EWMA.MS[dateString],

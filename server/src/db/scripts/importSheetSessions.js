@@ -52,8 +52,8 @@ async function importSessionData(userEmail, csvFileName) {
                 }, { transaction });
 
                 for (const entry of entries) {
-                    const startTime = DateTime.fromFormat(`${entry.Date} ${entry['Start Time']}`, 'M/d/yyyy h:mm a').toISO();
-                    const endTime = DateTime.fromFormat(`${entry.Date} ${entry['End Time']}`, 'M/d/yyyy h:mm a').toISO();
+                    const startTime = DateTime.fromFormat(`${entry['Start Time']}`, 'h:mm a').toFormat('HH:mm');
+                    const endTime = DateTime.fromFormat(`${entry['End Time']}`, 'h:mm a').toFormat('HH:mm');
 
                     // Find or create the Activity
                     const activity = await Activity.findOne({ where: { name: entry.Activity } });

@@ -1,6 +1,6 @@
 import React, { useEffect, useRef } from 'react';
 import { Activity } from '../../types';
-import { axisBottom, axisLeft, axisTop, scaleBand, scaleTime, select, timeFormat } from 'd3';
+import { axisBottom, axisLeft, axisTop, scaleBand, scaleTime, select, sum, timeFormat } from 'd3';
 import { DateTime } from 'luxon';
 
 interface SessionGanttProps {
@@ -26,6 +26,21 @@ const SessionGantt: React.FC<SessionGanttProps> = ({ activities }) => {
         maxEndTime = currentHour;
         minStartTime = nextHour;
     }
+
+    const normalizedActivities = validActivities.map(activity => {
+        const intensities = activity.intensities;
+        const totalIntensity = intensities.fingers + intensities.upperBody + intensities.lowerBody;
+        return {
+            ...activity,
+            segments: [
+                { part: 'fingers', value: intensities.fingers / totalIntensity, color: 'steelblue' },
+                { part: 'upperBody', value: intensities.upperBody / totalIntensity, color: 'red' },
+                { part: 'lowerBody', value: intensities.lowerBody / totalIntensity, color: 'gold' }
+            ]
+        };
+    });
+
+    console.log(normalizedActivities);
 
     useEffect(() => {
         const ganttChart = select(ref.current)
@@ -69,15 +84,42 @@ const SessionGantt: React.FC<SessionGanttProps> = ({ activities }) => {
             .attr("stroke", "lightgray")
             .attr("stroke-opacity", 0.7);
 
-        ganttChart
-            .selectAll(".bar")
-            .data(validActivities)
-            .join("rect")
-            .attr("class", "bar")
+        const barGroups = ganttChart.selectAll(".barGroup")
+            .data(normalizedActivities)
+            .join("g")
+            .attr("class", "barGroup")
             .attr("x", d => xScale(DateTime.fromISO(d.startTime)))
-            .attr("y", d => yScale(d.name)!)
-            .attr("width", d => xScale(DateTime.fromISO(d.endTime)) - xScale(DateTime.fromISO(d.startTime)))
-            .attr("height", yScale.bandwidth());
+            .attr("y", d => yScale(d.name)!);
+        barGroups.each(function(activity) {
+            const group = select(this);
+            let accumulatedWidth = 0;
+
+            group.selectAll(".segment")
+                .data(activity.segments)
+                .join("rect")
+                .attr("class", "segment")
+                .attr("x", d => {
+                    const segmentWidth = (xScale(DateTime.fromISO(activity.endTime)) - xScale(DateTime.fromISO(activity.startTime))) * d.value;
+                    const currentX = accumulatedWidth;
+                    accumulatedWidth += segmentWidth;
+                    return currentX + xScale(DateTime.fromISO(activity.startTime));
+                })
+                .attr("y", yScale(activity.name)!)
+                .attr("width", d => (xScale(DateTime.fromISO(activity.endTime)) - xScale(DateTime.fromISO(activity.startTime))) * d.value)
+                .attr("height", yScale.bandwidth())
+                .attr("fill", d => d.color);
+
+            group.append("rect")
+                .attr("x", xScale(DateTime.fromISO(activity.startTime)))
+                .attr("y", yScale(activity.name)!)
+                .attr("width", accumulatedWidth)  // Cover the full width as calculated
+                .attr("height", yScale.bandwidth())
+                .attr("fill", "none")
+                .attr("stroke", "black")
+                .attr("stroke-width", "2")
+                .attr("rx", 3)
+                .attr("ry", 3);
+        });
     });
 
     return (
@@ -85,6 +127,7 @@ const SessionGantt: React.FC<SessionGanttProps> = ({ activities }) => {
             <g className="x-axis"/>
             <g className="y-axis"/>
             <g className="grid"/>
+            <g className="barGroup"/>
         </svg>
     );
 };

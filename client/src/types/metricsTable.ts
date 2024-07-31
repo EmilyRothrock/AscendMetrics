@@ -1,7 +1,7 @@
 import { BodyPartMetrics } from "./bodyPartMetrics";
 
 export interface MetricsTable {
-    [date: string]: DailyMetrics,
+    [date: string]: DailyMetrics;
 }
 
 export interface DailyMetrics {

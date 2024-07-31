@@ -1,93 +1,91 @@
-import React from 'react';
-import * as d3 from 'd3';
-import { DateTime } from 'luxon';
-import D3Graph from './D3Graph';
+import React, { useEffect, useRef } from 'react';
 import { Activity } from '../../types';
+import { axisBottom, axisLeft, axisTop, scaleBand, scaleTime, select, timeFormat } from 'd3';
+import { DateTime } from 'luxon';
 
 interface SessionGanttProps {
   activities: Activity[];
 }
 
 const SessionGantt: React.FC<SessionGanttProps> = ({ activities }) => {
-  const renderGraph = (
-    svg: d3.Selection<SVGSVGElement, unknown, null, undefined>,
-    dimensions: { width: number; height: number }
-  ) => {
-    // Clear SVG contents before redrawing
-    svg.selectAll("*").remove();
+    const ref = useRef();
 
-    // Set SVG dimensions
-    svg
-      .attr("width", dimensions.width)
-      .attr("height", dimensions.height);
 
-    const margin = { top: 20, right: 30, bottom: 30, left: 40 };
-    const width = dimensions.width - margin.left - margin.right;
-    const height = dimensions.height - margin.top - margin.bottom;
-
-    const g = svg.append("g")
-      .attr("transform", `translate(${margin.left},${margin.top})`);
-    
     const validActivities = activities.filter(d => d.startTime && d.endTime);
 
-    // Determine if we have any activities
+    let maxEndTime = null;
+    let minStartTime = null;
     if (validActivities.length > 0) {
-      // Prepare data
-      const times = validActivities.map(a => [DateTime.fromISO(a.startTime), DateTime.fromISO(a.endTime)]);
-      const maxEndTime = DateTime.max(...times.map(d => d[1]));
-      const minStartTime = DateTime.min(...times.map(d => d[0]));
-
-      // Set up x-axis
-      const xScale = d3.scaleTime()
-        .domain([minStartTime.minus({ minutes: 30 }), maxEndTime.plus({ minutes: 30 })])
-        .range([0, width]);
-
-      g.append("g")
-        .attr("transform", `translate(0,${height})`)
-        .call(d3.axisBottom(xScale).ticks(d3.timeMinute.every(30)));
-
-      // Set up y-axis
-      const yScale = d3.scaleBand()
-        .domain(validActivities.map(a => a.name))
-        .range([0, height])
-        .padding(0.1);
-
-      g.append("g")
-        .call(d3.axisLeft(yScale));
-
-      // Create bars
-      g.selectAll(".bar")
-        .data(validActivities)
-        .enter().append("rect")
-        .attr("class", "bar")
-        .attr("x", d => xScale(DateTime.fromISO(d.startTime)))
-        .attr("y", d => yScale(d.name)!)
-        .attr("width", d => xScale(DateTime.fromISO(d.endTime)) - xScale(DateTime.fromISO(d.startTime)))
-        .attr("height", yScale.bandwidth())
-        .attr("fill", "steelblue");
+        // Prepare data
+        const times = validActivities.map(a => [DateTime.fromISO(a.startTime), DateTime.fromISO(a.endTime)]);
+        maxEndTime = DateTime.max(...times.map(d => d[1]));
+        minStartTime = DateTime.min(...times.map(d => d[0]));
     } else {
-      // Set x-axis for current hour
-      const currentHour = DateTime.now().startOf('hour');
-      const nextHour = currentHour.plus({ hour: 1 });
-
-      const xScale = d3.scaleTime()
-        .domain([currentHour, nextHour])
-        .range([0, width]);
-
-      g.append("g")
-        .attr("transform", `translate(0,${height})`)
-        .call(d3.axisBottom(xScale).ticks(d3.timeMinute.every(10)));
-
-      // Indicate no activities
-      g.append("text")
-        .attr("x", width / 2)
-        .attr("y", height / 2)
-        .attr("text-anchor", "middle")
-        .text("No activities to display");
+        const currentHour = DateTime.now().startOf('hour');
+        const nextHour = currentHour.plus({ hour: 1 });
+        maxEndTime = currentHour;
+        minStartTime = nextHour;
     }
-  };
 
-  return <D3Graph title="Session Summary" renderGraph={renderGraph} />;
+    useEffect(() => {
+        const ganttChart = select(ref.current)
+            .style("overflow", "visible")
+            .style("padding-left", "30px")
+            .style("padding-top", "20px");
+        
+        const xScale = scaleTime()
+            .domain([minStartTime, maxEndTime])
+            .range([0, 800]);
+        
+        const yScale = scaleBand()
+            .domain(validActivities.map(a => a.name))
+            .range([0, 400])
+            .padding(0.5);
+
+        const xAxis = axisTop(xScale)
+            .tickFormat((d) => timeFormat("%-I:%M %p")(d));
+        ganttChart
+            .select(".x-axis")
+            .call(xAxis);
+
+        const yAxis = axisLeft(yScale)
+            .tickSize(0) // No tick marks
+        ganttChart
+            .select(".y-axis")
+            .call(yAxis)
+            .selectAll(".tick text") // Select all text elements in the y-axis
+            .style("text-anchor", "middle") // Ensures text aligns correctly when rotated
+            .style("font-size", "12")
+            .attr("transform", "rotate(-90)") // Rotates the text 90 degrees counterclockwise
+            .attr("dy", "-0.5em");
+
+        const gridlines = axisTop(xScale)
+            .tickSize(-400) // Full chart height
+            .tickFormat("");
+        ganttChart
+            .select(".grid")
+            .call(gridlines)
+            .selectAll(".tick line")
+            .attr("stroke", "lightgray")
+            .attr("stroke-opacity", 0.7);
+
+        ganttChart
+            .selectAll(".bar")
+            .data(validActivities)
+            .join("rect")
+            .attr("class", "bar")
+            .attr("x", d => xScale(DateTime.fromISO(d.startTime)))
+            .attr("y", d => yScale(d.name)!)
+            .attr("width", d => xScale(DateTime.fromISO(d.endTime)) - xScale(DateTime.fromISO(d.startTime)))
+            .attr("height", yScale.bandwidth());
+    });
+
+    return (
+        <svg ref={ref} width={"100%"} height={"100%"}>
+            <g className="x-axis"/>
+            <g className="y-axis"/>
+            <g className="grid"/>
+        </svg>
+    );
 };
-
 export default SessionGantt;

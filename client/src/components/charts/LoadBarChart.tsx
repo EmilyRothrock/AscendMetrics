@@ -4,7 +4,10 @@ import D3Graph from './D3Graph.tsx';
 import { BodyPartMetrics } from '../../types';
 
 const LoadBarChart: React.FC<{ data: BodyPartMetrics; }> = ({ data }) => {
-  const renderGraph = (svg: d3.Selection<SVGSVGElement, unknown, null, undefined>, dimensions: { width: number; height: number }) => {
+  const renderGraph = (
+    svg: d3.Selection<SVGSVGElement, unknown, null, undefined>, 
+    dimensions: { width: number; height: number }
+  ) => {
     const margin = { top: 0, right: 5, bottom: 20, left: 0 };
     const { width, height } = dimensions;
 
@@ -16,7 +19,6 @@ const LoadBarChart: React.FC<{ data: BodyPartMetrics; }> = ({ data }) => {
       .attr("width", width)
       .attr("height", height)
       .append("g")
-      .attr("transform", `translate(${margin.left},${margin.top})`);
 
     // Convert BodyPartMetrics to array for D3
     const metricsArray = Object.entries(data).map(([part, load]) => ({ part, load }));

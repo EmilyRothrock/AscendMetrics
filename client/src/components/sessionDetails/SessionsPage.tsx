@@ -165,7 +165,7 @@ const SessionPage = () => {
 
   return (
     <>
-      <Grid container spacing={1}>
+      <Grid container>
         <Grid item xs={12} md={4}>
           <Box component="form" noValidate autoComplete="off">
             <Typography variant="h4">{id === 'new' ? 'New Session' : 'Edit Session'}</Typography>

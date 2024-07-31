@@ -3,12 +3,13 @@ import { Stack, Typography, Box, Button } from '@mui/material';
 import ReadinessTile from './ReadinessTile';
 import Grid from '@mui/material/Unstable_Grid2'; // Grid version 2
 import TileTrainingSession from './TileTrainingSession';
-import { BarChart, LineChart } from '@mui/x-charts';
+import { BarChart } from '@mui/x-charts';
 import NewSessionButton from './NewSessionButton';
 import { RootState } from '../../store/store'; 
 import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import SessionIcon from '@mui/icons-material/EventNote'; // Example icon for "Sessions"
+import BalanceLineChart from '../charts/BalanceLineChart';
 
 // Landing page after logging in - surface level information about your Readiness, Past Sessions, and Visualizations for trends in past month
 const Dashboard: React.FC = () => {
@@ -51,15 +52,7 @@ const Dashboard: React.FC = () => {
                                 series={[{ data: [4, 3, 5] }, { data: [1, 6, 3] }, { data: [2, 5, 6] }]}
                                 height={300}
                             />
-                            <LineChart
-                                xAxis={[{ data: [1, 2, 3, 5, 8, 10] }]}
-                                series={[
-                                    {
-                                    data: [2, 5.5, 2, 8.5, 1.5, 5],
-                                    },
-                                ]}
-                                height={300}
-                            />
+                            <BalanceLineChart />
                         </Stack>
                     </DashboardColumn>
                 </Grid>

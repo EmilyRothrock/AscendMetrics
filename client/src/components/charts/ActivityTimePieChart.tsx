@@ -1,13 +1,11 @@
-import React, { useState } from 'react';
-import * as d3 from 'd3';
+import React, { useEffect, useRef } from 'react';
 import { Activity } from '../../types';
-import D3Graph from './D3Graph';
+import { select, pie, arc, PieArcDatum, schemeCategory10, interpolateYlGnBu, interpolateRainbow } from 'd3';
 
 const ActivityTimePieChart: React.FC<{ activities: Activity[]; }> = ({ activities }) => {
-    const [selectedActivity, setSelectedActivity] = useState<{ activity: string, totalDuration: number } | null>(null);
+    const ref = useRef();
 
-    // Prepare data
-    const data: { activity: string, totalDuration: number }[] = activities.reduce((acc, activity) => {
+    const data: { activity: string, totalDuration: number}[] = activities.reduce((acc, activity) => {
         const existing = acc.find(a => a.activity === activity.name);
         if (existing) {
             existing.totalDuration += activity.duration;
@@ -17,79 +15,52 @@ const ActivityTimePieChart: React.FC<{ activities: Activity[]; }> = ({ activitie
         return acc;
     }, [] as { activity: string, totalDuration: number }[]);
 
-    const renderGraph = (svg: d3.Selection<SVGSVGElement, unknown, null, undefined>, dimensions: { width: number; height: number }) => {
-        const radius = Math.min(dimensions.width, dimensions.height) / 2;
+    useEffect(() => {
+        const radius = 80;
 
-        // Clear the SVG
-        svg.selectAll("*").remove();
+        const pieChart = select(ref.current)
+            .selectAll('.pie')
+            .attr('transform', `translate(90, 90)`)
+            .style("overflow", "visible");
 
-        // Create the pie chart layout
-        const pie = d3.pie<{ activity: string, totalDuration: number }>()
-            .value(d => d.totalDuration)
-            .sort(null);
+        // Pie generator - defines how value is handled
+        const myPie = pie<{ activity: string, totalDuration: number }>()
+            .value(d => d.totalDuration);
 
-        // Create the arc generator
-        const arc = d3.arc<d3.PieArcDatum<{ activity: string, totalDuration: number }>>()
+        // Arc generator - creates full objects with start and end angles
+        const myArc = arc<PieArcDatum<{ activity: string, totalDuration: number }>>()
             .innerRadius(radius * 0.67)
             .outerRadius(radius);
 
-        // Append the group element for the pie chart
-        const g = svg.append('g')
-            .attr('transform', `translate(${dimensions.width / 2}, ${dimensions.height / 2})`);
-
-        // Create pie chart slices
-        const arcs = g.selectAll('.arc')
-            .data(pie(data))
-            .enter().append('g')
+        // Execute generation
+        const arcs = pieChart
+            .selectAll('.arc')
+            .data(myPie(data))
+            .join('g')
             .attr('class', 'arc');
 
-        // Append path elements for each slice and set up event listeners
-        arcs.append('path')
-            .attr('d', arc)
-            .attr('fill', (d, i) => d3.schemeCategory10[i % 10])
+        arcs
+            .append('path')
+            .attr('d', myArc)
+            .attr('fill', (d) => interpolateRainbow(Math.random()))
             .on('mouseover', function (event, d) {
-                setSelectedActivity(d.data);
                 updateCentralText(d.data);
             })
             .on('mouseout', function () {
-                setSelectedActivity(null);
                 updateCentralText(null);
             })
             .on('click', function (event, d) {
-                setSelectedActivity(d.data);
                 updateCentralText(d.data);
             });
 
-        // Add a central text element to display activity details
-        const centralText = g.append('text')
-            .attr('class', 'center-text')
-            .attr('text-anchor', 'middle')
-            .style('font-size', '14px');
+        const centralText = pieChart.selectAll(".center-text");
 
-        // Function to update central text with wrapping
         const updateCentralText = (data: { activity: string, totalDuration: number } | null) => {
             centralText.selectAll("tspan").remove();
-            if (data) {
-                const text = `${data.activity}: ${data.totalDuration.toFixed(0)} min.`;
-                const words = text.split(" ");
-                let line = "";
-                const lines: string[] = [];
-                const maxCharsPerLine = 20; // Adjust this divisor for fine-tuning
-
-                for (let i = 0; i < words.length; i++) {
-                    if (line.length + words[i].length > maxCharsPerLine) {
-                        lines.push(line);
-                        line = words[i];
-                    } else {
-                        line = line + (line.length ? " " : "") + words[i];
-                    }
-                }
-                lines.push(line);
-                
-                // Calculate the y offset to center the text block
+            if (data) {            
+                const lines = [`${data.activity}:`, `${data.totalDuration.toFixed(0)} min.`];
                 const lineHeight = 1.2; // Line height in em units
                 const initialY = -((lines.length - 1) * lineHeight) / 2;
-
                 lines.forEach((line, i) => {
                     centralText.append("tspan")
                         .attr("x", 0)
@@ -104,20 +75,25 @@ const ActivityTimePieChart: React.FC<{ activities: Activity[]; }> = ({ activitie
                     .style("font-style", "italic")
                     .text("hover/click");
                 centralText.append("tspan")
-                .attr("x", 0)
-                .attr("dy", "1.2em")
-                .style("fill", "grey")
-                .style("font-style", "italic")
-                .text("for details");
+                    .attr("x", 0)
+                    .attr("dy", "1.2em")
+                    .style("fill", "grey")
+                    .style("font-style", "italic")
+                    .text("for details");
             }
-        };
+        }
 
-        // Initial rendering of central text
-        updateCentralText(selectedActivity);
-    };
-
+        updateCentralText(null); // initial rendering
+    });
+    
     return (
-        <D3Graph title="Activity Time" renderGraph={renderGraph} />
+        <svg ref={ref} width={"100%"} height={"100%"}>
+            <g className="pie">
+                <text className="center-text" textAnchor="middle" style={{ fontSize:"14px" }}>
+                    <tspan>testing</tspan>
+                </text>
+            </g>
+        </svg>
     );
 }
 

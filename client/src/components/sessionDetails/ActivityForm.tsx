@@ -155,7 +155,7 @@ const ActivityForm: React.FC<{ activity: Activity; onActivityChange: (activity: 
         renderInput={(params) => <TextField {...params} label="Activity Name" variant="standard" fullWidth />}
         sx={{ pr: 4 }}
       />
-      <Box display="flex" alignItems="center" justifyContent="space-between">
+      <Box display="flex" alignItems="center" justifyContent="center" paddingTop="12px" >
         <TextField
           label="Start Time"
           name="startTime"
@@ -180,7 +180,7 @@ const ActivityForm: React.FC<{ activity: Activity; onActivityChange: (activity: 
         fullWidth
         variant="standard"
         multiline
-        margin="normal"
+        sx={{ marginTop:"6px", marginBottom:"8px" }}
       />
       <Box display="flex" justifyContent="space-between">
         <IntensityInput

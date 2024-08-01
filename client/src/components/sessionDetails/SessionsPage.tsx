@@ -196,6 +196,7 @@ const SessionPage = () => {
               value={sessionData.notes}
               onChange={handleInputChange}
               fullWidth
+              multiline
               margin="normal"
               sx={{ mt: '8px', mb: '4px' }}
             />

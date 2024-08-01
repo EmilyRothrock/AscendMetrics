@@ -5,7 +5,6 @@ const { incrementLoads } = require('./metricsHelpers')
 /* Creation Utitilities */
 async function createActivity(activity, sessionId, transaction) {
     const dbActivity = await fetchActivityByName(activity.name, transaction);
-
     const startTime = DateTime.fromISO(activity.startTime).toFormat("HH:mm");
     const endTime = DateTime.fromISO(activity.endTime).toFormat("HH:mm");
 
@@ -23,8 +22,8 @@ async function createActivity(activity, sessionId, transaction) {
 
 async function updateOrCreateActivity(activity, sessionId, transaction) {
     const dbActivity = await fetchActivityByName(activity.name, transaction);
-    const startTime = DateTime.fromISO(activity.startTime).toFormat("HH:MM:ss");
-    const endTime = DateTime.fromISO(activity.endTime).toFormat("HH:MM:ss");
+    const startTime = DateTime.fromISO(activity.startTime).toFormat("HH:mm");
+    const endTime = DateTime.fromISO(activity.endTime).toFormat("HH:mm");
 
     if (!activity.id || activity.id < 0) {
         return await db.SessionActivity.create({

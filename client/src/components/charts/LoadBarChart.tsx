@@ -1,73 +1,72 @@
-import React from 'react';
-import * as d3 from 'd3';
-import D3Graph from './D3Graph.tsx';
+import React, { useEffect, useRef } from 'react';
 import { BodyPartMetrics } from '../../types';
+import { axisBottom, axisLeft, max, scaleBand, scaleLinear, select } from 'd3';
 
 const LoadBarChart: React.FC<{ data: BodyPartMetrics; }> = ({ data }) => {
-  const renderGraph = (
-    svg: d3.Selection<SVGSVGElement, unknown, null, undefined>, 
-    dimensions: { width: number; height: number }
-  ) => {
-    const margin = { top: 0, right: 5, bottom: 20, left: 0 };
-    const { width, height } = dimensions;
+  const ref = useRef();
 
-    // Clear SVG contents before redrawing
-    svg.selectAll("*").remove();
+  const metricsArray = Object.entries(data).map(([part, load]) => ({ part, load }));
+  const colors = { fingers:"#2E96FF", upperBody:"#B800D8", lowerBody:"#02B2AF"};
+  const labels = { fingers:"Fingers", upperBody:"Upper Body", lowerBody:"Lower Body"}
 
-    // Set SVG dimensions
-    const g = svg
-      .attr("width", width)
-      .attr("height", height)
-      .append("g")
+  useEffect(() => {
+    const barChart = select(ref.current)
+      .style("overflow", "visible");
 
-    // Convert BodyPartMetrics to array for D3
-    const metricsArray = Object.entries(data).map(([part, load]) => ({ part, load }));
+    const xScale = scaleLinear()
+      .domain([0, max(metricsArray, d => d.load) as number])
+      .range([0, 150]);
+    const xAxis = axisBottom(xScale)
+      .ticks(3);
+    barChart
+      .select(".x-axis")
+      .call(xAxis)            
+      .style("transform", "translateY(150px)");
 
-    // Set up scales
-    const x = d3.scaleLinear()
-      .domain([0, d3.max(metricsArray, d => d.load) as number])
-      .range([0, width - margin.left - margin.right]);
-
-    const y = d3.scaleBand()
-      .range([0, height - margin.top - margin.bottom])
+    const yScale = scaleBand()
+      .range([0, 150])
       .domain(metricsArray.map(d => d.part))
       .padding(0.3);
+    const yAxis = axisLeft(yScale)
+      .ticks(0)
+      .tickFormat("");
+    barChart
+      .select(".y-axis")
+      .call(yAxis)
+      .selectAll(".tick line")
+      .attr("stroke-width",0);
 
-    // Draw axes
-    g.append("g")
-      .call(d3.axisLeft(y)); // Y-axis
-
-    // Customize X-axis ticks to show every 5th label
-    g.append("g")
-      .attr("transform", `translate(0,${height - margin.top - margin.bottom})`)
-      .call(d3.axisBottom(x).tickValues(d3.range(5, d3.max(metricsArray, d => d.load) as number + 1, 5)));
-
-    // Draw bars
-    g.selectAll(".bar")
+    barChart
+      .selectAll(".bar")
       .data(metricsArray)
       .enter()
       .append("rect")
       .attr("class", "bar")
-      .attr("y", d => y(d.part)!)
-      .attr("width", d => x(d.load))
-      .attr("height", y.bandwidth())
-      .attr("fill", "#69b3a2");
-
-    // Add labels to bars
-    g.selectAll(".label")
+      .attr("y", d => yScale(d.part)!)
+      .attr("width", d => xScale(d.load))
+      .attr("height", yScale.bandwidth())
+      .attr("fill", (d) => colors[d.part]);
+    
+    barChart
+      .selectAll(".label")
       .data(metricsArray)
       .enter()
       .append("text")
       .attr("class", "label")
-      .attr("y", d => y(d.part)! + y.bandwidth() / 2)
+      .attr("y", d => yScale(d.part)! + yScale.bandwidth() / 2)
       .attr("x", 5) // slight offset from the start of the bar
       .attr("dy", "0.35em") // vertically center
       .attr("text-anchor", "start")
       .style("font-size", "12px")
-      .text(d => `${d.part}: ${d.load.toFixed(2)}`);
-  };
+      .text(d => `${labels[d.part]}: ${d.load.toFixed(2)}`);
+  });
 
-  return <D3Graph title="Loads" renderGraph={renderGraph} />;
+  return (
+    <svg ref={ref} width={"100%"} height={"100%"}>
+      <g className="x-axis"/>
+      <g className="y-axis"/>
+    </svg>
+  );
 };
 
 export default LoadBarChart;

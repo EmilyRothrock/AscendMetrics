@@ -107,7 +107,7 @@ const BalanceLineChart = () => {
             .attr("d", d => myLine(d.values))
             .attr("fill", "none")
             .style("stroke", d => d.color)
-            .attr("stroke-width", "2");
+            .attr("stroke-width", (d, i) => 3 - (i + 1)/2);
 
         const legend = lineChart.selectAll(".legend")
             .data(data)

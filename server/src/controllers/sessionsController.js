@@ -74,12 +74,12 @@ const createSession = async (req, res) => {
         }, { transaction });
         
         await Promise.all(activities.map(activity =>
-            createActivity(activity, completedOn, createdSession.id, transaction)
+            createActivity(activity, createdSession.id, transaction)
         ));
 
         await transaction.commit();
 
-        const fetchedSession = await fetchSessionById(sessionId, userId);
+        const fetchedSession = await fetchSessionById(createdSession.id, userId);
         const formattedSession = formatFetchedSession(fetchedSession);
         const createdSessionData = calculateSessionStats(formattedSession);
 

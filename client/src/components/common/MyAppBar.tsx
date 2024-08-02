@@ -56,7 +56,7 @@ const MyAppBar: React.FC = () => {
                         Dashboard
                     </Button>
                     <UnderConstructionBadge>
-                        <Button color="inherit" startIcon={<SessionIcon />} onClick={() => navigate('/sessions')} sx={{ mx: 1 }}>
+                        <Button color="inherit" startIcon={<SessionIcon />} onClick={() => navigate('/sessions/manage')} sx={{ mx: 1 }}>
                             Sessions
                         </Button>
                     </UnderConstructionBadge>

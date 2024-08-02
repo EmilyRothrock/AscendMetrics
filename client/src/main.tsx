@@ -6,7 +6,7 @@ import {
   RouterProvider,
 } from "react-router-dom";
 import { createTheme, ThemeProvider } from '@mui/material/styles';
-import SessionPage from "./components/sessionDetails/SessionsPage";
+import SessionPage from "./components/sessionEditor/SessionsPage";
 import Layout from "./components/common/Layout";
 import ProtectedRoute from "./components/auth/ProtectedRoute";
 import SigninPage from "./components/auth/SigninPage";
@@ -16,6 +16,8 @@ import { Provider as StoreProvider } from "react-redux";
 import store from './store/store';
 import dashboardLoader from "./loaders/dashboardLoader";
 import { sessionLoader } from "./loaders/sessionsLoader";
+import { sessionsManagerLoader } from "./loaders/sessionsManagerLoader";
+import SessionsManagerPage from "./components/sessionsManager/SessionManagerPage";
 
 const theme = createTheme({
   palette: {
@@ -63,6 +65,11 @@ const router = createBrowserRouter([
         element: <SessionPage/>,
         loader: sessionLoader,
       },
+      {
+        path: "sessions/manage",
+        element: <SessionsManagerPage/>,
+        loader: sessionsManagerLoader,
+      }
     ]
   },
 ]);

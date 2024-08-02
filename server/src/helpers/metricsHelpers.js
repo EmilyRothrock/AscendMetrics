@@ -87,7 +87,7 @@ function calculateMetricsForDateRange(startDate, endDate, sessions) {
 
             // Assignments
             metricsTable[dateString] = {
-                dailyLoad: dailyLoads[dateString],
+                dailyLoad: dailyLoads[dateString] || { fingers:0, upperBody:0, lowerBody:0 },
                 weeklyLoad: EWMA.WL[dateString],
                 monthlyLoad: EWMA.ML[dateString],
                 loadBalance: loadBalance,

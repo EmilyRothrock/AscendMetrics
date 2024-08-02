@@ -10,6 +10,7 @@ import DashboardIcon from '@mui/icons-material/Dashboard';
 import SessionIcon from '@mui/icons-material/EventNote'; // Example icon for "Sessions"
 import { useNavigate } from 'react-router-dom';
 import SignoutButton from '../auth/SignoutButton';
+import UnderConstructionBadge from './UnderConstructionBadge';
 
 const MyAppBar: React.FC = () => {
     const navigate = useNavigate();
@@ -54,24 +55,36 @@ const MyAppBar: React.FC = () => {
                     <Button color="inherit" startIcon={<DashboardIcon />} onClick={() => navigate('/dashboard')} sx={{ mx: 1 }}>
                         Dashboard
                     </Button>
-                    <Button color="inherit" startIcon={<SessionIcon />} onClick={() => navigate('/sessions')} sx={{ mx: 1 }}>
-                        Sessions
-                    </Button>
-                    <Button color="inherit" startIcon={<FitnessCenterIcon />} onClick={() => navigate('/sessions')} sx={{ mx: 1 }}>
-                        Activities
-                    </Button>
-                    <Button color="inherit" startIcon={<QuizIcon />} onClick={() => navigate('/sessions')} sx={{ mx: 1 }}>
-                        Calibration
-                    </Button>
-                    <Button color="inherit" startIcon={<BarChartIcon />} onClick={() => navigate('/sessions')} sx={{ mx: 1 }}>
-                        Visualizations
-                    </Button>
-                    <Button color="inherit" startIcon={<CalendarMonthIcon />} onClick={() => navigate('/sessions')} sx={{ mx: 1 }}>
-                        Planning
-                    </Button>
-                    <Button color="inherit" startIcon={<SettingsIcon />} onClick={() => navigate('/sessions')} sx={{ mx: 1 }}>
-                        Settings
-                    </Button>
+                    <UnderConstructionBadge>
+                        <Button color="inherit" startIcon={<SessionIcon />} onClick={() => navigate('/sessions')} sx={{ mx: 1 }}>
+                            Sessions
+                        </Button>
+                    </UnderConstructionBadge>
+                    <UnderConstructionBadge>
+                        <Button color="inherit" startIcon={<FitnessCenterIcon />} onClick={() => navigate('/sessions')} sx={{ mx: 1 }}>
+                            Activities
+                        </Button>
+                    </UnderConstructionBadge>
+                    <UnderConstructionBadge>
+                        <Button color="inherit" startIcon={<QuizIcon />} onClick={() => navigate('/sessions')} sx={{ mx: 1 }}>
+                            Calibration
+                        </Button>
+                    </UnderConstructionBadge>
+                    <UnderConstructionBadge>
+                        <Button color="inherit" startIcon={<BarChartIcon />} onClick={() => navigate('/sessions')} sx={{ mx: 1 }}>
+                            Visualizations
+                        </Button>
+                    </UnderConstructionBadge>
+                    <UnderConstructionBadge>
+                        <Button color="inherit" startIcon={<CalendarMonthIcon />} onClick={() => navigate('/sessions')} sx={{ mx: 1 }}>
+                            Planning
+                        </Button>
+                    </UnderConstructionBadge>
+                    <UnderConstructionBadge>
+                        <Button color="inherit" startIcon={<SettingsIcon />} onClick={() => navigate('/sessions')} sx={{ mx: 1 }}>
+                            Settings
+                        </Button>
+                    </UnderConstructionBadge>
                     <SignoutButton />
                 </Box>
             </Toolbar>

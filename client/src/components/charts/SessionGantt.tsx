@@ -1,6 +1,6 @@
 import React, { useEffect, useRef } from 'react';
 import { Activity } from '../../types';
-import { axisBottom, axisLeft, axisTop, scaleBand, scaleTime, select, sum, timeFormat } from 'd3';
+import { axisLeft, axisTop, scaleBand, scaleTime, select, timeFormat } from 'd3';
 import { DateTime } from 'luxon';
 
 interface SessionGanttProps {
@@ -11,7 +11,7 @@ const SessionGantt: React.FC<SessionGanttProps> = ({ activities }) => {
     const ref = useRef();
 
 
-    const validActivities = activities.filter(d => d.startTime && d.endTime);
+    const validActivities = activities.filter(d => d.startTime && d.endTime && (d.startTime !== d.endTime) && (d.intensities.fingers || d.intensities.upperBody || d.intensities.lowerBody) );
 
     let maxEndTime = null;
     let minStartTime = null;
@@ -34,7 +34,7 @@ const SessionGantt: React.FC<SessionGanttProps> = ({ activities }) => {
             ...activity,
             segments: [
                 { part: 'fingers', value: intensities.fingers / totalIntensity, color: 'steelblue' },
-                { part: 'upperBody', value: intensities.upperBody / totalIntensity, color: 'red' },
+                { part: 'upperBody', value: intensities.upperBody / totalIntensity, color: 'crimson' },
                 { part: 'lowerBody', value: intensities.lowerBody / totalIntensity, color: 'gold' }
             ]
         };
@@ -109,7 +109,12 @@ const SessionGantt: React.FC<SessionGanttProps> = ({ activities }) => {
                 .attr("height", yScale.bandwidth())
                 .attr("fill", d => d.color);
 
-            group.append("rect")
+            group
+                .selectAll(".outline")
+                .remove()
+            group
+                .append("rect")
+                .attr("class", "outline")
                 .attr("x", xScale(DateTime.fromISO(activity.startTime)))
                 .attr("y", yScale(activity.name)!)
                 .attr("width", accumulatedWidth)  // Cover the full width as calculated

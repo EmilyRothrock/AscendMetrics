@@ -1,6 +1,6 @@
 import React, { useEffect, useRef } from 'react';
 import { Activity } from '../../types';
-import { select, pie, arc, PieArcDatum, schemeCategory10, interpolateYlGnBu, interpolateRainbow } from 'd3';
+import { select, pie, arc, PieArcDatum, interpolateRainbow } from 'd3';
 
 const ActivityTimePieChart: React.FC<{ activities: Activity[]; }> = ({ activities }) => {
     const ref = useRef();

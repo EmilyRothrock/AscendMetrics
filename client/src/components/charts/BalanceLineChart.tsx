@@ -1,17 +1,22 @@
-import React, { useRef, useEffect } from 'react';
+import React, { useRef, useEffect, MutableRefObject, RefObject } from 'react';
 import { scaleTime, scaleLinear, axisBottom, axisLeft, line, curveCardinal, select, timeFormat } from 'd3';
 import { MetricsTable } from '../../types';
 import { useSelector } from 'react-redux';
 import { RootState } from '../../store/store';
+import { useResizeObserver } from '../hooks/useResizeObserver';
 
 const BalanceLineChart = () => {
-    const ref = useRef();
+    const chartRef = useRef() as RefObject<SVGSVGElement>;
+    const wrapperRef = useRef() as MutableRefObject<HTMLDivElement>;
+    const dimensions = useResizeObserver(wrapperRef, { height: 200, width: 400 });
+
 
     const today = new Date();
     const thirtyDaysAgo = new Date(today);
     thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
     const oneDay = 86400000; // milliseconds in one day
 
+    // TODO: factor out data prep
     const metricsTable: MetricsTable = useSelector((state: RootState) => state.metrics.metricsTable);
 
     const series = {
@@ -41,20 +46,16 @@ const BalanceLineChart = () => {
     ];
 
     useEffect(() => {
-        const lineChart = select(ref.current)
-            .style("padding-top", "10px")    
-            .style("padding-left", "30px")
-            .style("padding-bottom", "20px")
+        const lineChart = select(chartRef.current)
             .style("overflow", "visible");
         
         const xScale = scaleTime()
-            // .domain([thirtyDaysAgo, today]) // sets the domain from 30 days ago to today
             .domain([thirtyDaysAgo, today]) // sets the domain from 30 days ago to today
-            .range([0, 400]);
+            .range([0, dimensions.width]);
 
         const yScale = scaleLinear()
             .domain([0, 2])
-            .range([200, 0]); // flipped because y counts from top down
+            .range([dimensions.height, 0]);
         
         const xAxis = axisBottom(xScale)
             .ticks(30)
@@ -64,7 +65,7 @@ const BalanceLineChart = () => {
             });
         lineChart
             .select(".x-axis")
-            .style("transform", "translateY(200px)")
+            .style("transform", `translateY(${dimensions.height}px`)
             .call(xAxis)
             .selectAll(".tick line") // Select all tick lines
             .attr("stroke-width", (d) => {
@@ -74,12 +75,12 @@ const BalanceLineChart = () => {
 
         // Separate gridlines for better control
         const gridlines = axisBottom(xScale)
-            .tickSize(-200) // Full chart height
+            .tickSize(-dimensions.height) // Full chart height
             .ticks(30)
             .tickFormat("");
         lineChart
             .select(".grid")
-            .style("transform", "translateY(200px)")
+            .style("transform", `translateY(${dimensions.height}px)`)
             .call(gridlines)
             .selectAll(".tick line")
             .attr("stroke", "lightgray")
@@ -127,14 +128,16 @@ const BalanceLineChart = () => {
             .attr("dy", ".35em")
             .style("text-anchor", "start")
             .text(d => d.name);
-    }, [data]);
+    }, [data, dimensions]);
 
     return (
-        <svg ref={ref} height="200px">
-            <g className="x-axis"/>
-            <g className="y-axis"/>
-            <g className="grid"/>
-        </svg>
+        <div ref={wrapperRef} style={{ padding:"10px 20px 20px 30px" }}>
+            <svg ref={chartRef} >
+                <g className="x-axis"/>
+                <g className="y-axis"/>
+                <g className="grid"/>
+            </svg>
+        </div>
     );
 };
 

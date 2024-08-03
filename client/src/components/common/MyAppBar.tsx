@@ -1,19 +1,9 @@
-import { IconButton, Drawer, AppBar, Toolbar, Typography, Button, Box } from '@mui/material';
+import { IconButton, Drawer, AppBar, Toolbar, Typography, Box } from '@mui/material';
 import MenuIcon from '@mui/icons-material/Menu';
-import SettingsIcon from '@mui/icons-material/Settings';
-import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
-import BarChartIcon from '@mui/icons-material/BarChart';
-import FitnessCenterIcon from '@mui/icons-material/FitnessCenter';
-import QuizIcon from '@mui/icons-material/Quiz';
 import React from 'react';
-import DashboardIcon from '@mui/icons-material/Dashboard';
-import SessionIcon from '@mui/icons-material/EventNote'; // Example icon for "Sessions"
-import { useNavigate } from 'react-router-dom';
-import SignoutButton from '../auth/SignoutButton';
-import UnderConstructionBadge from './UnderConstructionBadge';
+import { NavButtons } from './NavButtons';
 
 const MyAppBar: React.FC = () => {
-    const navigate = useNavigate();
     const [mobileOpen, setMobileOpen] = React.useState(false);
 
     const handleDrawerToggle = () => {
@@ -43,49 +33,10 @@ const MyAppBar: React.FC = () => {
                         keepMounted: true, // Better open performance on mobile.
                     }}
                 >
-                    <Button onClick={() => navigate('/dashboard')} sx={{ my: 1 }}>
-                        Dashboard
-                    </Button>
-                    <Button onClick={() => navigate('/sessions')} sx={{ my: 1 }}>
-                        Sessions
-                    </Button>
-                    <SignoutButton />
+                    <NavButtons sx={{ my:1 }}/>
                 </Drawer>
                 <Box sx={{ flexGrow: 1, display: { xs: 'none', sm: 'flex' }, justifyContent: 'right' }}>
-                    <Button color="inherit" startIcon={<DashboardIcon />} onClick={() => navigate('/dashboard')} sx={{ mx: 1 }}>
-                        Dashboard
-                    </Button>
-                    <UnderConstructionBadge>
-                        <Button color="inherit" startIcon={<SessionIcon />} onClick={() => navigate('/sessions/manage')} sx={{ mx: 1 }}>
-                            Sessions
-                        </Button>
-                    </UnderConstructionBadge>
-                    <UnderConstructionBadge>
-                        <Button color="inherit" startIcon={<FitnessCenterIcon />} onClick={() => navigate('/sessions')} sx={{ mx: 1 }}>
-                            Activities
-                        </Button>
-                    </UnderConstructionBadge>
-                    <UnderConstructionBadge>
-                        <Button color="inherit" startIcon={<QuizIcon />} onClick={() => navigate('/sessions')} sx={{ mx: 1 }}>
-                            Calibration
-                        </Button>
-                    </UnderConstructionBadge>
-                    <UnderConstructionBadge>
-                        <Button color="inherit" startIcon={<BarChartIcon />} onClick={() => navigate('/sessions')} sx={{ mx: 1 }}>
-                            Visualizations
-                        </Button>
-                    </UnderConstructionBadge>
-                    <UnderConstructionBadge>
-                        <Button color="inherit" startIcon={<CalendarMonthIcon />} onClick={() => navigate('/sessions')} sx={{ mx: 1 }}>
-                            Planning
-                        </Button>
-                    </UnderConstructionBadge>
-                    <UnderConstructionBadge>
-                        <Button color="inherit" startIcon={<SettingsIcon />} onClick={() => navigate('/sessions')} sx={{ mx: 1 }}>
-                            Settings
-                        </Button>
-                    </UnderConstructionBadge>
-                    <SignoutButton />
+                    <NavButtons sx={{ mx:1 }}/>
                 </Box>
             </Toolbar>
         </AppBar>

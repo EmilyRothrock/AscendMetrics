@@ -125,10 +125,9 @@ const SessionPage = () => {
             console.log(updatedSession);
             dispatch(updateSessionInStore(updatedSession));
           }
-          navigate('/dashboard');
+          navigate(-1);
         } catch (error) {
           console.error('Error saving session:', error);
-          // TODO: display error to the user
         } finally {
           setSaveConfirmed(false);
         }
@@ -225,8 +224,8 @@ const SessionPage = () => {
             </ButtonGroup>
           </Box>
         </Grid>
-        <Grid item md={8} sx={{ display: { xs: 'none', lg: 'block' } }}>
-          <SessionGantt activities={sessionData.activities} />
+        <Grid item md={8} sx={{ display: { xs: 'none', md: 'block' } }}>
+          <SessionGantt activities={sessionData.activities} yAxisLabels={true}/>
         </Grid>
       </Grid>
       <WarningDialog

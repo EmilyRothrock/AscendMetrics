@@ -1,15 +1,18 @@
-import React, { useEffect, useRef } from 'react';
+import React, { MutableRefObject, RefObject, useEffect, useRef } from 'react';
 import { Activity } from '../../types';
 import { axisLeft, axisTop, scaleBand, scaleTime, select, timeFormat } from 'd3';
 import { DateTime } from 'luxon';
+import { useResizeObserver } from '../hooks/useResizeObserver';
 
 interface SessionGanttProps {
   activities: Activity[];
+  yAxisLabels?: boolean;
 }
 
-const SessionGantt: React.FC<SessionGanttProps> = ({ activities }) => {
-    const ref = useRef();
-
+const SessionGantt: React.FC<SessionGanttProps> = ({ activities, yAxisLabels }) => {
+    const chartRef = useRef() as RefObject<SVGSVGElement>;
+    const wrapperRef = useRef() as MutableRefObject<HTMLDivElement>;
+    const dimensions = useResizeObserver(wrapperRef, { width: 200, height: 200 });  
 
     const validActivities = activities.filter(d => d.startTime && d.endTime && (d.startTime !== d.endTime) && (d.intensities.fingers || d.intensities.upperBody || d.intensities.lowerBody) );
 
@@ -40,42 +43,53 @@ const SessionGantt: React.FC<SessionGanttProps> = ({ activities }) => {
         };
     });
 
-    console.log(normalizedActivities);
-
     useEffect(() => {
-        const ganttChart = select(ref.current)
+        const paddingTopAndSides = 30;
+
+        const ganttChart = select(chartRef.current)
             .style("overflow", "visible")
-            .style("padding-left", "30px")
-            .style("padding-top", "20px");
+            .style("padding-left", `${paddingTopAndSides}px`)
+            .style("padding-top", `${paddingTopAndSides}px`);
         
         const xScale = scaleTime()
             .domain([minStartTime, maxEndTime])
-            .range([0, 800]);
+            .range([0, dimensions.width-2*paddingTopAndSides]);
         
         const yScale = scaleBand()
             .domain(validActivities.map(a => a.name))
-            .range([0, 400])
-            .padding(0.5);
+            .range([0, dimensions.height-2*paddingTopAndSides])
+            .padding(0.2);
 
         const xAxis = axisTop(xScale)
             .tickFormat((d) => timeFormat("%-I:%M %p")(d));
         ganttChart
             .select(".x-axis")
             .call(xAxis);
-
-        const yAxis = axisLeft(yScale)
-            .tickSize(0) // No tick marks
-        ganttChart
-            .select(".y-axis")
-            .call(yAxis)
-            .selectAll(".tick text") // Select all text elements in the y-axis
-            .style("text-anchor", "middle") // Ensures text aligns correctly when rotated
-            .style("font-size", "12")
-            .attr("transform", "rotate(-90)") // Rotates the text 90 degrees counterclockwise
-            .attr("dy", "-0.5em");
+        
+        if (yAxisLabels) {
+            const yAxis = axisLeft(yScale)
+                .tickSize(0) // No tick marks
+            ganttChart
+                .select(".y-axis")
+                .call(yAxis)
+                .selectAll(".tick text") // Select all text elements in the y-axis
+                .style("text-anchor", "middle") // Ensures text aligns correctly when rotated
+                .style("font-size", "12")
+                .attr("transform", "rotate(-90)") // Rotates the text 90 degrees counterclockwise
+                .attr("dy", "-0.5em");
+        } else {
+            const yAxis = axisLeft(yScale)
+                .tickSize(0) // No tick marks
+            ganttChart
+                .select(".y-axis")
+                .call(yAxis)
+                .selectAll(".tick text") // Select all text elements in the y-axis
+                .remove();
+        }
+            
 
         const gridlines = axisTop(xScale)
-            .tickSize(-400) // Full chart height
+            .tickSize(-(dimensions.height-2*paddingTopAndSides)) // Full chart height
             .tickFormat("");
         ganttChart
             .select(".grid")
@@ -125,15 +139,17 @@ const SessionGantt: React.FC<SessionGanttProps> = ({ activities }) => {
                 .attr("rx", 3)
                 .attr("ry", 3);
         });
-    });
+    }, [dimensions, maxEndTime, minStartTime, normalizedActivities, validActivities]);
 
     return (
-        <svg ref={ref} width={"100%"} height={"100%"}>
-            <g className="x-axis"/>
-            <g className="y-axis"/>
-            <g className="grid"/>
-            <g className="barGroup"/>
-        </svg>
+        <div ref={wrapperRef} style={{ width:"100%", height:"100%" }}>
+            <svg ref={chartRef}>
+                <g className="x-axis"/>
+                <g className="y-axis"/>
+                <g className="grid"/>
+                <g className="barGroup"/>
+            </svg>
+        </div>
     );
 };
 export default SessionGantt;

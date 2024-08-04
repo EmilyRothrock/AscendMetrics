@@ -6,8 +6,7 @@ import { useResizeObserver } from '../hooks/useResizeObserver';
 const LoadBarChart: React.FC<{ data: BodyPartMetrics }> = ({ data }) => {
   const chartRef = useRef() as RefObject<SVGSVGElement>;
   const wrapperRef = useRef() as MutableRefObject<HTMLDivElement>;
-  const dimensions = useResizeObserver(wrapperRef, { width: 400, height: 200 });
-
+  const dimensions = useResizeObserver(wrapperRef, { width: 200, height: 200 });
 
   const metricsArray = Object.entries(data).map(([part, load]) => ({ part, load }));
 
@@ -20,25 +19,26 @@ const LoadBarChart: React.FC<{ data: BodyPartMetrics }> = ({ data }) => {
     const barChart = select(chartRef.current)
       .style("overflow", "visible");
 
-      const xScale = scaleLinear()
+    const xScale = scaleLinear()
       .domain([0, max(metricsArray, d => d.load) || 0])
-      .range([0, dimensions.width]);
+      .range([0, dimensions.width-10]);
     const xAxis = axisBottom(xScale)
       .ticks(3);
     barChart
       .select(".x-axis")
       .call(xAxis)            
-      .style("transform", `translateY(${dimensions.height}px)`);
+      .style("transform", `translate(10px, ${dimensions.height - 10}px)`);
 
     const yScale = scaleBand()
       .domain(metricsArray.map(d => d.part))
-      .range([0, dimensions.height])
+      .range([0, dimensions.height - 10])
       .padding(0.3);
     const yAxis = axisLeft(yScale)
       .tickFormat("");
     barChart
       .select(".y-axis")
       .call(yAxis)
+      .style("transform", `translateX(10px)`)
       .selectAll(".tick line")
       .attr("stroke-width",0);
 
@@ -50,7 +50,8 @@ const LoadBarChart: React.FC<{ data: BodyPartMetrics }> = ({ data }) => {
       .attr("y", d => yScale(d.part)!)
       .attr("width", d => xScale(d.load))
       .attr("height", yScale.bandwidth())
-      .attr("fill", d => colors[d.part]);
+      .attr("fill", d => colors[d.part])
+      .style("transform", `translateX(10px)`);
     
     barChart
       .selectAll(".label")
@@ -58,7 +59,7 @@ const LoadBarChart: React.FC<{ data: BodyPartMetrics }> = ({ data }) => {
       .join("text")
       .attr("class", "label")
       .attr("y", d => yScale(d.part)! + yScale.bandwidth() / 2)
-      .attr("x", 5) // slight offset from the start of the bar
+      .attr("x", 15) // slight offset from the start of the bar
       .attr("dy", "0.35em") // vertically center
       .style("font-size", "12px")
       .text(d => `${labels[d.part]}: ${d.load.toFixed(2)}`);

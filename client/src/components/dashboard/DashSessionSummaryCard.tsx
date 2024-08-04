@@ -45,7 +45,7 @@ const DashSessionSummaryCard: React.FC<{ session: Session; }> = ({ session }) =>
                             width: '100%',
                         }}
                     >
-                        {session.name || generateDisplayName(session)}
+                        {session.name || generateDisplayName(session, 15)}
                     </Typography>
                 }
                 subheader={<>

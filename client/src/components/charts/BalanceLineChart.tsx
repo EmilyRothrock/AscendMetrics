@@ -8,7 +8,8 @@ import { useResizeObserver } from '../hooks/useResizeObserver';
 const BalanceLineChart = () => {
     const chartRef = useRef() as RefObject<SVGSVGElement>;
     const wrapperRef = useRef() as MutableRefObject<HTMLDivElement>;
-    const dimensions = useResizeObserver(wrapperRef, { height: 200, width: 400 });
+    const dimensions = useResizeObserver(wrapperRef, { width: 400, height: 200 });
+    dimensions.height = dimensions.width/2;
 
 
     const today = new Date();

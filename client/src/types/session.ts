@@ -33,7 +33,14 @@ export const defaultNewSession = (): Session => ({
 });
 
 
-export const generateDisplayName = (session:Session): string => {
+export const generateDisplayName = (session:Session, maxChars: number): string => {
+  const names = generateActivitiesString(session);
+  
+  const cutNames = names.length > maxChars ? `${names.substring(0, maxChars)}...` : names;
+
+  return cutNames};
+
+export const generateActivitiesString = (session:Session): string => {
   if (!session.activities || session.activities.length === 0) {
     return 'Session with no activities';  // Default text when there are no activities
   }

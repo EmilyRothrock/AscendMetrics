@@ -100,7 +100,7 @@ const ActivityTimePieChart: React.FC<{ activities: Activity[] }> = ({ activities
     }, [selectedActivity]);
 
     return (
-        <div ref={wrapperRef}>
+        <div ref={wrapperRef} style={{ width:"100%", height:"100%" }} >
             <svg ref={chartRef}/>
         </div>
     );

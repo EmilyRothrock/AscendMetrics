@@ -2,7 +2,7 @@ import React from 'react';
 import { Stack, Typography } from '@mui/material';
 import ReadinessTile from './ReadinessTile';
 import Grid from '@mui/material/Unstable_Grid2'; // Grid version 2
-import TileTrainingSession from './TileTrainingSession';
+import DashSessionSummaryCard from './DashSessionSummaryCard';
 import NewSessionButton from './NewSessionButton';
 import { RootState } from '../../store/store'; 
 import { useSelector } from 'react-redux';
@@ -31,7 +31,7 @@ const Dashboard: React.FC = () => {
                         <NewSessionButton/>
                         {sessionIds.slice(0, 3).map((id: number) => {
                             const session = sessions[id];
-                            return <TileTrainingSession key={id} session={session} />;
+                            return <DashSessionSummaryCard key={id} session={session} />;
                         })}
                     </Stack>
                 </Grid>

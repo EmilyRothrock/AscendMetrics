@@ -10,7 +10,7 @@ import ExpandLessIcon from '@mui/icons-material/ExpandLess';
 import { DateTime } from 'luxon';
 import { useNavigate } from 'react-router-dom';
 
-const TileTrainingSession: React.FC<{ session: Session; }> = ({ session }) => {
+const DashSessionSummaryCard: React.FC<{ session: Session; }> = ({ session }) => {
     const [expanded, setExpanded] = useState(false);
     const navigate = useNavigate();
     const formattedDateTime = DateTime.fromISO(session.completedOn).toLocaleString(DateTime.DATETIME_MED);
@@ -64,11 +64,11 @@ const TileTrainingSession: React.FC<{ session: Session; }> = ({ session }) => {
             />
             {expanded && (
                 <CardContent>
-                    <Grid container spacing={2}>
-                        <Grid xs={12} sm={6}>
+                    <Grid container spacing={1}>
+                        <Grid xs={12} sm={6} sx={{ aspectRatio:"1" }}>
                             <ActivityTimePieChart activities={session.activities} />
                         </Grid>
-                        <Grid xs={12} sm={6}>
+                        <Grid xs={12} sm={6} sx={{ aspectRatio:"1" }}>
                             <LoadBarChart data={session.loads} />
                         </Grid>
                     </Grid>
@@ -78,4 +78,4 @@ const TileTrainingSession: React.FC<{ session: Session; }> = ({ session }) => {
     );
 };
 
-export default TileTrainingSession;
+export default DashSessionSummaryCard;

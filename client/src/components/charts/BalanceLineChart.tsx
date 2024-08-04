@@ -8,7 +8,7 @@ import { useResizeObserver } from '../hooks/useResizeObserver';
 const BalanceLineChart = () => {
     const chartRef = useRef() as RefObject<SVGSVGElement>;
     const wrapperRef = useRef() as MutableRefObject<HTMLDivElement>;
-    const dimensions = useResizeObserver(wrapperRef, { width: 400, height: 200 });
+    const dimensions = useResizeObserver(wrapperRef, { width: 200, height: 100 });
     dimensions.height = dimensions.width/2;
 
 
@@ -132,7 +132,7 @@ const BalanceLineChart = () => {
     }, [data, dimensions]);
 
     return (
-        <div ref={wrapperRef} style={{ padding:"10px 20px 20px 30px" }}>
+        <div ref={wrapperRef} style={{ width:"90%", height:"90%", padding:"10px 20px 20px 30px" }}>
             <svg ref={chartRef} >
                 <g className="x-axis"/>
                 <g className="y-axis"/>

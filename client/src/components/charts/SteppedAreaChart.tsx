@@ -1,11 +1,14 @@
-import { useEffect, useRef } from "react";
+import { MutableRefObject, RefObject, useEffect, useRef } from "react";
 import { useSelector } from "react-redux";
 import { RootState } from "../../store/store";
 import { MetricsTable } from "../../types";
-import { area, axisBottom, axisLeft, curveCardinal, curveStep, line, scaleLinear, scaleTime, select, timeFormat } from "d3";
+import { area, axisBottom, axisLeft, curveStep, scaleLinear, scaleTime, select, timeFormat } from "d3";
+import { useResizeObserver } from "../hooks/useResizeObserver";
 
 const SteppedAreaChart = () => {
-    const ref = useRef();
+    const chartRef = useRef() as RefObject<SVGSVGElement>;
+    const wrapperRef = useRef() as MutableRefObject<HTMLDivElement>;
+    const dimensions = useResizeObserver(wrapperRef, { width: 200, height: 100 });
 
     const today = new Date();
     const thirtyDaysAgo = new Date(today);
@@ -42,20 +45,18 @@ const SteppedAreaChart = () => {
     ];
 
     useEffect(() => {
-        const steppedAreaChart = select(ref.current)
+        const steppedAreaChart = select(chartRef.current)
             .style("padding-top", "10px")    
-            .style("padding-left", "30px")
             .style("padding-bottom", "20px")
             .style("overflow", "visible");
 
         const xScale = scaleTime()
-            // .domain([thirtyDaysAgo, today]) // sets the domain from 30 days ago to today
             .domain([thirtyDaysAgo, today]) // sets the domain from 30 days ago to today
-            .range([0, 400]);
+            .range([0, dimensions.width]);
         
         const yScale = scaleLinear()
             .domain([0, 30])
-            .range([200, 0]); // flipped because y counts from top down
+            .range([dimensions.height, 0]);
         
         const xAxis = axisBottom(xScale)
             .ticks(30)
@@ -65,7 +66,7 @@ const SteppedAreaChart = () => {
             });
         steppedAreaChart
             .select(".x-axis")
-            .style("transform", "translateY(200px)")
+            .style("transform", `translateY(${dimensions.height}px`)
             .call(xAxis)
             .selectAll(".tick line") // Select all tick lines
             .attr("stroke-width", (d) => {
@@ -74,12 +75,12 @@ const SteppedAreaChart = () => {
             });
         
         const gridlines = axisBottom(xScale)
-            .tickSize(-200) // Full chart height
+            .tickSize(-dimensions.height) // Full chart height
             .ticks(30)
             .tickFormat("");
         steppedAreaChart
             .select(".grid")
-            .style("transform", "translateY(200px)")
+            .style("transform", `translateY(${dimensions.height}px)`)
             .call(gridlines)
             .selectAll(".tick line")
             .attr("stroke", "lightgray")
@@ -96,7 +97,7 @@ const SteppedAreaChart = () => {
         
         const myLine = area()
             .x(d => xScale(d.x))
-            .y0(200)
+            .y0(dimensions.height)
             .y1(d => yScale(d.y))
             .curve(curveStep);
         
@@ -131,14 +132,16 @@ const SteppedAreaChart = () => {
             .style("text-anchor", "start")
             .text(d => d.name);
 
-    }, [data]);
+    }, [data, dimensions]);
     
     return (
-        <svg ref={ref} height="200px">
-            <g className="x-axis"/>
-            <g className="y-axis"/>
-            <g className="grid"/>
-        </svg>
+        <div ref={wrapperRef} style={{ width:"90%", height:"100%", padding:"10px 20px 20px 30px" }}>
+            <svg ref={chartRef} >
+                <g className="x-axis"/>
+                <g className="y-axis"/>
+                <g className="grid"/>
+            </svg>
+        </div>
     );
 }
 

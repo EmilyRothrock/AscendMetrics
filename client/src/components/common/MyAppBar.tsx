@@ -21,7 +21,7 @@ const MyAppBar: React.FC = () => {
                     aria-label="open drawer"
                     edge="end"
                     onClick={handleDrawerToggle}
-                    sx={{ mr: 2, display: { sm: 'none' } }}
+                    sx={{ mr: 2, display: { md: 'none' } }}
                 >
                     <MenuIcon />
                 </IconButton>
@@ -35,7 +35,7 @@ const MyAppBar: React.FC = () => {
                 >
                     <NavButtons sx={{ my:1 }}/>
                 </Drawer>
-                <Box sx={{ flexGrow: 1, display: { xs: 'none', sm: 'flex' }, justifyContent: 'right' }}>
+                <Box sx={{ flexGrow: 1, display: { xs: 'none', md: 'flex' }, justifyContent: 'right' }}>
                     <NavButtons sx={{ mx:1 }}/>
                 </Box>
             </Toolbar>

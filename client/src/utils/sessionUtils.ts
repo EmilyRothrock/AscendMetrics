@@ -1,6 +1,10 @@
 import { DateTime } from "luxon";
 import { BodyPartMetrics, Session } from "../types";
 import { SessionsState } from "../types/sessionState";
+import { FieldName } from "../types/fieldOptions";
+import { FilterValueType } from "../types/filterValueType";
+import { compareDates, fieldComparer } from "./comparisons";
+import { fieldFilterer } from "./filters";
 
 export function updateSessionCalculations(session: Session) {
   const results = session.activities.reduce((accumulator, activity) => {
@@ -83,19 +87,31 @@ export function updateSessionsState(state: SessionsState, newSessions: Session[]
 
   state.sessionIds = Array.from(sessionIdsSet);
   // TODO: custom sort which removes dupes for lower run time?
-  state.sessionIds.sort((a, b) => compareSessionsByDate(state.sessions, a, b));
+  state.sessionIds.sort((a, b) => compareDates(state.sessions[a].completedOn, state.sessions[b].completedOn));
 }
 
-/**
- * Compares two sessions based on their completion dates in descending order.
- * @param sessions The sessions record from state.
- * @param a The id of the first session.
- * @param b The id of the second session.
- * @returns A number indicating the order of the sessions.
- */
-export function compareSessionsByDate(sessions: Record<number, Session>, a: number, b: number): number {
-  const dateA = DateTime.fromISO(sessions[a].completedOn);
-  const dateB = DateTime.fromISO(sessions[b].completedOn);
-  return dateB.toMillis() - dateA.toMillis();  // Descending order
+
+
+export function sortSessions(sessionIds: number[], sessions: Record<number, Session>, selectedField: FieldName | null = 'completedOn', sortAscending: boolean = true): number[] {
+  // init sorted ids array
+  if (selectedField && sessions && sessionIds && selectedField !== 'activities') {
+    const sortedSessionIds = sessionIds.slice();
+    const comparisonFunction = fieldComparer(selectedField);
+    sortedSessionIds.sort((a, b) => 
+      comparisonFunction(
+        sessions[a][selectedField],
+        sessions[b][selectedField],
+        sortAscending
+      )
+    );
+    return sortedSessionIds;
+  } else return sessionIds;
 }
 
+export function filterSessions(sessionIds: number[], sessions: Record<number, Session>, selectedField: FieldName | null, filterValue: FilterValueType): number[] {
+  if (selectedField && sessions && sessionIds) {
+    const filterFunction = fieldFilterer(selectedField);
+    const filteredSessionIds = sessionIds.filter((id) => filterFunction(sessions[id][selectedField], filterValue));
+    return filteredSessionIds;
+  } else return sessionIds;
+}

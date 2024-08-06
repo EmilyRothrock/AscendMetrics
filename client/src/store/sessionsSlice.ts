@@ -1,12 +1,13 @@
 import { createAsyncThunk, createSelector, createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { Session } from '../types'; 
-import { compareSessionsByDate, findIndexByDate, insertSessionId, updateSessionsState, updateSessionCalculations } from '../utils/sessionUtils';
+import { findIndexByDate, insertSessionId, updateSessionsState, updateSessionCalculations } from '../utils/sessionUtils';
 import { RootState } from './store';
 import { getSessionsForDateRange, getSessionById } from '../services/sessionService';
 import { AxiosError } from 'axios';
 import { DateTime } from 'luxon';
 import { fetchMetricsWithSessionsForDateRange } from './metricsSlice';
 import { SessionsState } from '../types/sessionState';
+import { compareDates } from '../utils/comparisons';
 
 const initialState: SessionsState = {
   sessions: {},
@@ -125,7 +126,7 @@ const sessionsSlice = createSlice({
       const updatedSession = updateSessionCalculations(action.payload);
       state.sessions[updatedSession.id] = updatedSession;
       if (prevDate != newDate) { 
-          state.sessionIds.sort((a: number, b: number) => compareSessionsByDate(state.sessions, a, b)); 
+          state.sessionIds.sort((a: number, b: number) => compareDates(state.sessions[a].completedOn, state.sessions[b].completedOn)); 
       }
     },
     deleteSession(state, action: PayloadAction<number>) {

@@ -19,11 +19,9 @@ export const NavButtons: React.FC<SxProps> = (SxProps: SxProps) => {
             <Button color="inherit" startIcon={<DashboardIcon />} onClick={() => navigate('/dashboard')} sx={SxProps}>
                 Dashboard
             </Button>
-            <UnderConstructionBadge>
-                <Button color="inherit" startIcon={<SessionIcon />} onClick={() => navigate('/sessions/manage')} sx={SxProps}>
-                    Sessions
-                </Button>
-            </UnderConstructionBadge>
+            <Button color="inherit" startIcon={<SessionIcon />} onClick={() => navigate('/sessions/manage')} sx={SxProps}>
+                Sessions
+            </Button>
             <UnderConstructionBadge>
                 <Button color="inherit" startIcon={<FitnessCenterIcon />} onClick={() => navigate('/sessions')} sx={SxProps}>
                     Activities

@@ -1,9 +1,9 @@
-import { Button } from '@mui/material';
+import { Button, SxProps } from '@mui/material';
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import AddBoxIcon from '@mui/icons-material/AddBox';
 
-const NewSessionButton: React.FC = () => {
+const NewSessionButton: React.FC<{sx?: SxProps, text?:string}> = ({sx, text}) => {
     const navigate = useNavigate();
 
     const handleButtonClick = () => {
@@ -16,8 +16,9 @@ const NewSessionButton: React.FC = () => {
             startIcon={<AddBoxIcon />} 
             fullWidth
             onClick={handleButtonClick}
+            sx={sx}
         >
-            Log New Training Session
+            { text? text: "Log New Training Session"}
         </Button>
     );
 };

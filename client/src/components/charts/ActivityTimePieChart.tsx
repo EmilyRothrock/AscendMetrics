@@ -1,7 +1,8 @@
 import React, { MutableRefObject, RefObject, useEffect, useMemo, useRef, useState } from 'react';
 import { Activity } from '../../types';
-import { select, pie, arc, PieArcDatum, interpolateRainbow } from 'd3';
+import { select, pie, arc, PieArcDatum } from 'd3';
 import { useResizeObserver } from '../hooks/useResizeObserver';
+import { activityNameToColor } from '../../utils/activityNameToColor';
 
 interface ActivityDuration {
     activity: string;
@@ -55,7 +56,7 @@ const ActivityTimePieChart: React.FC<{ activities: Activity[] }> = ({ activities
         myArcs
             .append('path')
             .attr('d', myArc)
-            .attr('fill', d => interpolateRainbow(Math.random()))
+            .attr('fill', d => activityNameToColor(d.data.activity))
             .on('mouseover', (_, d) => setSelectedActivity(d.data))
             .on('mouseout', () => setSelectedActivity(null))
             .on('click', (_, d) => setSelectedActivity(d.data));

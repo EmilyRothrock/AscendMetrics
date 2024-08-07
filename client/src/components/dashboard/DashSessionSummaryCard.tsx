@@ -23,7 +23,7 @@ const DashSessionSummaryCard: React.FC<{ session: Session; }> = ({ session }) =>
     };
 
     return (
-        <Card elevation={2} sx={{ margin: 1, padding: 1 }}>a
+        <Card elevation={2} sx={{ margin: 1, padding: 1 }}>
             <CardHeader
                 title={
                     <Typography 

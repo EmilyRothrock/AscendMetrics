@@ -10,6 +10,8 @@ const SteppedAreaChart = () => {
     const wrapperRef = useRef() as MutableRefObject<HTMLDivElement>;
     const dimensions = useResizeObserver(wrapperRef, { width: 200, height: 100 });
 
+    const fontFamily = "'Roboto', sans-serif";
+
     const today = new Date();
     const thirtyDaysAgo = new Date(today);
     thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
@@ -46,9 +48,20 @@ const SteppedAreaChart = () => {
 
     useEffect(() => {
         const steppedAreaChart = select(chartRef.current)
-            .style("padding-top", "10px")    
-            .style("padding-bottom", "20px")
             .style("overflow", "visible");
+
+        const titleText = "Past Month's Daily Metrics";
+        steppedAreaChart
+            .selectAll(".title")
+            .data([titleText])
+            .join("text")
+            .attr("class", "title")
+            .attr("x", dimensions.width/2)  // Center the text
+            .attr("y", -5)  // Position it at the top of the SVG
+            .attr("text-anchor", "middle")  // Center the text horizontally
+            .style("font-size", "16px")  // Set the font size
+            .style("font-family", fontFamily)
+            .text(d => d);
 
         const xScale = scaleTime()
             .domain([thirtyDaysAgo, today]) // sets the domain from 30 days ago to today
@@ -130,12 +143,14 @@ const SteppedAreaChart = () => {
             .attr("y", 9)
             .attr("dy", ".35em")
             .style("text-anchor", "start")
+            .style("font-size", "12px")
+            .style("font-family", fontFamily)
             .text(d => d.name);
 
     }, [data, dimensions]);
     
     return (
-        <div ref={wrapperRef} style={{ width:"90%", height:"100%", padding:"10px 20px 20px 30px" }}>
+        <div ref={wrapperRef} style={{ width:"90%", height:"100%", padding:"20px 20px 20px 30px" }}>
             <svg ref={chartRef} >
                 <g className="x-axis"/>
                 <g className="y-axis"/>

@@ -11,6 +11,7 @@ const BalanceLineChart = () => {
     const dimensions = useResizeObserver(wrapperRef, { width: 200, height: 100 });
     dimensions.height = dimensions.width/2;
 
+    const fontFamily = "'Roboto', sans-serif";
 
     const today = new Date();
     const thirtyDaysAgo = new Date(today);
@@ -39,16 +40,30 @@ const BalanceLineChart = () => {
         series.lowerBody.push({ x: date, y: 0 });
         }
     }
-    
     const data = [
-        { name: "Fingers", values: series.fingers, color: "steelblue" },
-        { name: "Upper Body", values: series.upperBody, color: "red" },
-        { name: "Lower Body", values: series.lowerBody, color: "gold" }
+        { name: "Fingers", values: series.fingers, color: "#2E96FF" },
+        { name: "Upper Body", values: series.upperBody, color: "#B800D8" },
+        { name: "Lower Body", values: series.lowerBody, color: "#02B2AF" }
     ];
 
     useEffect(() => {
         const lineChart = select(chartRef.current)
+            .attr("height", dimensions.height)
+            .attr("width", dimensions.width)
             .style("overflow", "visible");
+        
+        const titleText = "Past Month's Balances";
+        lineChart
+            .selectAll(".title")
+            .data([titleText])
+            .join("text")
+            .attr("class", "title")
+            .attr("x", dimensions.width/2)  // Center the text
+            .attr("y", -5)  // Position it at the top of the SVG
+            .attr("text-anchor", "middle")  // Center the text horizontally
+            .style("font-size", "16px")  // Set the font size
+            .style("font-family", fontFamily)
+            .text(d => d);
         
         const xScale = scaleTime()
             .domain([thirtyDaysAgo, today]) // sets the domain from 30 days ago to today
@@ -128,11 +143,13 @@ const BalanceLineChart = () => {
             .attr("y", 9)
             .attr("dy", ".35em")
             .style("text-anchor", "start")
+            .style("font-size", "12px")
+            .style("font-family", fontFamily)
             .text(d => d.name);
     }, [data, dimensions]);
 
     return (
-        <div ref={wrapperRef} style={{ width:"90%", height:"90%", padding:"10px 20px 20px 30px" }}>
+        <div ref={wrapperRef} style={{ width:"90%", height:"90%", padding:"25px 20px 20px 30px" }}>
             <svg ref={chartRef} >
                 <g className="x-axis"/>
                 <g className="y-axis"/>

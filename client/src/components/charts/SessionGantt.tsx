@@ -1,4 +1,4 @@
-import React, { MutableRefObject, RefObject, useEffect, useRef } from 'react';
+import React, { MutableRefObject, RefObject, useEffect, useRef, useState } from 'react';
 import { Activity } from '../../types';
 import { axisLeft, axisTop, scaleBand, scaleTime, select, timeFormat } from 'd3';
 import { DateTime } from 'luxon';
@@ -13,68 +13,45 @@ const SessionGantt: React.FC<SessionGanttProps> = ({ activities, yAxisLabels }) 
     const chartRef = useRef() as RefObject<SVGSVGElement>;
     const wrapperRef = useRef() as MutableRefObject<HTMLDivElement>;
     const dimensions = useResizeObserver(wrapperRef, { width: 200, height: 200 });  
+    const [tooltip, setTooltip] = useState({ x: 0, y: 0, visible: false, content: "" });
 
     const validActivities = activities.filter(d => d.startTime && d.endTime && (d.startTime !== d.endTime) && (d.intensities.fingers || d.intensities.upperBody || d.intensities.lowerBody) );
 
-    let maxEndTime = null;
-    let minStartTime = null;
-    if (validActivities.length > 0) {
-        // Prepare data
-        const times = validActivities.map(a => [DateTime.fromISO(a.startTime), DateTime.fromISO(a.endTime)]);
-        maxEndTime = DateTime.max(...times.map(d => d[1]));
-        minStartTime = DateTime.min(...times.map(d => d[0]));
-    } else {
-        const currentHour = DateTime.now().startOf('hour');
-        const nextHour = currentHour.plus({ hour: 1 });
-        maxEndTime = currentHour;
-        minStartTime = nextHour;
-    }
-
-    const normalizedActivities = validActivities.map(activity => {
-        const intensities = activity.intensities;
-        const totalIntensity = intensities.fingers + intensities.upperBody + intensities.lowerBody;
-        return {
-            ...activity,
-            segments: [
-                { part: 'fingers', value: intensities.fingers / totalIntensity, color: 'steelblue' },
-                { part: 'upperBody', value: intensities.upperBody / totalIntensity, color: 'crimson' },
-                { part: 'lowerBody', value: intensities.lowerBody / totalIntensity, color: 'gold' }
-            ]
-        };
-    });
-
     useEffect(() => {
-        const paddingTopAndSides = 30;
+        const padding = 30;
 
         const ganttChart = select(chartRef.current)
             .style("overflow", "visible")
-            .style("padding-left", `${paddingTopAndSides}px`)
-            .style("padding-top", `${paddingTopAndSides}px`);
+            .style("padding", `${padding}px`);
         
         const xScale = scaleTime()
-            .domain([minStartTime, maxEndTime])
-            .range([0, dimensions.width-2*paddingTopAndSides]);
+            .domain([
+                DateTime.min(...validActivities.map(a => DateTime.fromISO(a.startTime))),
+                DateTime.max(...validActivities.map(a => DateTime.fromISO(a.endTime)))
+            ])
+            .range([0, dimensions.width - 2 * padding]);
         
         const yScale = scaleBand()
             .domain(validActivities.map(a => a.name))
-            .range([0, dimensions.height-2*paddingTopAndSides])
+            .range([0, dimensions.height-2*padding])
             .padding(0.2);
 
-        const xAxis = axisTop(xScale)
-            .tickFormat((d) => timeFormat("%-I:%M %p")(d));
+        const xAxis = axisTop(xScale).tickFormat(timeFormat("%-I:%M %p"));
         ganttChart
             .select(".x-axis")
-            .call(xAxis);
+            .call(xAxis)
+            .selectAll(".tick text")
+            .style("font-size", "12");
         
         if (yAxisLabels) {
             const yAxis = axisLeft(yScale)
-                .tickSize(0) // No tick marks
+                .tickSize(0); // No tick marks
             ganttChart
                 .select(".y-axis")
                 .call(yAxis)
                 .selectAll(".tick text") // Select all text elements in the y-axis
                 .style("text-anchor", "middle") // Ensures text aligns correctly when rotated
-                .style("font-size", "12")
+                .style("font-size", "16")
                 .attr("transform", "rotate(-90)") // Rotates the text 90 degrees counterclockwise
                 .attr("dy", "-0.5em");
         } else {
@@ -89,7 +66,7 @@ const SessionGantt: React.FC<SessionGanttProps> = ({ activities, yAxisLabels }) 
             
 
         const gridlines = axisTop(xScale)
-            .tickSize(-(dimensions.height-2*paddingTopAndSides)) // Full chart height
+            .tickSize(-(dimensions.height-2*padding)) // Full chart height
             .tickFormat("");
         ganttChart
             .select(".grid")
@@ -98,48 +75,51 @@ const SessionGantt: React.FC<SessionGanttProps> = ({ activities, yAxisLabels }) 
             .attr("stroke", "lightgray")
             .attr("stroke-opacity", 0.7);
 
-        const barGroups = ganttChart.selectAll(".barGroup")
-            .data(normalizedActivities)
-            .join("g")
-            .attr("class", "barGroup")
+        const bars = ganttChart.selectAll(".bar")
+            .data(activities)
+            .join("rect")
+            .attr("class", "bar")
             .attr("x", d => xScale(DateTime.fromISO(d.startTime)))
-            .attr("y", d => yScale(d.name)!);
-        barGroups.each(function(activity) {
-            const group = select(this);
-            let accumulatedWidth = 0;
+            .attr("y", d => yScale(d.name))
+            .attr("width", d => xScale(DateTime.fromISO(d.endTime)) - xScale(DateTime.fromISO(d.startTime)))
+            .attr("height", yScale.bandwidth())
+            .attr("rx", 5)
+            .attr("ry", 5)
+            .attr("stroke", "black")
+            .attr("stroke-width", "1px")
+            .attr("fill", d => {
+                const totalIntensity = d.intensities.fingers + d.intensities.upperBody + d.intensities.lowerBody;
+                const gradientId = `gradient-${d.name.replace(/\s/g, '-')}`;
+                const defs = ganttChart.append("defs");
+                const gradient = defs.append("linearGradient")
+                    .attr("id", gradientId)
+                    .attr("x1", "0%")
+                    .attr("x2", "100%")
+                    .attr("y1", "0%")
+                    .attr("y2", "100%");
+                gradient.append("stop")
+                    .attr("offset", "33%")
+                    .attr("stop-color", `rgba(46, 150, 255, ${0.99 + 0.01 * (d.intensities.fingers / totalIntensity)})`);
+                gradient.append("stop")
+                    .attr("offset", "66%")
+                    .attr("stop-color", `rgba(184, 0, 216, ${0.99 + 0.01 * (d.intensities.upperBody / totalIntensity)})`);
+                gradient.append("stop")
+                    .attr("offset", "100%")
+                    .attr("stop-color", `rgba(2, 178, 175, ${0.99 + 0.01 * (d.intensities.lowerBody / totalIntensity)})`);
+                return `url(#${gradientId})`;
+            })
+            .on("mouseover", (event, d) => {
+                const scrollX = window.scrollX || document.documentElement.scrollLeft;
+                const scrollY = window.scrollY || document.documentElement.scrollTop;
+                setTooltip({
+                    x: event.clientX + scrollX + 10,
+                    y: event.clientY + scrollY - 28,
+                    visible: true,
+                    content: `Intensities<br>Fingers: ${d.intensities.fingers}<br>Upper Body: ${d.intensities.upperBody}<br>Lower Body: ${d.intensities.lowerBody}`
+                })})
+            .on("mouseout", () => setTooltip(prev => ({ ...prev, visible: false })));
 
-            group.selectAll(".segment")
-                .data(activity.segments)
-                .join("rect")
-                .attr("class", "segment")
-                .attr("x", d => {
-                    const segmentWidth = (xScale(DateTime.fromISO(activity.endTime)) - xScale(DateTime.fromISO(activity.startTime))) * d.value;
-                    const currentX = accumulatedWidth;
-                    accumulatedWidth += segmentWidth;
-                    return currentX + xScale(DateTime.fromISO(activity.startTime));
-                })
-                .attr("y", yScale(activity.name)!)
-                .attr("width", d => (xScale(DateTime.fromISO(activity.endTime)) - xScale(DateTime.fromISO(activity.startTime))) * d.value)
-                .attr("height", yScale.bandwidth())
-                .attr("fill", d => d.color);
-
-            group
-                .selectAll(".outline")
-                .remove()
-            group
-                .append("rect")
-                .attr("class", "outline")
-                .attr("x", xScale(DateTime.fromISO(activity.startTime)))
-                .attr("y", yScale(activity.name)!)
-                .attr("width", accumulatedWidth)  // Cover the full width as calculated
-                .attr("height", yScale.bandwidth())
-                .attr("fill", "none")
-                .attr("stroke", "black")
-                .attr("stroke-width", "2")
-                .attr("rx", 3)
-                .attr("ry", 3);
-        });
-    }, [dimensions, maxEndTime, minStartTime, normalizedActivities, validActivities]);
+    }, [activities, dimensions, validActivities, yAxisLabels]);
 
     return (
         <div ref={wrapperRef} style={{ width:"100%", height:"100%" }}>
@@ -149,6 +129,23 @@ const SessionGantt: React.FC<SessionGanttProps> = ({ activities, yAxisLabels }) 
                 <g className="grid"/>
                 <g className="barGroup"/>
             </svg>
+            <div className="tooltip" style={{
+                left: `${tooltip.x}px`,
+                top: `${tooltip.y}px`,
+                display: tooltip.visible ? 'block' : 'none',
+                position: "absolute",
+                textAlign: "center",
+                padding: "8px",
+                fontSize: "12px",
+                background: "#fff", /* Light background for contrast */
+                color: "#333", /* Dark text for visibility */
+                border: "1px solid #666", /* Subtle border */
+                borderRadius: "6px",
+                pointerEvents: "none",
+                opacity: "80%",
+                boxShadow: "2px 2px 10px rgba(0,0,0,0.2)", /* Soft shadow for floating effect */
+                zIndex: "100", /* Ensure it's on top */
+            }} dangerouslySetInnerHTML={{ __html: tooltip.content }}></div>
         </div>
     );
 };

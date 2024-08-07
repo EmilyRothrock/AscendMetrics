@@ -42,17 +42,26 @@ const LoadBarChart: React.FC<{ data: BodyPartMetrics }> = ({ data }) => {
       .selectAll(".tick line")
       .attr("stroke-width",0);
 
-    barChart
+      barChart
       .selectAll(".bar")
       .data(metricsArray)
-      .join("rect")
+      .join("path")
       .attr("class", "bar")
-      .attr("y", d => yScale(d.part)!)
-      .attr("width", d => xScale(d.load))
-      .attr("height", yScale.bandwidth())
-      .attr("fill", d => colors[d.part])
-      .style("transform", `translateX(10px)`);
-    
+      .attr("d", d => {
+        const y = yScale(d.part);
+        const height = yScale.bandwidth();
+        const width = xScale(d.load);
+        const ry = 5;  // Radius for the y corners
+        return `M ${10},${y} 
+                h ${width - ry}
+                a ${ry},${ry} 0 0 1 ${ry},${ry} 
+                v ${height - 2 * ry}
+                a ${ry},${ry} 0 0 1 -${ry},${ry} 
+                h -${width - ry}
+                z`;
+      })
+      .attr("fill", d => colors[d.part]);
+        
     barChart
       .selectAll(".label")
       .data(metricsArray)

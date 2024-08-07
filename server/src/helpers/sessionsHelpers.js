@@ -5,8 +5,8 @@ const { incrementLoads } = require('./metricsHelpers')
 /* Creation Utitilities */
 async function createActivity(activity, sessionId, transaction) {
     const dbActivity = await fetchActivityByName(activity.name, transaction);
-    const startTime = DateTime.fromISO(activity.startTime).toFormat("HH:mm");
-    const endTime = DateTime.fromISO(activity.endTime).toFormat("HH:mm");
+    const startTime = DateTime.fromISO(activity.startTime).toFormat("HH:mm:ss");
+    const endTime = DateTime.fromISO(activity.endTime).toFormat("HH:mm:ss");
 
     return await db.SessionActivity.create({
         ActivityId: dbActivity.id,
@@ -22,8 +22,8 @@ async function createActivity(activity, sessionId, transaction) {
 
 async function updateOrCreateActivity(activity, sessionId, transaction) {
     const dbActivity = await fetchActivityByName(activity.name, transaction);
-    const startTime = DateTime.fromISO(activity.startTime).toFormat("HH:mm");
-    const endTime = DateTime.fromISO(activity.endTime).toFormat("HH:mm");
+    const startTime = DateTime.fromISO(activity.startTime).toFormat("HH:mm:ss");
+    const endTime = DateTime.fromISO(activity.endTime).toFormat("HH:mm:ss");
 
     if (!activity.id || activity.id < 0) {
         return await db.SessionActivity.create({
@@ -38,7 +38,7 @@ async function updateOrCreateActivity(activity, sessionId, transaction) {
         }, { transaction });
     } else {
         const existingActivity = await db.SessionActivity.findByPk(activity.id, { transaction });
-        if (existingActivity && existingActivity.TrainingSessionId === sessionId) {
+        if (existingActivity) {
             return await existingActivity.update({
                 ActivityId: dbActivity.id,
                 note: activity.note,
@@ -128,6 +128,7 @@ function formatFetchedSession(fetchedSession) {
         id: fetchedSession.id,
         name: fetchedSession.name,
         completedOn: fetchedSession.completedOn,
+        note: fetchedSession.note,
         activities: fetchedSession.SessionActivities.map(sa => ({
             id: sa.id,
             name: sa.Activity.name,

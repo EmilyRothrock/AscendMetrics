@@ -173,9 +173,9 @@ const ActivityForm: React.FC<{ activity: Activity; onActivityChange: (activity: 
         />
       </Box>
       <TextField
-        label="Notes"
-        name="notes"
-        value={formData.notes}
+        label="Note"
+        name="note"
+        value={formData.note}
         onChange={handleInputChange}
         fullWidth
         variant="standard"

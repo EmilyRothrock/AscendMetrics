@@ -6,7 +6,7 @@ export interface Activity {
     name: string;
     startTime: string; // ISO format
     endTime: string; // ISO format
-    notes?: string;
+    note?: string;
     duration: number; // In minutes
     intensities: BodyPartMetrics;
     loads: BodyPartMetrics;

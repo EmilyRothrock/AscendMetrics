@@ -190,9 +190,9 @@ const SessionPage = () => {
               sx={{ mt: '8px', mb: '4px' }}
             />
             <TextField
-              label="Session Notes"
-              name="notes"
-              value={sessionData.notes}
+              label="Session Note"
+              name="note"
+              value={sessionData.note}
               onChange={handleInputChange}
               fullWidth
               multiline

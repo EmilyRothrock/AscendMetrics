@@ -6,7 +6,7 @@ export interface Session {
     id: number;
     completedOn: string; // ISO format
     name?: string;
-    notes?: string;
+    note?: string;
     duration: number; // hours
     activities: Activity[];
     loads: BodyPartMetrics;
@@ -22,7 +22,7 @@ export const defaultNewSession = (): Session => ({
     id: -DateTime.now().valueOf(),                 // A temporary ID that cannot conflict with database given IDs
     completedOn: DateTime.now().toISO(),              // Current date and time in ISO format
     name: '',                                  // Default empty name
-    notes: '',                                 // Default empty notes
+    note: '',                                 // Default empty notes
     duration: 0,                               // Default duration of zero
     activities: [defaultNewActivity()],                            // Empty activities array
     loads: {

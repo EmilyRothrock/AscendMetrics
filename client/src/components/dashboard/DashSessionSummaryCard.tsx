@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
-import { Card, CardContent, IconButton, Typography,  CardHeader, Box } from '@mui/material';
-import Grid from '@mui/material/Unstable_Grid2'; // Grid version 2
+import { Card, CardContent, IconButton, Typography,  CardHeader, Box, Collapse, Grid } from '@mui/material';
 import LoadBarChart from '../charts/LoadBarChart';
 import ActivityTimePieChart from '../charts/ActivityTimePieChart';
 import { Session, generateDisplayName } from '../../types'; // adjust the path to where your types are defined
@@ -24,18 +23,8 @@ const DashSessionSummaryCard: React.FC<{ session: Session; }> = ({ session }) =>
     };
 
     return (
-        <Card elevation={2} sx={{ margin: 1, padding: 2, alignContent: 'center' }}>
+        <Card elevation={2} sx={{ margin: 1, padding: 1 }}>a
             <CardHeader
-                action={
-                    <Box display="flex" flexDirection="column">
-                        <IconButton onClick={handleEditClick}>
-                            <EditIcon sx={{ fontSize: 30 }} />
-                        </IconButton>
-                        <IconButton onClick={handleExpandClick}>
-                            {expanded ? <ExpandLessIcon /> : <ExpandMoreIcon />}
-                        </IconButton>
-                    </Box>
-                }
                 title={
                     <Typography 
                         sx={{ 
@@ -56,24 +45,29 @@ const DashSessionSummaryCard: React.FC<{ session: Session; }> = ({ session }) =>
                         Total Duration: {session.duration.toFixed(2)} hours
                     </Typography>
                 </>}
-                sx={{ 
-                    '.MuiCardHeader-content': { 
-                        maxWidth: 'calc(100% - 30px)' // Adjust this based on icon widths
-                    } 
-                }}
-            />
-            {expanded && (
+                action={
+                    <Box display="flex" flexDirection="column">
+                        <IconButton onClick={handleEditClick}>
+                            <EditIcon sx={{ fontSize: 30 }} />
+                        </IconButton>
+                        <IconButton onClick={handleExpandClick}>
+                            {expanded ? <ExpandLessIcon /> : <ExpandMoreIcon />}
+                        </IconButton>
+                    </Box>                    
+                }
+            /> 
+            <Collapse in={expanded} timeout="auto" unmountOnExit>
                 <CardContent>
                     <Grid container spacing={1}>
-                        <Grid xs={12} sm={6} sx={{ aspectRatio:"1" }}>
+                        <Grid item xs={12} sm={6} sx={{ aspectRatio:"1" }}>
                             <ActivityTimePieChart activities={session.activities} />
                         </Grid>
-                        <Grid xs={12} sm={6} sx={{ aspectRatio:"1" }}>
+                        <Grid item xs={12} sm={6} sx={{ aspectRatio:"1" }}>
                             <LoadBarChart data={session.loads} />
                         </Grid>
                     </Grid>
                 </CardContent>
-            )}
+            </Collapse>
         </Card>
     );
 };

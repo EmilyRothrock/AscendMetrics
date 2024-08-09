@@ -8,11 +8,35 @@ import { RootState } from '../../store/store';
 import { useSelector } from 'react-redux';
 import BalanceLineChart from '../charts/BalanceLineChart';
 import SteppedAreaChart from '../charts/SteppedAreaChart';
+import { bodyPartLabels } from '../../styles/bodyPartLabels';
+import { bodyPartColors } from '../../styles/bodyPartColors';
 
 // Landing page after logging in - surface level information about your Readiness, Past Sessions, and Visualizations for trends in past month
 const Dashboard: React.FC = () => {
     const sessions = useSelector((state: RootState) => state.sessions.sessions);
     const sessionIds = useSelector((state: RootState) => state.sessions.sessionIds);
+
+    const fakeReadinessStuff = {
+        readiness: {
+            fingers: 10,
+            upperBody: 20,
+            lowerBody: 30
+        },
+        feedback: {
+            fingers: "10",
+            upperBody: "20",
+            lowerBody: "30"
+        },
+    };
+
+    const readinessData = [ "fingers", "upperBody", "lowerBody"].map((bodyPart) => { 
+        return ({ 
+            title: bodyPartLabels[bodyPart],
+            value: fakeReadinessStuff.readiness[bodyPart],
+            feedback: fakeReadinessStuff.feedback[bodyPart],
+            color: bodyPartColors[bodyPart],
+        });
+    });
 
     return (
         <div>
@@ -20,9 +44,9 @@ const Dashboard: React.FC = () => {
                 <Grid xs={12} md={4}>
                     <Typography variant='h5'>Readiness</Typography>
                     <Stack direction='column' width={'100%'}>
-                        <ReadinessTile>Fingers and Forearms</ReadinessTile>
-                        <ReadinessTile>Upper Body</ReadinessTile>
-                        <ReadinessTile>Lower Body</ReadinessTile>
+                        {readinessData.map(data => {
+                            return <ReadinessTile data={data}/>
+                        })}
                     </Stack>
                 </Grid>
                 <Grid xs={12} md={4}>

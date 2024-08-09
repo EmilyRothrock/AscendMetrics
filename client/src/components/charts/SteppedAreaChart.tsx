@@ -48,6 +48,7 @@ const SteppedAreaChart = () => {
 
     useEffect(() => {
         const steppedAreaChart = select(chartRef.current)
+            .attr("width", dimensions.width)
             .style("overflow", "visible");
 
         const titleText = "Past Month's Daily Metrics";

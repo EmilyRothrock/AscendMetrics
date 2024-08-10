@@ -3,6 +3,7 @@ import { Activity } from '../../types';
 import { axisLeft, axisTop, scaleBand, scaleTime, select, timeFormat } from 'd3';
 import { DateTime } from 'luxon';
 import { useResizeObserver } from '../hooks/useResizeObserver';
+import { activityNameToColor } from '../../utils/activityNameToColor';
 
 interface SessionGanttProps {
   activities: Activity[];
@@ -87,27 +88,7 @@ const SessionGantt: React.FC<SessionGanttProps> = ({ activities, yAxisLabels }) 
             .attr("ry", 5)
             .attr("stroke", "black")
             .attr("stroke-width", "1px")
-            .attr("fill", d => {
-                const totalIntensity = d.intensities.fingers + d.intensities.upperBody + d.intensities.lowerBody;
-                const gradientId = `gradient-${d.name.replace(/\s/g, '-')}`;
-                const defs = ganttChart.append("defs");
-                const gradient = defs.append("linearGradient")
-                    .attr("id", gradientId)
-                    .attr("x1", "0%")
-                    .attr("x2", "100%")
-                    .attr("y1", "0%")
-                    .attr("y2", "100%");
-                gradient.append("stop")
-                    .attr("offset", "33%")
-                    .attr("stop-color", `rgba(46, 150, 255, ${0.99 + 0.01 * (d.intensities.fingers / totalIntensity)})`);
-                gradient.append("stop")
-                    .attr("offset", "66%")
-                    .attr("stop-color", `rgba(184, 0, 216, ${0.99 + 0.01 * (d.intensities.upperBody / totalIntensity)})`);
-                gradient.append("stop")
-                    .attr("offset", "100%")
-                    .attr("stop-color", `rgba(2, 178, 175, ${0.99 + 0.01 * (d.intensities.lowerBody / totalIntensity)})`);
-                return `url(#${gradientId})`;
-            })
+            .attr("fill", d => activityNameToColor(d.name))
             .on("mouseover", (event, d) => {
                 const scrollX = window.scrollX || document.documentElement.scrollLeft;
                 const scrollY = window.scrollY || document.documentElement.scrollTop;

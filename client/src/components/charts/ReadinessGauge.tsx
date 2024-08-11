@@ -39,14 +39,15 @@ const ReadinessGauge: React.FC<{ value: number, color: string, defaultDimensions
         .attr("d", myArc)
         .attr("transform", `translate(${dimensions.width / 2}, ${dimensions.height})`);
 
-      gauge
+    gauge
         .selectAll("text")
         .remove();
     gauge.append("text")
         .attr("x", radius) // Center the text horizontally
         .attr("y", radius) // Position the text below the gauge
         .attr("text-anchor", "middle") // Center the text horizontally
-        .text(`${value} / 100`); // Set the text to the value
+        .attr("font-family", "'Roboto', sans-serif")
+        .text(`${value}%`); // Set the text to the value
   }, [dimensions, value]);
 
 

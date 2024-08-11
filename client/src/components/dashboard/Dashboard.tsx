@@ -10,30 +10,22 @@ import BalanceLineChart from '../charts/BalanceLineChart';
 import SteppedAreaChart from '../charts/SteppedAreaChart';
 import { bodyPartLabels } from '../../styles/bodyPartLabels';
 import { bodyPartColors } from '../../styles/bodyPartColors';
+import { selectMetricsByDate } from '../../store/metricsSlice';
+import { DateTime } from 'luxon';
 
 // Landing page after logging in - surface level information about your Readiness, Past Sessions, and Visualizations for trends in past month
 const Dashboard: React.FC = () => {
     const sessions = useSelector((state: RootState) => state.sessions.sessions);
     const sessionIds = useSelector((state: RootState) => state.sessions.sessionIds);
-
-    const fakeReadinessStuff = {
-        readiness: {
-            fingers: 10,
-            upperBody: 20,
-            lowerBody: 30
-        },
-        feedback: {
-            fingers: "10",
-            upperBody: "20",
-            lowerBody: "30"
-        },
-    };
+    const { metrics } = useSelector((state: RootState) => selectMetricsByDate(state, DateTime.now().toISODate()));
+    
+    const readinessValues = metrics.readiness ? metrics.readiness : { fingers: 0, upperBody: 0, lowerBody: 0 };
 
     const readinessData = [ "fingers", "upperBody", "lowerBody"].map((bodyPart) => { 
         return ({ 
             title: bodyPartLabels[bodyPart],
-            value: fakeReadinessStuff.readiness[bodyPart],
-            feedback: fakeReadinessStuff.feedback[bodyPart],
+            value: Math.round(readinessValues[bodyPart] * 100),
+            feedback: "Textual feedback on training patterns coming soon!",
             color: bodyPartColors[bodyPart],
         });
     });

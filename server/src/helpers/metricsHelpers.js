@@ -1,8 +1,11 @@
 const { DateTime } = require("luxon");
+const { weightedMean, severityNormalization, quarticNormalization, inverseCubicNormalization, strainNormalization, inverseQuarticNormalization, getReadinessWeights } = require("./readinessUtils");
 
 /** Metrics Calculations */
 function calculateMetricsForDateRange(startDate, endDate, sessions) {
     //  Calculations related to sessions - stats, daily loads, fatigues
+    const readinessWeights = getReadinessWeights();
+
     const dailyLoads = {};
     const fatigues = {};
     for (const session of sessions) {
@@ -54,7 +57,9 @@ function calculateMetricsForDateRange(startDate, endDate, sessions) {
         EWMA.MS[dateString] = {};
         const strainBalance = {};
         const strainSeverity = {};
+        const fatigueSeverity = {};
         EWMA.WSS[dateString] = {};
+        const readiness = {};
 
         // Calculations
         bodyParts.forEach(part => {
@@ -81,9 +86,24 @@ function calculateMetricsForDateRange(startDate, endDate, sessions) {
             bodyParts.forEach(part => {
                 loadBalance[part] = getMetricValue(EWMA.WL, dateString, part) / getMetricValue(EWMA.ML, dateString, part); 
                 strainBalance[part] = getMetricValue(EWMA.WS, dateString, part) / getMetricValue(EWMA.MS, dateString, part); 
+                fatigueSeverity[part] = getMetricValue(fatigues, dateString, part) / getMetricValue(EWMA.MS, dateString, part);
             });
 
             const burnoutRiskIndex = calculateBurnoutRiskIndex(dailyLoads, metricsTable, currentDate, bodyParts, EWMA.WL[dateString])
+
+            bodyParts.forEach(part => {
+                const normalizedValues = {
+                    loadBalance: quarticNormalization(2, loadBalance[part]),
+                    averageLoadSeverity: severityNormalization(5, EWMA.WLS[dateString][part]),
+                    averageWeeklyLoadChange: quarticNormalization(2, EWMA.WLChange[dateString][part]),
+                    fatigueSeverity: inverseCubicNormalization(5, fatigueSeverity[part]),
+                    strainBalance: strainNormalization(2, strainBalance[part]),
+                    averageStrainSeverity: inverseCubicNormalization(4, EWMA.WSS[dateString][part]),
+                    burnoutRiskIndex: inverseQuarticNormalization(2.5, burnoutRiskIndex[part]),
+                };
+    
+                readiness[part] = weightedMean(readinessWeights, normalizedValues);
+            });
 
             // Assignments
             metricsTable[dateString] = {
@@ -96,6 +116,7 @@ function calculateMetricsForDateRange(startDate, endDate, sessions) {
                 weeklyLoadChange: weeklyLoadChange,
                 averageWeeklyLoadChange: EWMA.WLChange[dateString],
                 fatigue: fatigues[dateString],
+                fatigueSeverity: fatigueSeverity,
                 dailyStrain: dailyStrain,
                 weeklyStrain: EWMA.WS[dateString],
                 monthlyStrain: EWMA.MS[dateString],
@@ -103,6 +124,7 @@ function calculateMetricsForDateRange(startDate, endDate, sessions) {
                 strainSeverity: strainSeverity,
                 averageStrainSeverity: EWMA.WSS[dateString],
                 burnoutRiskIndex: burnoutRiskIndex,
+                readiness: readiness,
             };
         }
     }

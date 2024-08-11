@@ -80,6 +80,7 @@ const metricsSlice = createSlice({
       })
       .addCase(fetchMetricsWithSessionsForDateRange.fulfilled, (state, action) => {
         const newMetricsTable = action.payload.metricsTable;
+        console.log(newMetricsTable);
         state.metricsTable = updateMetricsTable(state.metricsTable, newMetricsTable);
         const newRange = action.meta.arg;
         state.loadedRange = updateLoadedRange(state.loadedRange, newRange);

@@ -19,7 +19,7 @@ const ReadinessTile: React.FC<ReadinessTileProps> = ({ data }) => {
             <Grid container spacing={2}>
                 <Grid xs={6}>
                     <Typography variant="body1">{title}</Typography>
-                    <Typography variant="body1">{feedback}</Typography>
+                    <Typography variant="body2">{feedback}</Typography>
                 </Grid>
                 <Grid xs={6}>
                     <ReadinessGauge value={value} color={color}/>

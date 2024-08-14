@@ -1,15 +1,31 @@
-import React, { useEffect, useState } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
-import { Button, TextField, Typography, Box, Grid, FormHelperText, ButtonGroup } from '@mui/material';
-import { DateTime } from 'luxon';
-import { useSelector, useDispatch } from 'react-redux';
-import { RootState } from '../../store/store';
-import ActivityList from './ActivityList';
-import WarningDialog from './WarningDialog';
-import { Activity, Session, defaultNewSession } from '../../types';
-import { deleteSession as deleteSessionInAPI, createSession as createSessionInAPI, updateSession as updateSessionInAPI } from '../../services/sessionService';
-import { createSession as createSessionInStore, updateSession as updateSessionInStore, deleteSession as deleteSessionInStore } from '../../store/sessionsSlice';
-import SessionGantt from '../charts/SessionGantt';
+import React, { useEffect, useState } from "react";
+import { useNavigate, useParams } from "react-router-dom";
+import {
+  Button,
+  TextField,
+  Typography,
+  Box,
+  Grid,
+  FormHelperText,
+  ButtonGroup,
+} from "@mui/material";
+import { DateTime } from "luxon";
+import { useSelector, useDispatch } from "react-redux";
+import { RootState } from "../../store/store";
+import ActivityList from "./ActivityList";
+import WarningDialog from "./WarningDialog";
+import { Activity, Session, defaultNewSession } from "../../types";
+import {
+  deleteSession as deleteSessionInAPI,
+  createSession as createSessionInAPI,
+  updateSession as updateSessionInAPI,
+} from "../../services/sessionService";
+import {
+  createSession as createSessionInStore,
+  updateSession as updateSessionInStore,
+  deleteSession as deleteSessionInStore,
+} from "../../store/sessionsSlice";
+import SessionGantt from "../charts/SessionGantt";
 
 const SessionPage = () => {
   const { id } = useParams<{ id: string }>();
@@ -23,7 +39,7 @@ const SessionPage = () => {
   const dispatch = useDispatch();
 
   useEffect(() => {
-    if (id === 'new') {
+    if (id === "new") {
       setSessionData(defaultNewSession());
     } else {
       const session = sessions[Number(id)];
@@ -33,15 +49,15 @@ const SessionPage = () => {
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    setSessionData(prevState => ({ ...prevState, [name]: value }));
+    setSessionData((prevState) => ({ ...prevState, [name]: value }));
   };
 
   const handleActivityChange = (updatedActivity: Activity) => {
-    setSessionData(prevState => ({
+    setSessionData((prevState) => ({
       ...prevState,
-      activities: prevState.activities.map(activity =>
+      activities: prevState.activities.map((activity) =>
         activity.id === updatedActivity.id ? updatedActivity : activity
-      )
+      ),
     }));
   };
 
@@ -50,55 +66,74 @@ const SessionPage = () => {
     const newWarnings: string[] = [];
 
     if (!sessionData.completedOn) {
-      newErrors.date = 'Session date is required';
+      newErrors.date = "Session date is required";
     } else {
       const sessionDate = DateTime.fromISO(sessionData.completedOn);
       if (sessionDate > DateTime.now()) {
-        newErrors.date = 'Date cannot exceed today';
+        newErrors.date = "Date cannot exceed today";
       } else {
         const now = DateTime.now();
-        const monthsDifference = now.diff(sessionDate, 'months').months;
+        const monthsDifference = now.diff(sessionDate, "months").months;
         if (monthsDifference > 6) {
-          newWarnings.push('Date is over 6 months ago (often accidental year)');
+          newWarnings.push("Date is over 6 months ago (often accidental year)");
         }
       }
     }
 
     if (sessionData.activities.length === 0) {
-      newErrors.activities = 'At least one activity is required';
+      newErrors.activities = "At least one activity is required";
     }
 
     sessionData.activities.forEach((activity, index) => {
       if (!activity.name) {
-        newErrors[`activity-name-${index}`] = 'Activity name is required';
+        newErrors[`activity-name-${index}`] = "Activity name is required";
       }
       if (!activity.startTime) {
-        newErrors[`activity-startTime-${index}`] = 'Start time is required';
+        newErrors[`activity-startTime-${index}`] = "Start time is required";
       }
       if (!activity.endTime) {
-        newErrors[`activity-endTime-${index}`] = 'End time is required';
+        newErrors[`activity-endTime-${index}`] = "End time is required";
       }
-      if (activity.intensities.fingers < 0 || activity.intensities.fingers > 10) {
-        newErrors[`activity-intensities-${index}`] = 'Intensity must be between 0 and 10';
+      if (
+        activity.intensities.fingers < 0 ||
+        activity.intensities.fingers > 10
+      ) {
+        newErrors[`activity-intensities-${index}`] =
+          "Intensity must be between 0 and 10";
       }
-      if (DateTime.fromISO(activity.startTime) >= DateTime.fromISO(activity.endTime)) {
-        newErrors[`activity-time-${index}`] = 'Start time must be earlier than end time';
+      if (
+        DateTime.fromISO(activity.startTime) >=
+        DateTime.fromISO(activity.endTime)
+      ) {
+        newErrors[`activity-time-${index}`] =
+          "Start time must be earlier than end time";
       }
-      if (DateTime.fromISO(activity.endTime).diff(DateTime.fromISO(activity.startTime), 'hours').hours > 2) {
-        newWarnings.push('Activity duration is longer than 2 hours (often an accidental am/pm)');
+      if (
+        DateTime.fromISO(activity.endTime).diff(
+          DateTime.fromISO(activity.startTime),
+          "hours"
+        ).hours > 2
+      ) {
+        newWarnings.push(
+          "Activity duration is longer than 2 hours (often an accidental am/pm)"
+        );
       }
       if (
         activity.intensities.fingers === 0 &&
         activity.intensities.upperBody === 0 &&
         activity.intensities.lowerBody === 0
       ) {
-        newErrors[`activity-all-intensities-${index}`] = 'All intensities cannot be zero';
+        newErrors[`activity-all-intensities-${index}`] =
+          "All intensities cannot be zero";
       }
     });
 
     setErrors(newErrors);
     setWarnings(newWarnings);
-    return { valid: Object.keys(newErrors).length === 0, hasWarnings: newWarnings.length > 0 };
+    return {
+      valid: Object.keys(newErrors).length === 0,
+      hasWarnings: newWarnings.length > 0,
+    };
   };
 
   const handleSaveConfirmation = (confirm: boolean) => {
@@ -117,7 +152,10 @@ const SessionPage = () => {
             console.log("creating new session!");
             const createdSession = await createSessionInAPI(sessionData);
             console.log(createdSession);
-            setSessionData(prevState => ({ ...prevState, id: createdSession.id }));
+            setSessionData((prevState) => ({
+              ...prevState,
+              id: createdSession.id,
+            }));
             dispatch(createSessionInStore(createdSession));
           } else {
             console.log("updating existing session!");
@@ -127,7 +165,7 @@ const SessionPage = () => {
           }
           navigate(-1);
         } catch (error) {
-          console.error('Error saving session:', error);
+          console.error("Error saving session:", error);
         } finally {
           setSaveConfirmed(false);
         }
@@ -167,18 +205,22 @@ const SessionPage = () => {
       <Grid container>
         <Grid item xs={12} md={4}>
           <Box component="form" noValidate autoComplete="off">
-            <Typography variant="h4">{id === 'new' ? 'New Session' : 'Edit Session'}</Typography>
+            <Typography variant="h4">
+              {id === "new" ? "New Session" : "Edit Session"}
+            </Typography>
             <TextField
               label="Date"
               name="completedOn"
               type="date"
-              value={DateTime.fromISO(sessionData.completedOn).toFormat('yyyy-MM-dd')}
+              value={DateTime.fromISO(sessionData.completedOn).toFormat(
+                "yyyy-MM-dd"
+              )}
               onChange={handleInputChange}
               fullWidth
               margin="normal"
               error={!!errors.date}
               helperText={errors.date}
-              sx={{ mt: '8px', mb: '4px' }}
+              sx={{ mt: "8px", mb: "4px" }}
             />
             <TextField
               label="Name"
@@ -187,7 +229,7 @@ const SessionPage = () => {
               onChange={handleInputChange}
               fullWidth
               margin="normal"
-              sx={{ mt: '8px', mb: '4px' }}
+              sx={{ mt: "8px", mb: "4px" }}
             />
             <TextField
               label="Session Note"
@@ -197,11 +239,13 @@ const SessionPage = () => {
               fullWidth
               multiline
               margin="normal"
-              sx={{ mt: '8px', mb: '4px' }}
+              sx={{ mt: "8px", mb: "4px" }}
             />
             <ActivityList
               activities={sessionData.activities}
-              setActivities={(activities) => setSessionData({ ...sessionData, activities })}
+              setActivities={(activities) =>
+                setSessionData({ ...sessionData, activities })
+              }
               onActivityChange={handleActivityChange}
               errors={errors}
             />
@@ -215,17 +259,26 @@ const SessionPage = () => {
               </Box>
             )}
             <ButtonGroup variant="contained" fullWidth sx={{ marginTop: 1 }}>
-              <Button onClick={saveSession} color="primary">Save</Button>
-              {id === 'new' ? (
-                <Button onClick={() => navigate(-1)} color="secondary">Cancel</Button>
+              <Button onClick={saveSession} color="primary">
+                Save
+              </Button>
+              {id === "new" ? (
+                <Button onClick={() => navigate(-1)} color="secondary">
+                  Cancel
+                </Button>
               ) : (
-                <Button onClick={deleteSession} color="secondary">Delete</Button>
+                <Button onClick={deleteSession} color="secondary">
+                  Delete
+                </Button>
               )}
             </ButtonGroup>
           </Box>
         </Grid>
-        <Grid item md={8} sx={{ display: { xs: 'none', md: 'block' } }}>
-          <SessionGantt activities={sessionData.activities} yAxisLabels={true}/>
+        <Grid item md={8} sx={{ display: { xs: "none", md: "block" } }}>
+          <SessionGantt
+            activities={sessionData.activities}
+            yAxisLabels={true}
+          />
         </Grid>
       </Grid>
       <WarningDialog

@@ -1,16 +1,18 @@
-import { fetchSessionById, selectSessionById } from '../store/sessionsSlice';
-import store from '../store/store';
-import { LoaderFunctionArgs } from 'react-router-dom';
+import { fetchSessionById, selectSessionById } from "../store/sessionsSlice";
+import store from "../store/store";
+import { LoaderFunctionArgs } from "react-router-dom";
 
 interface SessionLoaderParams {
   params: {
     id: string;
   };
-  }
+}
 
-export const sessionLoader = async ({ params } : LoaderFunctionArgs<SessionLoaderParams['params']>) => {
+export const sessionLoader = async ({
+  params,
+}: LoaderFunctionArgs<SessionLoaderParams["params"]>) => {
   if (!params.id) {
-    throw new Error('Session ID is required');
+    throw new Error("Session ID is required");
   } else if (params.id === "new") {
     return null;
   } else {

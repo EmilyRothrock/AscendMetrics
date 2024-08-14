@@ -3,12 +3,12 @@ import { ControlPanelProvider } from "./ControlPanelContext";
 import SessionCardsContainer from "./SessionsCardContainer";
 
 const SessionsManagerPage = () => {
-    return (
-        <ControlPanelProvider>
-            <ControlPanel/>
-            <SessionCardsContainer/>
-        </ControlPanelProvider>
-    );
-}
+  return (
+    <ControlPanelProvider>
+      <ControlPanel />
+      <SessionCardsContainer />
+    </ControlPanelProvider>
+  );
+};
 
 export default SessionsManagerPage;

@@ -1,8 +1,12 @@
-import React, { createContext, useContext, useState, ReactNode } from 'react';
-import { FieldName } from '../../types/fieldOptions';
-import { FilterValueType } from '../../types/filterValueType';
+import React, { createContext, useContext, useState, ReactNode } from "react";
+import { FieldName } from "../../types/fieldOptions";
+import { FilterValueType } from "../../types/filterValueType";
 
-const defaultFilterValue: FilterValueType = { text: null, min: null, max: null};
+const defaultFilterValue: FilterValueType = {
+  text: null,
+  min: null,
+  max: null,
+};
 
 interface ControlPanelContextType {
   sortAscending: boolean;
@@ -23,10 +27,11 @@ const defaultContextValue: ControlPanelContextType = {
   handleSelectedFieldChange: () => {},
   setFilterValue: () => {},
   updateFilterValue: () => {},
-  resetControlPanel: () => {}
+  resetControlPanel: () => {},
 };
 
-const ControlPanelContext = createContext<ControlPanelContextType>(defaultContextValue);
+const ControlPanelContext =
+  createContext<ControlPanelContextType>(defaultContextValue);
 
 export const useControlPanel = () => useContext(ControlPanelContext);
 
@@ -34,10 +39,13 @@ interface ControlPanelProviderProps {
   children: ReactNode;
 }
 
-export const ControlPanelProvider: React.FC<ControlPanelProviderProps> = ({ children }) => {
+export const ControlPanelProvider: React.FC<ControlPanelProviderProps> = ({
+  children,
+}) => {
   const [sortAscending, setSortAscending] = useState<boolean>(false);
   const [selectedField, setSelectedField] = useState<FieldName | null>(null);
-  const [filterValue, setFilterValue] = useState<FilterValueType>(defaultFilterValue);
+  const [filterValue, setFilterValue] =
+    useState<FilterValueType>(defaultFilterValue);
 
   const toggleSort = () => setSortAscending(!sortAscending);
   const handleSelectedFieldChange = (field: FieldName) => {
@@ -46,7 +54,7 @@ export const ControlPanelProvider: React.FC<ControlPanelProviderProps> = ({ chil
     setFilterValue(defaultFilterValue);
   };
   const updateFilterValue = (key: string, value: string | number) => {
-    setFilterValue({...filterValue, [key]: value });
+    setFilterValue({ ...filterValue, [key]: value });
   };
   const resetControlPanel = () => {
     setSortAscending(false);
@@ -55,7 +63,18 @@ export const ControlPanelProvider: React.FC<ControlPanelProviderProps> = ({ chil
   };
 
   return (
-    <ControlPanelContext.Provider value={{ sortAscending, selectedField, filterValue, toggleSort, handleSelectedFieldChange, setFilterValue, updateFilterValue, resetControlPanel }}>
+    <ControlPanelContext.Provider
+      value={{
+        sortAscending,
+        selectedField,
+        filterValue,
+        toggleSort,
+        handleSelectedFieldChange,
+        setFilterValue,
+        updateFilterValue,
+        resetControlPanel,
+      }}
+    >
       {children}
     </ControlPanelContext.Provider>
   );

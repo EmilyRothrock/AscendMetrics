@@ -1,10 +1,15 @@
 import { MutableRefObject, useEffect, useLayoutEffect, useState } from "react";
 
-export const useDimensions = (targetRef: MutableRefObject<HTMLDivElement>, defaults: { height: number, width: number}) => {
+export const useDimensions = (
+  targetRef: MutableRefObject<HTMLDivElement>,
+  defaults: { height: number; width: number }
+) => {
   const getDimensions = () => {
     return {
       width: targetRef.current ? targetRef.current.offsetWidth : defaults.width,
-      height: targetRef.current ? targetRef.current.offsetHeight : defaults.height
+      height: targetRef.current
+        ? targetRef.current.offsetHeight
+        : defaults.height,
     };
   };
 
@@ -27,4 +32,4 @@ export const useDimensions = (targetRef: MutableRefObject<HTMLDivElement>, defau
   }, []);
 
   return dimensions;
-}
+};

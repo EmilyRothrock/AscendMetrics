@@ -1,22 +1,26 @@
-import React, { useState } from 'react';
-import Avatar from '@mui/material/Avatar';
-import Button from '@mui/material/Button';
-import CssBaseline from '@mui/material/CssBaseline';
-import TextField from '@mui/material/TextField';
-import FormControlLabel from '@mui/material/FormControlLabel';
-import Checkbox from '@mui/material/Checkbox';
-import Link from '@mui/material/Link';
-import Grid from '@mui/material/Grid';
-import Box from '@mui/material/Box';
-import Alert from '@mui/material/Alert';
-import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
-import Typography from '@mui/material/Typography';
-import Container from '@mui/material/Container';
-import { useNavigate } from 'react-router-dom';
-import { signin } from '../../services/authService';
+import React, { useState } from "react";
+import Avatar from "@mui/material/Avatar";
+import Button from "@mui/material/Button";
+import CssBaseline from "@mui/material/CssBaseline";
+import TextField from "@mui/material/TextField";
+import FormControlLabel from "@mui/material/FormControlLabel";
+import Checkbox from "@mui/material/Checkbox";
+import Link from "@mui/material/Link";
+import Grid from "@mui/material/Grid";
+import Box from "@mui/material/Box";
+import Alert from "@mui/material/Alert";
+import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
+import Typography from "@mui/material/Typography";
+import Container from "@mui/material/Container";
+import { useNavigate } from "react-router-dom";
+import { signin } from "../../services/authService";
 
 const SigninPage = () => {
-  const [alert, setAlert] = useState({ visible: false, severity: 'success', message: '' });
+  const [alert, setAlert] = useState({
+    visible: false,
+    severity: "success",
+    message: "",
+  });
   const navigate = useNavigate();
   // TODO: fix issues with severity and alert component... stupid TS
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
@@ -24,11 +28,18 @@ const SigninPage = () => {
     const data = new FormData(event.currentTarget);
 
     try {
-        const response = await signin(data.get('email') as string, data.get('password') as string);
-        setAlert({ visible: true, severity: 'success', message: response.message });
-        navigate('/dashboard');
+      const response = await signin(
+        data.get("email") as string,
+        data.get("password") as string
+      );
+      setAlert({
+        visible: true,
+        severity: "success",
+        message: response.message,
+      });
+      navigate("/dashboard");
     } catch (error) {
-        setAlert({ visible: true, severity: 'error', message: error });
+      setAlert({ visible: true, severity: "error", message: error });
     }
   };
 
@@ -38,12 +49,12 @@ const SigninPage = () => {
       <Box
         sx={{
           marginTop: 8,
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
         }}
       >
-        <Avatar sx={{ m: 1, bgcolor: 'secondary.main' }}>
+        <Avatar sx={{ m: 1, bgcolor: "secondary.main" }}>
           <LockOutlinedIcon />
         </Avatar>
         <Typography component="h1" variant="h5">
@@ -82,27 +93,27 @@ const SigninPage = () => {
           >
             Sign In
           </Button>
-        {alert.visible && (
-          <Alert variant="outlined" severity={alert.severity}>
-            {alert.message}
-          </Alert>
-        )}
-        <Grid container>
-          <Grid item xs>
-            <Link href="#" variant="body2">
-              Forgot password?
-            </Link>
+          {alert.visible && (
+            <Alert variant="outlined" severity={alert.severity}>
+              {alert.message}
+            </Alert>
+          )}
+          <Grid container>
+            <Grid item xs>
+              <Link href="#" variant="body2">
+                Forgot password?
+              </Link>
+            </Grid>
+            <Grid item>
+              <Link href="/auth/signup" variant="body2">
+                {"Don't have an account? Sign Up"}
+              </Link>
+            </Grid>
           </Grid>
-          <Grid item>
-            <Link href="/auth/signup" variant="body2">
-              {"Don't have an account? Sign Up"}
-            </Link>
-          </Grid>
-        </Grid>
         </Box>
       </Box>
     </Container>
   );
-}
+};
 
 export default SigninPage;

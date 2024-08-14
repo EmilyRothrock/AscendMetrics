@@ -1,5 +1,5 @@
 export interface BodyPartMetrics {
-    fingers: number;
-    upperBody: number;
-    lowerBody: number;
+  fingers: number;
+  upperBody: number;
+  lowerBody: number;
 }

@@ -1,5 +1,11 @@
-import React from 'react';
-import { Dialog, DialogTitle, DialogContent, DialogActions, Button } from '@mui/material';
+import React from "react";
+import {
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  Button,
+} from "@mui/material";
 
 interface WarningDialogProps {
   open: boolean;
@@ -7,7 +13,11 @@ interface WarningDialogProps {
   onClose: (confirm: boolean) => void;
 }
 
-const WarningDialog: React.FC<WarningDialogProps> = ({ open, warnings, onClose }) => {
+const WarningDialog: React.FC<WarningDialogProps> = ({
+  open,
+  warnings,
+  onClose,
+}) => {
   return (
     <Dialog open={open} onClose={() => onClose(false)}>
       <DialogTitle>Warnings Detected</DialogTitle>

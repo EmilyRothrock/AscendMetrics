@@ -5,7 +5,7 @@ import {
   Navigate,
   RouterProvider,
 } from "react-router-dom";
-import { createTheme, ThemeProvider } from '@mui/material/styles';
+import { createTheme, ThemeProvider } from "@mui/material/styles";
 import SessionPage from "./components/sessionEditor/SessionsPage";
 import Layout from "./components/common/Layout";
 import ProtectedRoute from "./components/auth/ProtectedRoute";
@@ -13,7 +13,7 @@ import SigninPage from "./components/auth/SigninPage";
 import SignupPage from "./components/auth/SignupPage";
 import Dashboard from "./components/dashboard/Dashboard";
 import { Provider as StoreProvider } from "react-redux";
-import store from './store/store';
+import store from "./store/store";
 import dashboardLoader from "./loaders/dashboardLoader";
 import { sessionLoader } from "./loaders/sessionsLoader";
 import { sessionsManagerLoader } from "./loaders/sessionsManagerLoader";
@@ -22,10 +22,10 @@ import SessionsManagerPage from "./components/sessionsManager/SessionManagerPage
 const theme = createTheme({
   palette: {
     primary: {
-      main: '#3f51b5',
+      main: "#3f51b5",
     },
     secondary: {
-      main: '#ff5722',
+      main: "#ff5722",
     },
   },
 });
@@ -37,11 +37,11 @@ const router = createBrowserRouter([
   },
   {
     path: "/signin",
-    element: <SigninPage/>,
+    element: <SigninPage />,
   },
   {
     path: "/signup",
-    element: <SignupPage/>,
+    element: <SignupPage />,
   },
   {
     path: "/forgot-password",
@@ -53,24 +53,28 @@ const router = createBrowserRouter([
   },
   {
     path: "/",
-    element: <ProtectedRoute><Layout /></ProtectedRoute>,
+    element: (
+      <ProtectedRoute>
+        <Layout />
+      </ProtectedRoute>
+    ),
     children: [
       {
         path: "dashboard",
-        element: <Dashboard/>,
+        element: <Dashboard />,
         loader: dashboardLoader,
       },
       {
         path: "sessions/:id",
-        element: <SessionPage/>,
+        element: <SessionPage />,
         loader: sessionLoader,
       },
       {
         path: "sessions/manage",
-        element: <SessionsManagerPage/>,
+        element: <SessionsManagerPage />,
         loader: sessionsManagerLoader,
-      }
-    ]
+      },
+    ],
   },
 ]);
 

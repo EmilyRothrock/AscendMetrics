@@ -1,4 +1,4 @@
 export interface CustomError {
-    message: string;
-    statusCode?: number;
-  }
+  message: string;
+  statusCode?: number;
+}

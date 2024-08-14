@@ -1,19 +1,32 @@
-import { createAsyncThunk, createSelector, createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { Session } from '../types'; 
-import { findIndexByDate, insertSessionId, updateSessionsState, updateSessionCalculations } from '../utils/sessionUtils';
-import { RootState } from './store';
-import { getSessionsForDateRange, getSessionById } from '../services/sessionService';
-import { AxiosError } from 'axios';
-import { DateTime } from 'luxon';
-import { fetchMetricsWithSessionsForDateRange } from './metricsSlice';
-import { SessionsState } from '../types/sessionState';
-import { compareDates } from '../utils/comparisons';
+import {
+  createAsyncThunk,
+  createSelector,
+  createSlice,
+  PayloadAction,
+} from "@reduxjs/toolkit";
+import { Session } from "../types";
+import {
+  findIndexByDate,
+  insertSessionId,
+  updateSessionsState,
+  updateSessionCalculations,
+} from "../utils/sessionUtils";
+import { RootState } from "./store";
+import {
+  getSessionsForDateRange,
+  getSessionById,
+} from "../services/sessionService";
+import { AxiosError } from "axios";
+import { DateTime } from "luxon";
+import { fetchMetricsWithSessionsForDateRange } from "./metricsSlice";
+import { SessionsState } from "../types/sessionState";
+import { compareDates } from "../utils/comparisons";
 
 const initialState: SessionsState = {
   sessions: {},
   sessionIds: [],
   loading: false,
-  error: null
+  error: null,
 };
 
 /* Selectors Definitions */
@@ -26,7 +39,10 @@ export const selectSessionById = createSelector(
 
 export const selectSessionsForDateRange = createSelector(
   (state: RootState) => state.sessions,
-  (_: RootState, { startDate, endDate }: { startDate: string, endDate: string }) => ({ startDate, endDate }),
+  (
+    _: RootState,
+    { startDate, endDate }: { startDate: string; endDate: string }
+  ) => ({ startDate, endDate }),
   (sessionsState, { startDate, endDate }) => {
     const endDateTime = DateTime.fromISO(endDate);
 
@@ -58,7 +74,7 @@ export const selectSessionsForDateRange = createSelector(
  * @return Fetched session with complete stats.
  */
 export const fetchSessionById = createAsyncThunk(
-  'sessions/fetchSessionById',
+  "sessions/fetchSessionById",
   async (sessionId: number, { rejectWithValue }) => {
     try {
       const data = await getSessionById(sessionId);
@@ -68,12 +84,12 @@ export const fetchSessionById = createAsyncThunk(
       if (axiosError.response) {
         return rejectWithValue({
           message: axiosError.message,
-          status: axiosError.response.status
+          status: axiosError.response.status,
         });
       } else {
         return rejectWithValue({
           message: axiosError.message,
-          status: axiosError.code ? parseInt(axiosError.code) : 500
+          status: axiosError.code ? parseInt(axiosError.code) : 500,
         });
       }
     }
@@ -87,8 +103,11 @@ export const fetchSessionById = createAsyncThunk(
  * @returns Fetched sessions with complete stats in a list.
  */
 export const fetchSessionsForDateRange = createAsyncThunk(
-  'sessions/fetchSessionForDateRange',
-  async ({startDate, endDate}: {startDate: string, endDate: string}, { rejectWithValue }) => {
+  "sessions/fetchSessionForDateRange",
+  async (
+    { startDate, endDate }: { startDate: string; endDate: string },
+    { rejectWithValue }
+  ) => {
     try {
       const data = await getSessionsForDateRange(startDate, endDate);
       return data;
@@ -97,12 +116,12 @@ export const fetchSessionsForDateRange = createAsyncThunk(
       if (axiosError.response) {
         return rejectWithValue({
           message: axiosError.message,
-          status: axiosError.response.status
+          status: axiosError.response.status,
         });
       } else {
         return rejectWithValue({
           message: axiosError.message,
-          status: axiosError.code ? parseInt(axiosError.code) : 500
+          status: axiosError.code ? parseInt(axiosError.code) : 500,
         });
       }
     }
@@ -111,7 +130,7 @@ export const fetchSessionsForDateRange = createAsyncThunk(
 
 /* Slice Definition */
 const sessionsSlice = createSlice({
-  name: 'sessions',
+  name: "sessions",
   initialState,
   reducers: {
     createSession(state, action: PayloadAction<Session>) {
@@ -125,13 +144,20 @@ const sessionsSlice = createSlice({
       const newDate = action.payload.completedOn;
       const updatedSession = updateSessionCalculations(action.payload);
       state.sessions[updatedSession.id] = updatedSession;
-      if (prevDate != newDate) { 
-          state.sessionIds.sort((a: number, b: number) => compareDates(state.sessions[a].completedOn, state.sessions[b].completedOn)); 
+      if (prevDate != newDate) {
+        state.sessionIds.sort((a: number, b: number) =>
+          compareDates(
+            state.sessions[a].completedOn,
+            state.sessions[b].completedOn
+          )
+        );
       }
     },
     deleteSession(state, action: PayloadAction<number>) {
       delete state.sessions[action.payload];
-      state.sessionIds = state.sessionIds.filter(item => item !== action.payload);
+      state.sessionIds = state.sessionIds.filter(
+        (item) => item !== action.payload
+      );
     },
   },
   extraReducers: (builder) => {
@@ -169,17 +195,24 @@ const sessionsSlice = createSlice({
         state.loading = true;
         state.error = null;
       })
-      .addCase(fetchMetricsWithSessionsForDateRange.fulfilled, (state, action) => {
-        const sessions = action.payload.sessions;
-        updateSessionsState(state, sessions);
-        state.loading = false;
-      })
-      .addCase(fetchMetricsWithSessionsForDateRange.rejected, (state, action) => {
-        state.loading = false;
-        state.error = action.error;  // Use action.error which is SerializedError type
-      });
+      .addCase(
+        fetchMetricsWithSessionsForDateRange.fulfilled,
+        (state, action) => {
+          const sessions = action.payload.sessions;
+          updateSessionsState(state, sessions);
+          state.loading = false;
+        }
+      )
+      .addCase(
+        fetchMetricsWithSessionsForDateRange.rejected,
+        (state, action) => {
+          state.loading = false;
+          state.error = action.error; // Use action.error which is SerializedError type
+        }
+      );
   },
 });
 
-export const { createSession, updateSession, deleteSession } = sessionsSlice.actions;
+export const { createSession, updateSession, deleteSession } =
+  sessionsSlice.actions;
 export default sessionsSlice.reducer;

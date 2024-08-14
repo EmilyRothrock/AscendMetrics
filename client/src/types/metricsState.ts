@@ -3,8 +3,8 @@ import { DateRange } from "./dateRange";
 import { MetricsTable } from "./metricsTable";
 
 export interface MetricsState {
-    metricsTable: MetricsTable,
-    loadedRange: DateRange | null;
-    loading: boolean,
-    error: SerializedError | null,
-  }
+  metricsTable: MetricsTable;
+  loadedRange: DateRange | null;
+  loading: boolean;
+  error: SerializedError | null;
+}

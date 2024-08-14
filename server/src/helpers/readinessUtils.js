@@ -1,5 +1,4 @@
 function weightedMean(weights, values) {
-    console.log(weights, values);
     let totalWeight = 0;
     let weightedSum = 0;
 

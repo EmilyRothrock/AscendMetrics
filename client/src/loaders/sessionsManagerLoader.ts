@@ -1,8 +1,7 @@
-
-import { DateTime } from 'luxon';
-import { fetchMetricsWithSessionsForDateRange } from '../store/metricsSlice';
-import store from '../store/store';
-import { isRangeLoaded } from '../utils/metricUtils';
+import { DateTime } from "luxon";
+import { fetchMetricsWithSessionsForDateRange } from "../store/metricsSlice";
+import store from "../store/store";
+import { isRangeLoaded } from "../utils/metricUtils";
 
 // TODO: check for at least past month of sessions and fetch if you don't have them
 export const sessionsManagerLoader = async () => {
@@ -11,10 +10,12 @@ export const sessionsManagerLoader = async () => {
 
   // TODO: fetch only missing range?
   if (!isRangeLoaded(store.getState(), startDate, endDate)) {
-    await store.dispatch(fetchMetricsWithSessionsForDateRange({
-      startDate,
-      endDate
-    }));
+    await store.dispatch(
+      fetchMetricsWithSessionsForDateRange({
+        startDate,
+        endDate,
+      })
+    );
   }
 
   return null;

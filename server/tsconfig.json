@@ -1,9 +1,8 @@
 {
   "extends": "../tsconfig.base.json",
   "compilerOptions": {
-    "outDir": "../dist/client",
-    "moduleResolution": "node",
-    "jsx": "react-jsx"
+    "outDir": "../dist/server",
+    "moduleResolution": "node"
   },
   "include": ["src"],
   "exclude": ["node_modules", "**/*.spec.ts"]

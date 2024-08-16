@@ -6,10 +6,9 @@ import configJson from "./config/config.js";
 
 const basename = path.basename(fileURLToPath(import.meta.url));
 const env = process.env.NODE_ENV || "development";
-const config = configJson.config[env];
+const config = configJson[env];
 const db = {};
 
-console.log(config);
 const sequelize = new Sequelize(
   config.database,
   config.username,

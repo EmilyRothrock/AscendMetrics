@@ -8,12 +8,9 @@ const User = (sequelize, DataTypes) => {
         autoIncrement: true,
         allowNull: false,
       },
-      passwordHash: {
+      auth0id: {
         type: DataTypes.STRING,
-        allowNull: false,
-      },
-      passwordSalt: {
-        type: DataTypes.STRING,
+        unique: true,
         allowNull: false,
       },
       email: {
@@ -31,13 +28,11 @@ const User = (sequelize, DataTypes) => {
       },
     },
     {
-      // optional: if you want to disable timestamp fields (createdAt, updatedAt)
       timestamps: true,
     }
   );
 
   User.associate = function (models) {
-    // define association here if any
     User.hasMany(models.TrainingSession);
   };
 

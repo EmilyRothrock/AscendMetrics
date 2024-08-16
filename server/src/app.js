@@ -1,13 +1,13 @@
 import express from "express";
 import cors from "cors";
-import { config as configDotenv } from "dotenv";
+import dotenv from "dotenv";
 import db from "./db/database.js";
 import sessionsRouter from "./routes/sessionsRoutes.js";
 import metricsRouter from "./routes/metricsRoutes.js";
 import { checkJwt } from "./middlewares/authMiddleware.ts";
 
 // Load environment variables
-configDotenv();
+dotenv.config({ path: "../server/.env" });
 
 const { sequelize, syncDatabase } = db;
 const app = express();

@@ -1,67 +1,42 @@
-const express = require('express');
-const session = require('express-session');
-const cors = require('cors');
-const passport = require('passport');
+import express from "express";
+import cors from "cors";
+import { config as configDotenv } from "dotenv";
+import db from "./db/database.js";
+import sessionsRouter from "./routes/sessionsRoutes.js";
+import metricsRouter from "./routes/metricsRoutes.js";
+import { checkJwt } from "./middlewares/authMiddleware.ts";
+
+// Load environment variables
+configDotenv();
+
+const { sequelize, syncDatabase } = db;
 const app = express();
-const port = 3000;
-const config = require('./config/config.json').development; // TODO: make this adapt to environment
-const SequelizeStore = require('connect-session-sequelize')(session.Store);
-const db = require('./db/database');
+const port = process.env.PORT || 3000;
 
 // Global middlewares that run on every request
-// TODO: move to config? CORS Configuration
 const corsOptions = {
-  origin: 'http://localhost:5173', // Allow only your frontend origin
-  methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+  origin: "http://localhost:5173", // Allow only your frontend origin
   credentials: true, // Allow cookies to be sent with requests
-  optionsSuccessStatus: 204 // For legacy browser support
 };
 app.use(cors(corsOptions)); // Enable CORS for all routes
 app.use(express.json());
 
-const myStore = new SequelizeStore({
-  db: db.sequelize,
-  checkExpirationInterval: 15 * 60 * 1000, // Check for expired sessions every 15 minutes
-  expiration: 24 * 60 * 60 * 1000,  // Sessions expire after 24 hours
-});
+// Sync the database and start the server
+db.sequelize
+  .sync()
+  .then(() => {
+    console.log("Database synchronized!");
 
-db.syncDatabase();
+    // Define routes
+    app.use(checkJwt); // JWT validation for all routes
+    app.use("/sessions", sessionsRouter);
+    app.use("/metrics", metricsRouter);
 
-app.use(session({
-  secret: config.secret,
-  store: myStore,
-  resave: false,
-  saveUninitialized: false,
-  cookie: { secure: 'auto' } // Use secure cookies in production
-}));
-
-myStore.sync(); // Ensure the session table is created
-
-app.use(passport.initialize());
-app.use(passport.session());
-
-// Routes: ties in all router modules from routes directory
-const authRouter = require('./routes/authRoutes');
-app.use('/auth', authRouter);
-
-const sessionsRouter = require('./routes/sessionsRoutes');
-const metricsRouter = require('./routes/metricsRoutes');
-app.use('/sessions', sessionsRouter);
-app.use('/metrics', metricsRouter);
-
-
-app.listen(port, () => {
-  console.log(`Server running at http://localhost:${port}`);
-});
-
-// Notes for optimization needs
-
-// Pagination and Lazy Loading: Instead of fetching large date ranges in a single request, 
-// consider implementing pagination and lazy loading. Fetch data in smaller chunks as the 
-// user navigates through the application. This reduces the response size and server load.
-
-// Efficient Querying: Optimize your database queries to fetch only the necessary data. 
-// Use indexes and other optimization techniques to improve query performance.
-
-// Pre-calculated Metrics: Consider pre-calculating and storing metrics periodically 
-// (e.g., daily) in the database. This reduces the computational load during real-time requests, as you can retrieve pre-calculated metrics instead of calculating them on-the-fly.
+    // Begin listening for requests
+    app.listen(port, () => {
+      console.log(`Server running at http://localhost:${port}`);
+    });
+  })
+  .catch((err) => {
+    console.error("Unable to synchronize database:", err);
+  });

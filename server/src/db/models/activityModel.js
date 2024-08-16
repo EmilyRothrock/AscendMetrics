@@ -1,30 +1,32 @@
-'use strict';
+const Activity = (sequelize, DataTypes) => {
+  const Activity = sequelize.define(
+    "Activity",
+    {
+      id: {
+        type: DataTypes.INTEGER,
+        primaryKey: true,
+        autoIncrement: true,
+        allowNull: false,
+      },
+      name: {
+        type: DataTypes.TEXT("tiny"),
+        allowNull: false,
+      },
+      description: {
+        type: DataTypes.TEXT,
+        allowNull: true,
+      },
+    },
+    {
+      timestamps: true,
+    }
+  );
 
-module.exports = (sequelize, DataTypes) => {
-  const Activity = sequelize.define('Activity', {
-    id: {
-      type: DataTypes.INTEGER,
-      primaryKey: true,
-      autoIncrement: true,
-      allowNull: false
-    },
-    name: {
-      type: DataTypes.TEXT('tiny'),
-      allowNull: false
-    },
-    description: {
-      type: DataTypes.TEXT,
-      allowNull: true
-    },
-  }, {
-    // optional: if you want to disable timestamp fields (createdAt, updatedAt)
-    timestamps: true,
-  });
-
-  Activity.associate = function(models) {
-    // define association here if any
+  Activity.associate = function (models) {
     Activity.hasMany(models.SessionActivity);
   };
 
   return Activity;
 };
+
+export default Activity;

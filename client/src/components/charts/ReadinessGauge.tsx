@@ -51,7 +51,7 @@ const ReadinessGauge: React.FC<{
     gauge
       .append("text")
       .attr("x", radius) // Center the text horizontally
-      .attr("y", radius) // Position the text below the gauge
+      .attr("y", dimensions.height) // Position the text below the gauge
       .attr("text-anchor", "middle") // Center the text horizontally
       .attr("font-family", "'Roboto', sans-serif")
       .text(`${value}%`); // Set the text to the value

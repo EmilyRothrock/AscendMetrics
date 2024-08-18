@@ -1,6 +1,6 @@
 import React from "react";
 import { Navigate, Route, Routes } from "react-router-dom";
-import LandingPage from "../components/auth/LandingPage";
+import LandingPage from "../components/common/LandingPage";
 import ProtectedRoute from "../components/auth/ProtectedRoute";
 import Layout from "../components/common/Layout";
 import dashboardLoader from "../loaders/dashboardLoader";

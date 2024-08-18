@@ -22,7 +22,7 @@ const initialState: MetricsState = {
 
 export const selectMetricsByDate = createSelector(
   (state: RootState, date: string) => state.metrics.metricsTable[date],
-  (metrics: DailyMetrics) => ({ metrics })
+  (metrics: DailyMetrics) => metrics
 );
 
 export const selectMetricsForDateRange = createSelector(

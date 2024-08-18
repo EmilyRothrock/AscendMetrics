@@ -13,29 +13,34 @@ import { bodyPartColors } from "../../styles/bodyPartColors";
 import { selectMetricsByDate } from "../../store/metricsSlice";
 import { DateTime } from "luxon";
 
-// Landing page after logging in - surface level information about your Readiness, Past Sessions, and Visualizations for trends in past month
 const Dashboard: React.FC = () => {
-  const sessions = useSelector((state: RootState) => state.sessions.sessions);
+  const sessions = useSelector(
+    (state: RootState) => state.sessions.sessions || {}
+  );
   const sessionIds = useSelector(
-    (state: RootState) => state.sessions.sessionIds
+    (state: RootState) => state.sessions.sessionIds || []
   );
-  const { metrics } = useSelector((state: RootState) =>
-    selectMetricsByDate(state, DateTime.now().toISODate())
+  const metrics = useSelector(
+    (state: RootState) =>
+      selectMetricsByDate(state, DateTime.now().toISODate()) || {
+        readiness: {},
+      }
   );
+  console.log(sessions, sessionIds, metrics);
 
-  const readinessValues = metrics.readiness
-    ? metrics.readiness
-    : { fingers: 0, upperBody: 0, lowerBody: 0 };
+  const readinessValues = {
+    fingers: metrics.readiness?.fingers || 0,
+    upperBody: metrics.readiness?.upperBody || 0,
+    lowerBody: metrics.readiness?.lowerBody || 0,
+  };
 
   const readinessData = ["fingers", "upperBody", "lowerBody"].map(
-    (bodyPart) => {
-      return {
-        title: bodyPartLabels[bodyPart],
-        value: Math.round(readinessValues[bodyPart] * 100),
-        feedback: "Textual feedback on training patterns coming soon!",
-        color: bodyPartColors[bodyPart],
-      };
-    }
+    (bodyPart) => ({
+      title: bodyPartLabels[bodyPart],
+      value: Math.round(readinessValues[bodyPart] * 100),
+      feedback: "Textual feedback on training patterns coming soon!",
+      color: bodyPartColors[bodyPart],
+    })
   );
 
   return (
@@ -44,19 +49,31 @@ const Dashboard: React.FC = () => {
         <Grid xs={12} md={4}>
           <Typography variant="h5">Readiness</Typography>
           <Stack direction="column" width={"100%"}>
-            {readinessData.map((data) => {
-              return <ReadinessTile data={data} />;
-            })}
+            {readinessData.map((data, index) => (
+              <ReadinessTile key={index} data={data} />
+            ))}
           </Stack>
         </Grid>
         <Grid xs={12} md={4}>
           <Typography variant="h5">Past Sessions</Typography>
           <Stack width={"100%"}>
             <NewSessionButton />
-            {sessionIds.slice(0, 3).map((id: number) => {
-              const session = sessions[id];
-              return <DashSessionSummaryCard key={id} session={session} />;
-            })}
+            {sessionIds.length > 0 ? (
+              sessionIds.slice(0, 3).map((id: number) => {
+                const session = sessions[id];
+                return session ? (
+                  <DashSessionSummaryCard key={id} session={session} />
+                ) : (
+                  <Typography key={id} color="textSecondary">
+                    Session data not available
+                  </Typography>
+                );
+              })
+            ) : (
+              <Typography color="textSecondary">
+                No sessions available
+              </Typography>
+            )}
           </Stack>
         </Grid>
         <Grid xs={12} md={4}>

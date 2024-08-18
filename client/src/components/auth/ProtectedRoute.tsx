@@ -1,26 +1,22 @@
 import { Navigate } from "react-router-dom";
-import React, { useState, useEffect } from "react";
-import { checkAuthentication } from "../../services/authService";
+import React from "react";
+import { useAuth0 } from "@auth0/auth0-react";
+import Loading from "../common/Loading";
 
 const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
-  const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null); // null initially to indicate loading state
+  const { isAuthenticated, isLoading } = useAuth0();
 
-  useEffect(() => {
-    async function checkAuth() {
-      const authStatus = await checkAuthentication();
-      setIsAuthenticated(authStatus);
-    }
-
-    checkAuth();
-  }, []); // Empty dependency array ensures this runs only once after the component mounts
-
-  if (isAuthenticated === null) {
-    return <div>Loading...</div>;
+  if (isLoading) {
+    return <Loading />;
   }
 
-  return isAuthenticated ? <>{children}</> : <Navigate to="/signin" />;
+  if (isAuthenticated) {
+    return <>{children}</>;
+  } else {
+    return <Navigate to="/signin" />;
+  }
 };
 
 export default ProtectedRoute;

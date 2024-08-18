@@ -1,19 +1,8 @@
-import { expressjwt, GetVerificationKey } from "express-jwt";
-import jwksRsa from "jwks-rsa";
-import { config as configDotenv } from "dotenv";
+import { auth } from "express-oauth2-jwt-bearer";
 
-configDotenv();
-
-const jwksClient = jwksRsa.expressJwtSecret({
-  cache: true,
-  rateLimit: true,
-  jwksRequestsPerMinute: 5,
-  jwksUri: `${process.env.AUTH0_DOMAIN}/.well-known/jwks.json`,
-}) as GetVerificationKey;
-
-export const checkJwt = expressjwt({
-  secret: jwksClient,
-  audience: process.env.AUTH0_AUDIENCE,
-  issuer: `${process.env.AUTH0_DOMAIN}/`,
-  algorithms: ["RS256"],
+// Authorization middleware. When used, the Access Token must
+// exist and be verified against the Auth0 JSON Web Key Set.
+export const checkJwt = auth({
+  audience: "http://ascend-metrics-api",
+  issuerBaseURL: `https://dev-rlyrvpnrecxx2kzm.us.auth0.com/`,
 });

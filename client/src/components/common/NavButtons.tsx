@@ -8,8 +8,8 @@ import React from "react";
 import DashboardIcon from "@mui/icons-material/Dashboard";
 import SessionIcon from "@mui/icons-material/EventNote";
 import { useNavigate } from "react-router-dom";
-import SignoutButton from "../auth/SignoutButton";
 import UnderConstructionBadge from "./UnderConstructionBadge";
+import SignOutButton from "../auth/SignOutButton";
 
 export const NavButtons: React.FC<SxProps> = (SxProps: SxProps) => {
   const navigate = useNavigate();
@@ -82,7 +82,7 @@ export const NavButtons: React.FC<SxProps> = (SxProps: SxProps) => {
           Settings
         </Button>
       </UnderConstructionBadge>
-      <SignoutButton />
+      <SignOutButton />
     </>
   );
 };

@@ -1,10 +1,10 @@
 import { useAuth0 } from "@auth0/auth0-react";
 import { Button } from "@mui/material";
 
-const SigninButton = () => {
+const SignInButton = () => {
   const { loginWithRedirect } = useAuth0();
 
-  const handleLogin = async () => {
+  const handleSignIn = async () => {
     await loginWithRedirect({
       appState: {
         returnTo: "/dashboard",
@@ -13,10 +13,10 @@ const SigninButton = () => {
   };
 
   return (
-    <Button variant={"contained"} onClick={handleLogin}>
+    <Button variant={"contained"} onClick={handleSignIn}>
       Sign In
     </Button>
   );
 };
 
-export default SigninButton;
+export default SignInButton;

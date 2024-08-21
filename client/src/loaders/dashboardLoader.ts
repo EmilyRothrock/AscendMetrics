@@ -3,12 +3,13 @@ import { fetchMetricsWithSessionsForDateRange } from "../store/metricsSlice";
 import store from "../store/store";
 import { isRangeLoaded } from "../utils/metricUtils";
 
-const dashboardLoader = async () => {
+export const dashboardLoader = async () => {
   const endDate = DateTime.now().toISODate();
   const startDate = DateTime.now().minus({ months: 1 }).toISODate();
 
-  // TODO: fetch only missing range?
-  if (!isRangeLoaded(store.getState(), startDate, endDate)) {
+  const state = store.getState();
+
+  if (!isRangeLoaded(state, startDate, endDate)) {
     await store.dispatch(
       fetchMetricsWithSessionsForDateRange({
         startDate,

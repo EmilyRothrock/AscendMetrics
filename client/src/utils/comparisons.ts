@@ -1,4 +1,4 @@
-import { BodyPartMetrics } from "../types";
+import { BodyPartMetrics } from "@shared/types";
 import { FieldName } from "../types/fieldOptions";
 
 export const fieldComparer = (selecteField: FieldName) => {
@@ -39,11 +39,15 @@ export const compareStrings = (a: string, b: string, sortAscending = true) => {
 };
 
 export const compareNumbers = (a: number, b: number, sortAscending = true) => {
-  if (sortAscending) {
-    return a - b;
-  } else {
-    return b - a;
-  }
+  if (a && b) {
+    if (sortAscending) {
+      return a - b;
+    } else {
+      return b - a;
+    }
+  } else if (!a) {
+    return 1;
+  } else return -1;
 };
 
 /**

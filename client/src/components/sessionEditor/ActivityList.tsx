@@ -12,14 +12,20 @@ import {
 } from "@mui/material";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
 import ActivityForm from "./ActivityForm";
-import { Activity, defaultNewActivity } from "../../types";
+import { defaultNewActivity } from "../../types/activity";
+import { SessionActivity } from "@shared/types";
 
 const ActivityList: React.FC<{
-  activities: Activity[];
-  setActivities: (activities: Activity[]) => void;
-  onActivityChange: (activity: Activity) => void;
+  sessionActivities: SessionActivity[];
+  setActivities: (activities: SessionActivity[]) => void;
+  onActivityChange: (activity: SessionActivity) => void;
   errors: { [key: string]: string };
-}> = ({ activities, setActivities, onActivityChange, errors }) => {
+}> = ({
+  sessionActivities: activities,
+  setActivities,
+  onActivityChange,
+  errors,
+}) => {
   const [expandedActivities, setExpandedActivities] = useState<Set<number>>(
     new Set()
   );

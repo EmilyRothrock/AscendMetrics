@@ -11,14 +11,15 @@ import {
 } from "@mui/material";
 import LoadBarChart from "../charts/LoadBarChart";
 import ActivityTimePieChart from "../charts/ActivityTimePieChart";
-import { Session, generateDisplayName } from "../../types"; // adjust the path to where your types are defined
+import { generateDisplayName } from "../../types/session"; // adjust the path to where your types are defined
 import EditIcon from "@mui/icons-material/Edit";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import ExpandLessIcon from "@mui/icons-material/ExpandLess";
 import { DateTime } from "luxon";
 import { useNavigate } from "react-router-dom";
+import { TrainingSession } from "@shared/types";
 
-const DashSessionSummaryCard: React.FC<{ session: Session }> = ({
+const DashSessionSummaryCard: React.FC<{ session: TrainingSession }> = ({
   session,
 }) => {
   const [expanded, setExpanded] = useState(false);
@@ -75,7 +76,7 @@ const DashSessionSummaryCard: React.FC<{ session: Session }> = ({
         <CardContent>
           <Grid container spacing={1}>
             <Grid item xs={12} sm={6} sx={{ aspectRatio: "1" }}>
-              <ActivityTimePieChart activities={session.activities} />
+              <ActivityTimePieChart activities={session.sessionActivities} />
             </Grid>
             <Grid item xs={12} sm={6} sx={{ aspectRatio: "1" }}>
               <LoadBarChart data={session.loads} />

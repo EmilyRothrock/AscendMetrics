@@ -12,7 +12,7 @@ import {
   Button,
 } from "@mui/material";
 import { DateTime } from "luxon";
-import { Activity, BodyPartMetrics } from "../../types";
+import { SessionActivity, BodyPartMetrics } from "@shared/types";
 import ForwardIcon from "@mui/icons-material/Forward";
 
 const activityOptions = [
@@ -154,10 +154,10 @@ const IntensityInput: React.FC<{
 };
 
 const ActivityForm: React.FC<{
-  activity: Activity;
-  onActivityChange: (activity: Activity) => void;
+  activity: SessionActivity;
+  onActivityChange: (activity: SessionActivity) => void;
 }> = ({ activity, onActivityChange }) => {
-  const [formData, setFormData] = useState<Activity>(activity);
+  const [formData, setFormData] = useState<SessionActivity>(activity);
 
   useEffect(() => {
     setFormData(activity);

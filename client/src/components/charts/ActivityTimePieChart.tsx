@@ -1,12 +1,5 @@
-import React, {
-  MutableRefObject,
-  RefObject,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from "react";
-import { Activity } from "../../types";
+import React, { useEffect, useMemo, useRef, useState } from "react";
+import { SessionActivity } from "@shared/types";
 import { select, pie, arc, PieArcDatum } from "d3";
 import { useResizeObserver } from "../hooks/useResizeObserver";
 import { activityNameToColor } from "../../utils/activityNameToColor";
@@ -16,11 +9,11 @@ interface ActivityDuration {
   totalDuration: number;
 }
 
-const ActivityTimePieChart: React.FC<{ activities: Activity[] }> = ({
+const ActivityTimePieChart: React.FC<{ activities: SessionActivity[] }> = ({
   activities,
 }) => {
-  const chartRef = useRef() as RefObject<SVGSVGElement>;
-  const wrapperRef = useRef() as MutableRefObject<HTMLDivElement>;
+  const chartRef = useRef<SVGSVGElement>(null);
+  const wrapperRef = useRef<HTMLDivElement>(null);
   const dimensions = useResizeObserver(wrapperRef, { width: 200, height: 200 });
   const [selectedActivity, setSelectedActivity] =
     useState<ActivityDuration | null>(null);
@@ -37,26 +30,22 @@ const ActivityTimePieChart: React.FC<{ activities: Activity[] }> = ({
     }, [] as ActivityDuration[]);
   }, [activities]);
 
-  // Basic Pie Structure
   useEffect(() => {
-    if (!chartRef.current) return;
-    const radius = Math.min(dimensions.height, dimensions.width) / 2;
+    if (!chartRef.current || !dimensions) return;
+
+    const { width, height } = dimensions;
+    const radius = Math.min(height, width) / 2;
 
     const svg = select(chartRef.current).style("overflow", "visible");
 
     const pieChart = svg
-      .join("g")
+      .append("g")
       .attr("class", "pie-chart")
-      .attr(
-        "transform",
-        `translate(${dimensions.width / 2}, ${dimensions.height / 2})`
-      );
+      .attr("transform", `translate(${width / 2}, ${height / 2})`);
 
     const myPie = pie<ActivityDuration>().value((d) => d.totalDuration);
 
-    const myArc = arc<
-      PieArcDatum<{ activity: string; totalDuration: number }>
-    >()
+    const myArc = arc<PieArcDatum<ActivityDuration>>()
       .innerRadius(radius * 0.67)
       .outerRadius(radius);
 
@@ -80,15 +69,19 @@ const ActivityTimePieChart: React.FC<{ activities: Activity[] }> = ({
       .attr("class", "center-text")
       .attr("text-anchor", "middle")
       .style("font-size", "14px");
+
+    return () => {
+      svg.selectAll("*").remove(); // Cleanup on unmount or data change
+    };
   }, [data, dimensions]);
 
-  // For central text updates
   useEffect(() => {
+    if (!chartRef.current) return;
+
     const svg = select(chartRef.current);
     const centralText = svg.select(".center-text");
     centralText.selectAll("tspan").remove(); // Clear previous texts
 
-    centralText.selectAll("tspan").remove();
     if (selectedActivity) {
       const lines = [
         `${selectedActivity.activity}:`,

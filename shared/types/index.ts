@@ -1,5 +1,5 @@
 import BodyPart from "./bodyPart";
-import { BODY_PARTS } from "./BODYPARTS";
+import BODY_PARTS from "./BODYPARTS";
 import BodyPartMetrics from "./bodyPartMetrics";
 import DailyMetrics from "./dailyMetrics";
 import MetricByDate from "./metricByDate";

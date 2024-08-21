@@ -24,11 +24,19 @@ const MyRoutes: React.FC = () => {
           </ProtectedRoute>
         }
       >
-        <Route path="/dashboard" element={<Dashboard />} />
+        <Route
+          path="/dashboard"
+          element={<Dashboard />}
+          loader={dashboardLoader}
+        />
         <Route path="/sessions">
-          <Route path="new" element={<SessionPage />} />
-          <Route path=":id" element={<SessionPage />} />
-          <Route path="manage" element={<SessionsManagerPage />} />
+          <Route path="new" element={<SessionPage />} loader={sessionLoader} />
+          <Route path=":id" element={<SessionPage />} loader={sessionLoader} />
+          <Route
+            path="manage"
+            element={<SessionsManagerPage />}
+            loader={sessionsManagerLoader}
+          />
         </Route>
       </Route>
     </Routes>

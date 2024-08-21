@@ -1,4 +1,4 @@
-import React, { useRef, useEffect, MutableRefObject, RefObject } from "react";
+import React, { useRef, useEffect } from "react";
 import {
   scaleTime,
   scaleLinear,
@@ -9,15 +9,25 @@ import {
   select,
   timeFormat,
 } from "d3";
-import { MetricsTable } from "../../types";
-import { useSelector } from "react-redux";
-import { RootState } from "../../store/store";
+import { MetricsTable } from "@shared/types";
 import { useResizeObserver } from "../hooks/useResizeObserver";
+import { SeriesByBodyParts } from "client/src/types/seriesByBodyParts";
 
-const BalanceLineChart = () => {
-  const chartRef = useRef() as RefObject<SVGSVGElement>;
-  const wrapperRef = useRef() as MutableRefObject<HTMLDivElement>;
+interface LineChartData {
+  name: string;
+  values: Array<{ x: Date; y: number }>;
+  color: string;
+}
+
+const BalanceLineChart: React.FC<{ metricsData: MetricsTable }> = ({
+  metricsData,
+}) => {
+  const chartRef = useRef<SVGSVGElement | null>(null);
+  const wrapperRef = useRef<HTMLDivElement | null>(null);
   const dimensions = useResizeObserver(wrapperRef, { width: 200, height: 100 });
+
+  if (!chartRef.current || !dimensions) return;
+
   dimensions.height = dimensions.width / 2;
 
   const fontFamily = "'Roboto', sans-serif";
@@ -27,12 +37,7 @@ const BalanceLineChart = () => {
   thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
   const oneDay = 86400000; // milliseconds in one day
 
-  // TODO: factor out data prep
-  const metricsTable: MetricsTable = useSelector(
-    (state: RootState) => state.metrics.metricsTable
-  );
-
-  const series = {
+  const series: SeriesByBodyParts = {
     fingers: [],
     upperBody: [],
     lowerBody: [],
@@ -44,18 +49,18 @@ const BalanceLineChart = () => {
     date = new Date(date.getTime() + oneDay)
   ) {
     const dateKey = date.toISOString().split("T")[0];
-    if (metricsTable[dateKey]) {
+    if (metricsData[dateKey]) {
       series.fingers.push({
         x: date,
-        y: metricsTable[dateKey].loadBalance.fingers || 0,
+        y: metricsData[dateKey].loadBalance.fingers || 0,
       });
       series.upperBody.push({
         x: date,
-        y: metricsTable[dateKey].loadBalance.upperBody || 0,
+        y: metricsData[dateKey].loadBalance.upperBody || 0,
       });
       series.lowerBody.push({
         x: date,
-        y: metricsTable[dateKey].loadBalance.lowerBody || 0,
+        y: metricsData[dateKey].loadBalance.lowerBody || 0,
       });
     } else {
       // If no data for the date, push zeros
@@ -64,7 +69,8 @@ const BalanceLineChart = () => {
       series.lowerBody.push({ x: date, y: 0 });
     }
   }
-  const data = [
+
+  const data: LineChartData[] = [
     { name: "Fingers", values: series.fingers, color: "#2E96FF" },
     { name: "Upper Body", values: series.upperBody, color: "#B800D8" },
     { name: "Lower Body", values: series.lowerBody, color: "#02B2AF" },
@@ -95,19 +101,20 @@ const BalanceLineChart = () => {
 
     const yScale = scaleLinear().domain([0, 2]).range([dimensions.height, 0]);
 
-    const xAxis = axisBottom(xScale)
+    const xAxis = axisBottom<Date>(xScale)
       .ticks(30)
-      .tickFormat((d) => {
+      .tickFormat((d: Date) => {
         const day = d.getDay(); // Get the day of the week, where 0 is Sunday and 1 is Monday
         return day === 1 ? timeFormat("%a %B %d")(d) : ""; // Format and show label only if it's Monday
       });
     lineChart
-      .select(".x-axis")
-      .style("transform", `translateY(${dimensions.height}px`)
+      .select<SVGGElement>(".x-axis")
+      .style("transform", `translateY(${dimensions.height}px)`)
       .call(xAxis)
       .selectAll(".tick line") // Select all tick lines
       .attr("stroke-width", (d) => {
-        const day = d.getDay(); // Check if the tick represents Monday
+        const date = d as Date; // Explicitly cast d to Date
+        const day = date.getDay(); // Check if the tick represents Monday
         return day === 1 ? 2 : 1; // Bolden the line for Mondays, normal for others
       });
 
@@ -115,43 +122,44 @@ const BalanceLineChart = () => {
     const gridlines = axisBottom(xScale)
       .tickSize(-dimensions.height) // Full chart height
       .ticks(30)
-      .tickFormat("");
+      .tickFormat(() => "");
     lineChart
-      .select(".grid")
+      .select<SVGGElement>(".grid")
       .style("transform", `translateY(${dimensions.height}px)`)
       .call(gridlines)
-      .selectAll(".tick line")
+      .selectAll<SVGLineElement, Date>(".tick line")
       .attr("stroke", "lightgray")
       .attr("stroke-opacity", (d) => {
-        const day = d.getDay();
+        const date = d as Date; // Explicitly cast d to Date
+        const day = date.getDay();
         return day === 1 ? 0.7 : 0;
       });
 
     const yAxis = axisLeft(yScale).ticks(6);
-    lineChart.select(".y-axis").call(yAxis);
+    lineChart.select<SVGGElement>(".y-axis").call(yAxis);
 
-    const myLine = line()
+    const myLine = line<{ x: Date; y: number }>()
       .x((d) => xScale(d.x))
       .y((d) => yScale(d.y))
       .curve(curveCardinal);
 
     lineChart
-      .selectAll(".line")
+      .selectAll<SVGPathElement, LineChartData>(".line")
       .data(data)
       .join("path")
       .attr("class", "line")
-      .attr("d", (d) => myLine(d.values))
+      .attr("d", (d) => myLine(d.values) || "")
       .attr("fill", "none")
       .style("stroke", (d) => d.color)
-      .attr("stroke-width", (d, i) => 3 - (i + 1) / 2);
+      .attr("stroke-width", (_d, i) => 3 - (i + 1) / 2);
 
     const legend = lineChart
-      .selectAll(".legend")
+      .selectAll<SVGGElement, LineChartData>(".legend")
       .data(data)
       .enter()
       .append("g")
       .attr("class", "legend")
-      .attr("transform", (d, i) => `translate(0, ${i * 20})`);
+      .attr("transform", (_d, i) => `translate(0, ${i * 20})`);
 
     legend
       .append("rect")

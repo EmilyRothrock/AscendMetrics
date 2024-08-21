@@ -1,13 +1,13 @@
 import { DateTime } from "luxon";
-import { BodyPartMetrics, Session } from "../types";
+import { BodyPartMetrics, TrainingSession } from "@shared/types";
 import { SessionsState } from "../types/sessionState";
 import { FieldName } from "../types/fieldOptions";
 import { FilterValueType } from "../types/filterValueType";
 import { compareDates, fieldComparer } from "./comparisons";
 import { fieldFilterer } from "./filters";
 
-export function updateSessionCalculations(session: Session) {
-  const results = session.activities.reduce(
+export function updateSessionCalculations(session: TrainingSession) {
+  const results = session.sessionActivities.reduce(
     (accumulator, activity) => {
       const activityDurationInHours = calculateDurationInHours(
         activity.startTime,
@@ -61,7 +61,7 @@ export function calculateLoads(
 
 export function insertSessionId(
   state: SessionsState,
-  newSession: Session
+  newSession: TrainingSession
 ): null {
   const index = findIndexByDate(state, newSession.completedOn);
   if (state.sessionIds[index] !== newSession.id) {
@@ -97,11 +97,11 @@ export const findIndexByDate = (state: SessionsState, targetDate: string) => {
  */
 export function updateSessionsState(
   state: SessionsState,
-  newSessions: Session[]
+  newSessions: TrainingSession[]
 ): void {
   const sessionIdsSet = new Set(state.sessionIds);
 
-  newSessions.forEach((session: Session) => {
+  newSessions.forEach((session: TrainingSession) => {
     state.sessions[session.id] = session;
     sessionIdsSet.add(session.id);
   });
@@ -115,11 +115,10 @@ export function updateSessionsState(
 
 export function sortSessions(
   sessionIds: number[],
-  sessions: Record<number, Session>,
+  sessions: Record<number, TrainingSession>,
   selectedField: FieldName | null = "completedOn",
   sortAscending: boolean = true
 ): number[] {
-  // init sorted ids array
   if (
     selectedField &&
     sessions &&
@@ -141,7 +140,7 @@ export function sortSessions(
 
 export function filterSessions(
   sessionIds: number[],
-  sessions: Record<number, Session>,
+  sessions: Record<number, TrainingSession>,
   selectedField: FieldName | null,
   filterValue: FilterValueType
 ): number[] {

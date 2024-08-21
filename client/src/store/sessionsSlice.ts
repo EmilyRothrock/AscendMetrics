@@ -4,9 +4,8 @@ import {
   createSlice,
   PayloadAction,
 } from "@reduxjs/toolkit";
-import { Session } from "../types";
+import { TrainingSession } from "@shared/types";
 import {
-  findIndexByDate,
   insertSessionId,
   updateSessionsState,
   updateSessionCalculations,
@@ -34,35 +33,28 @@ const initialState: SessionsState = {
 export const selectSessionById = createSelector(
   (state: RootState) => state.sessions.sessions,
   (_: RootState, sessionId: number) => sessionId,
-  (sessions, sessionId) => sessions[sessionId]
+  (sessions, sessionId) => sessions[sessionId] || null
 );
 
 export const selectSessionsForDateRange = createSelector(
-  (state: RootState) => state.sessions,
+  (state: RootState) => state.sessions.sessions,
+  (state: RootState) => state.sessions.sessionIds,
   (
     _: RootState,
     { startDate, endDate }: { startDate: string; endDate: string }
   ) => ({ startDate, endDate }),
-  (sessionsState, { startDate, endDate }) => {
-    const endDateTime = DateTime.fromISO(endDate);
+  (sessions, sessionIds, { startDate, endDate }) => {
+    const start = DateTime.fromISO(startDate);
+    const end = DateTime.fromISO(endDate);
 
-    const { sessions, sessionIds } = sessionsState;
+    const relevantSessions = sessionIds
+      .map((id) => sessions[id])
+      .filter((session) => {
+        const sessionDate = DateTime.fromISO(session.completedOn);
+        return sessionDate >= start && sessionDate <= end;
+      });
 
-    const startIndex = findIndexByDate(sessionsState, startDate);
-
-    // TODO: reformat relevant sessions as needed by components.
-    const relevantSessions = [];
-    for (let i = startIndex; i < sessionIds.length; i++) {
-      const sessionId = sessionIds[i];
-      const sessionDate = DateTime.fromISO(sessions[sessionId].completedOn);
-      if (sessionDate <= endDateTime) {
-        relevantSessions.push(sessions[sessionId]);
-      } else {
-        break;
-      }
-    }
-
-    return relevantSessions;
+    return relevantSessions.length > 0 ? relevantSessions : null;
   }
 );
 
@@ -133,13 +125,13 @@ const sessionsSlice = createSlice({
   name: "sessions",
   initialState,
   reducers: {
-    createSession(state, action: PayloadAction<Session>) {
+    createSession(state, action: PayloadAction<TrainingSession>) {
       const newSession = action.payload;
       const updatedSession = updateSessionCalculations(newSession);
       state.sessions[newSession.id] = updatedSession;
       insertSessionId(state, newSession);
     },
-    updateSession(state, action: PayloadAction<Session>) {
+    updateSession(state, action: PayloadAction<TrainingSession>) {
       const prevDate = state.sessions[action.payload.id].completedOn;
       const newDate = action.payload.completedOn;
       const updatedSession = updateSessionCalculations(action.payload);
@@ -198,7 +190,7 @@ const sessionsSlice = createSlice({
       .addCase(
         fetchMetricsWithSessionsForDateRange.fulfilled,
         (state, action) => {
-          const sessions = action.payload.sessions;
+          const sessions: TrainingSession[] = action.payload.sessions;
           updateSessionsState(state, sessions);
           state.loading = false;
         }

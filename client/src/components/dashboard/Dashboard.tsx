@@ -10,8 +10,10 @@ import BalanceLineChart from "../charts/BalanceLineChart";
 import SteppedAreaChart from "../charts/SteppedAreaChart";
 import { bodyPartLabels } from "../../styles/bodyPartLabels";
 import { bodyPartColors } from "../../styles/bodyPartColors";
-import { selectMetricsByDate } from "../../store/metricsSlice";
-import { DateTime } from "luxon";
+import { DateTime, Interval } from "luxon";
+import BodyPartMetrics from "@shared/types/bodyPartMetrics";
+import BODY_PARTS from "@shared/types/BODYPARTS";
+import { MetricsTable } from "@shared/types";
 
 const Dashboard: React.FC = () => {
   const sessions = useSelector(
@@ -20,28 +22,42 @@ const Dashboard: React.FC = () => {
   const sessionIds = useSelector(
     (state: RootState) => state.sessions.sessionIds || []
   );
-  const metrics = useSelector(
-    (state: RootState) =>
-      selectMetricsByDate(state, DateTime.now().toISODate()) || {
-        readiness: {},
+
+  const metricsTable: MetricsTable = useSelector(
+    (state: RootState) => state.metrics.metricsTable || {}
+  );
+
+  const start = DateTime.now().minus({ days: 30 });
+  const end = DateTime.now();
+  const range = Interval.fromDateTimes(start, end);
+  const metricsData = range
+    .splitBy({ days: 1 })
+    .reduce<MetricsTable>((acc, dt) => {
+      const dateKey = dt.start?.toISODate();
+      if (dateKey) {
+        acc[dateKey] = metricsTable[dateKey] || null;
       }
-  );
-  console.log(sessions, sessionIds, metrics);
+      return acc;
+    }, {} as MetricsTable);
 
-  const readinessValues = {
-    fingers: metrics.readiness?.fingers || 0,
-    upperBody: metrics.readiness?.upperBody || 0,
-    lowerBody: metrics.readiness?.lowerBody || 0,
-  };
+  console.log(sessions, sessionIds, metricsData);
 
-  const readinessData = ["fingers", "upperBody", "lowerBody"].map(
-    (bodyPart) => ({
-      title: bodyPartLabels[bodyPart],
-      value: Math.round(readinessValues[bodyPart] * 100),
-      feedback: "Textual feedback on training patterns coming soon!",
-      color: bodyPartColors[bodyPart],
-    })
-  );
+  const readinessValues: BodyPartMetrics = metricsData[
+    DateTime.now().toISODate()
+  ]
+    ? metricsData[DateTime.now().toISODate()].readiness
+    : {
+        fingers: 0,
+        upperBody: 0,
+        lowerBody: 0,
+      };
+
+  const readinessData = BODY_PARTS.map((bodyPart) => ({
+    title: bodyPartLabels[bodyPart],
+    value: Math.round(readinessValues[bodyPart] * 100),
+    feedback: "Textual feedback on training patterns coming soon!",
+    color: bodyPartColors[bodyPart],
+  }));
 
   return (
     <div>
@@ -79,8 +95,8 @@ const Dashboard: React.FC = () => {
         <Grid xs={12} md={4}>
           <Typography variant="h5">Visualizations</Typography>
           <Stack>
-            <SteppedAreaChart />
-            <BalanceLineChart />
+            <SteppedAreaChart metricsData={metricsData} />
+            <BalanceLineChart metricsData={metricsData} />
           </Stack>
         </Grid>
       </Grid>

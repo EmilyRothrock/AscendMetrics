@@ -1,11 +1,10 @@
-import React from "react";
 import Container from "@mui/material/Container";
 import SignInButton from "../auth/SignInButton";
 import Typography from "@mui/material/Typography";
 import SignUpButton from "../auth/SignUpButton";
 import { Divider } from "@mui/material";
 
-const LandingPage = () => {
+const LandingPage: React.FC = () => {
   return (
     <Container
       maxWidth="sm"

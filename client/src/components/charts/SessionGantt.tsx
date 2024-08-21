@@ -1,11 +1,5 @@
-import React, {
-  MutableRefObject,
-  RefObject,
-  useEffect,
-  useRef,
-  useState,
-} from "react";
-import { Activity } from "../../types";
+import React, { useEffect, useRef, useState } from "react";
+import { SessionActivity } from "@shared/types";
 import {
   axisLeft,
   axisTop,
@@ -19,18 +13,25 @@ import { useResizeObserver } from "../hooks/useResizeObserver";
 import { activityNameToColor } from "../../utils/activityNameToColor";
 
 interface SessionGanttProps {
-  activities: Activity[];
+  activities: SessionActivity[];
   yAxisLabels?: boolean;
+}
+
+interface TooltipState {
+  x: number;
+  y: number;
+  visible: boolean;
+  content: string;
 }
 
 const SessionGantt: React.FC<SessionGanttProps> = ({
   activities,
   yAxisLabels,
 }) => {
-  const chartRef = useRef() as RefObject<SVGSVGElement>;
-  const wrapperRef = useRef() as MutableRefObject<HTMLDivElement>;
+  const chartRef = useRef<SVGSVGElement | null>(null);
+  const wrapperRef = useRef<HTMLDivElement | null>(null);
   const dimensions = useResizeObserver(wrapperRef, { width: 200, height: 200 });
-  const [tooltip, setTooltip] = useState({
+  const [tooltip, setTooltip] = useState<TooltipState>({
     x: 0,
     y: 0,
     visible: false,
@@ -48,41 +49,50 @@ const SessionGantt: React.FC<SessionGanttProps> = ({
   );
 
   useEffect(() => {
+    if (!chartRef.current || !dimensions) return;
+
     const padding = 30;
 
     const ganttChart = select(chartRef.current)
       .style("overflow", "visible")
       .style("padding", `${padding}px`);
 
+    // Safely get the minimum and maximum dates
+    const minDateTime = DateTime.min(
+      ...validActivities.map((a) => DateTime.fromISO(a.startTime))
+    );
+    const maxDateTime = DateTime.max(
+      ...validActivities.map((a) => DateTime.fromISO(a.endTime))
+    );
+
+    // Check if minDateTime or maxDateTime is invalid
+    if (!minDateTime || !maxDateTime) {
+      console.error("Invalid date range");
+      return;
+    }
+
     const xScale = scaleTime()
-      .domain([
-        DateTime.min(
-          ...validActivities.map((a) => DateTime.fromISO(a.startTime))
-        ),
-        DateTime.max(
-          ...validActivities.map((a) => DateTime.fromISO(a.endTime))
-        ),
-      ])
+      .domain([minDateTime.toJSDate(), maxDateTime.toJSDate()])
       .range([0, dimensions.width - 2 * padding]);
 
-    const yScale = scaleBand()
+    const yScale = scaleBand<string>()
       .domain(validActivities.map((a) => a.name))
       .range([0, dimensions.height - 2 * padding])
       .padding(0.2);
 
-    const xAxis = axisTop(xScale).tickFormat(timeFormat("%-I:%M %p"));
+    const xAxis = axisTop<Date>(xScale).tickFormat(timeFormat("%-I:%M %p"));
     ganttChart
-      .select(".x-axis")
+      .select<SVGGElement>(".x-axis")
       .call(xAxis)
-      .selectAll(".tick text")
+      .selectAll<SVGTextElement, Date>(".tick text")
       .style("font-size", "12");
 
     if (yAxisLabels) {
       const yAxis = axisLeft(yScale).tickSize(0); // No tick marks
       ganttChart
-        .select(".y-axis")
+        .select<SVGGElement>(".y-axis")
         .call(yAxis)
-        .selectAll(".tick text") // Select all text elements in the y-axis
+        .selectAll<SVGTextElement, string>(".tick text") // Select all text elements in the y-axis
         .style("text-anchor", "middle") // Ensures text aligns correctly when rotated
         .style("font-size", "16")
         .attr("transform", "rotate(-90)") // Rotates the text 90 degrees counterclockwise
@@ -90,34 +100,34 @@ const SessionGantt: React.FC<SessionGanttProps> = ({
     } else {
       const yAxis = axisLeft(yScale).tickSize(0); // No tick marks
       ganttChart
-        .select(".y-axis")
+        .select<SVGGElement>(".y-axis")
         .call(yAxis)
-        .selectAll(".tick text") // Select all text elements in the y-axis
+        .selectAll<SVGTextElement, string>(".tick text") // Select all text elements in the y-axis
         .remove();
     }
 
-    const gridlines = axisTop(xScale)
+    const gridlines = axisTop<Date>(xScale)
       .tickSize(-(dimensions.height - 2 * padding)) // Full chart height
-      .tickFormat("");
+      .tickFormat(null);
     ganttChart
-      .select(".grid")
+      .select<SVGGElement>(".grid")
       .call(gridlines)
-      .selectAll(".tick line")
+      .selectAll<SVGLineElement, Date>(".tick line")
       .attr("stroke", "lightgray")
       .attr("stroke-opacity", 0.7);
 
-    const bars = ganttChart
-      .selectAll(".bar")
-      .data(activities)
+    ganttChart
+      .selectAll<SVGRectElement, SessionActivity>(".bar")
+      .data(validActivities)
       .join("rect")
       .attr("class", "bar")
-      .attr("x", (d) => xScale(DateTime.fromISO(d.startTime)))
-      .attr("y", (d) => yScale(d.name))
+      .attr("x", (d) => xScale(DateTime.fromISO(d.startTime).toJSDate())!)
+      .attr("y", (d) => yScale(d.name)!)
       .attr(
         "width",
         (d) =>
-          xScale(DateTime.fromISO(d.endTime)) -
-          xScale(DateTime.fromISO(d.startTime))
+          xScale(DateTime.fromISO(d.endTime).toJSDate())! -
+          xScale(DateTime.fromISO(d.startTime).toJSDate())!
       )
       .attr("height", yScale.bandwidth())
       .attr("rx", 5)
@@ -173,4 +183,5 @@ const SessionGantt: React.FC<SessionGanttProps> = ({
     </div>
   );
 };
+
 export default SessionGantt;

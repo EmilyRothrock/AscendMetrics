@@ -1,57 +1,72 @@
-import React, { MutableRefObject, RefObject, useEffect, useRef } from "react";
-import { BodyPartMetrics } from "../../types";
+import React, { useEffect, useRef } from "react";
+import { BodyPartMetrics } from "@shared/types";
 import { axisBottom, axisLeft, max, scaleBand, scaleLinear, select } from "d3";
 import { useResizeObserver } from "../hooks/useResizeObserver";
 
-const LoadBarChart: React.FC<{ data: BodyPartMetrics }> = ({ data }) => {
-  const chartRef = useRef() as RefObject<SVGSVGElement>;
-  const wrapperRef = useRef() as MutableRefObject<HTMLDivElement>;
+interface LoadBarChartProps {
+  data: BodyPartMetrics;
+}
+
+interface Metric {
+  part: keyof BodyPartMetrics;
+  load: number;
+}
+
+const LoadBarChart: React.FC<LoadBarChartProps> = ({ data }) => {
+  const chartRef = useRef<SVGSVGElement | null>(null);
+  const wrapperRef = useRef<HTMLDivElement | null>(null);
   const dimensions = useResizeObserver(wrapperRef, { width: 200, height: 200 });
 
-  const metricsArray = Object.entries(data).map(([part, load]) => ({
-    part,
+  const metricsArray: Metric[] = Object.entries(data).map(([part, load]) => ({
+    part: part as keyof BodyPartMetrics,
     load,
   }));
 
   useEffect(() => {
     if (!chartRef.current || !dimensions) return;
 
-    const colors = {
+    const colors: Record<keyof BodyPartMetrics, string> = {
       fingers: "#2E96FF",
       upperBody: "#B800D8",
       lowerBody: "#02B2AF",
     };
-    const labels = {
+
+    const labels: Record<keyof BodyPartMetrics, string> = {
       fingers: "Fingers",
       upperBody: "Upper Body",
       lowerBody: "Lower Body",
     };
 
-    const barChart = select(chartRef.current).style("overflow", "visible");
+    const barChart = select(chartRef.current)
+      .attr("width", dimensions.width)
+      .attr("height", dimensions.height)
+      .style("overflow", "visible");
 
     const xScale = scaleLinear()
       .domain([0, max(metricsArray, (d) => d.load) || 0])
       .range([0, dimensions.width - 10]);
+
     const xAxis = axisBottom(xScale).ticks(3);
     barChart
-      .select(".x-axis")
+      .select<SVGGElement>(".x-axis")
       .call(xAxis)
       .style("transform", `translate(10px, ${dimensions.height - 10}px)`);
 
-    const yScale = scaleBand()
+    const yScale = scaleBand<keyof BodyPartMetrics>()
       .domain(metricsArray.map((d) => d.part))
       .range([0, dimensions.height - 10])
       .padding(0.3);
-    const yAxis = axisLeft(yScale).tickFormat("");
+
+    const yAxis = axisLeft(yScale).tickFormat(null);
     barChart
-      .select(".y-axis")
+      .select<SVGGElement>(".y-axis")
       .call(yAxis)
       .style("transform", `translateX(10px)`)
       .selectAll(".tick line")
       .attr("stroke-width", 0);
 
     barChart
-      .selectAll(".bar")
+      .selectAll<SVGPathElement, Metric>(".bar")
       .data(metricsArray)
       .join("path")
       .attr("class", "bar")
@@ -60,6 +75,9 @@ const LoadBarChart: React.FC<{ data: BodyPartMetrics }> = ({ data }) => {
         const height = yScale.bandwidth();
         const width = xScale(d.load);
         const ry = 5; // Radius for the y corners
+
+        if (y === undefined || height === 0 || width === 0) return null;
+
         return `M ${10},${y} 
                 h ${width - ry}
                 a ${ry},${ry} 0 0 1 ${ry},${ry} 
@@ -71,7 +89,7 @@ const LoadBarChart: React.FC<{ data: BodyPartMetrics }> = ({ data }) => {
       .attr("fill", (d) => colors[d.part]);
 
     barChart
-      .selectAll(".label")
+      .selectAll<SVGTextElement, Metric>(".label")
       .data(metricsArray)
       .join("text")
       .attr("class", "label")

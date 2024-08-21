@@ -14,7 +14,8 @@ import { useSelector, useDispatch } from "react-redux";
 import { RootState } from "../../store/store";
 import ActivityList from "./ActivityList";
 import WarningDialog from "./WarningDialog";
-import { Activity, Session, defaultNewSession } from "../../types";
+import { defaultNewSession } from "../../types/session";
+import { SessionActivity, TrainingSession } from "@shared/types";
 import {
   deleteSession as deleteSessionInAPI,
   createSession as createSessionInAPI,
@@ -31,7 +32,9 @@ const SessionPage = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const sessions = useSelector((state: RootState) => state.sessions.sessions);
-  const [sessionData, setSessionData] = useState<Session>(defaultNewSession());
+  const [sessionData, setSessionData] = useState<TrainingSession>(
+    defaultNewSession()
+  );
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
   const [warnings, setWarnings] = useState<string[]>([]);
   const [showWarningDialog, setShowWarningDialog] = useState(false);
@@ -52,10 +55,10 @@ const SessionPage = () => {
     setSessionData((prevState) => ({ ...prevState, [name]: value }));
   };
 
-  const handleActivityChange = (updatedActivity: Activity) => {
+  const handleActivityChange = (updatedActivity: SessionActivity) => {
     setSessionData((prevState) => ({
       ...prevState,
-      activities: prevState.activities.map((activity) =>
+      activities: prevState.sessionActivities.map((activity) =>
         activity.id === updatedActivity.id ? updatedActivity : activity
       ),
     }));
@@ -80,37 +83,31 @@ const SessionPage = () => {
       }
     }
 
-    if (sessionData.activities.length === 0) {
+    if (sessionData.sessionActivities.length === 0) {
       newErrors.activities = "At least one activity is required";
     }
 
-    sessionData.activities.forEach((activity, index) => {
-      if (!activity.name) {
+    sessionData.sessionActivities.forEach((sa, index) => {
+      if (!sa.name) {
         newErrors[`activity-name-${index}`] = "Activity name is required";
       }
-      if (!activity.startTime) {
+      if (!sa.startTime) {
         newErrors[`activity-startTime-${index}`] = "Start time is required";
       }
-      if (!activity.endTime) {
+      if (!sa.endTime) {
         newErrors[`activity-endTime-${index}`] = "End time is required";
       }
-      if (
-        activity.intensities.fingers < 0 ||
-        activity.intensities.fingers > 10
-      ) {
+      if (sa.intensities.fingers < 0 || sa.intensities.fingers > 10) {
         newErrors[`activity-intensities-${index}`] =
           "Intensity must be between 0 and 10";
       }
-      if (
-        DateTime.fromISO(activity.startTime) >=
-        DateTime.fromISO(activity.endTime)
-      ) {
+      if (DateTime.fromISO(sa.startTime) >= DateTime.fromISO(sa.endTime)) {
         newErrors[`activity-time-${index}`] =
           "Start time must be earlier than end time";
       }
       if (
-        DateTime.fromISO(activity.endTime).diff(
-          DateTime.fromISO(activity.startTime),
+        DateTime.fromISO(sa.endTime).diff(
+          DateTime.fromISO(sa.startTime),
           "hours"
         ).hours > 2
       ) {
@@ -119,9 +116,9 @@ const SessionPage = () => {
         );
       }
       if (
-        activity.intensities.fingers === 0 &&
-        activity.intensities.upperBody === 0 &&
-        activity.intensities.lowerBody === 0
+        sa.intensities.fingers === 0 &&
+        sa.intensities.upperBody === 0 &&
+        sa.intensities.lowerBody === 0
       ) {
         newErrors[`activity-all-intensities-${index}`] =
           "All intensities cannot be zero";
@@ -242,9 +239,9 @@ const SessionPage = () => {
               sx={{ mt: "8px", mb: "4px" }}
             />
             <ActivityList
-              activities={sessionData.activities}
-              setActivities={(activities) =>
-                setSessionData({ ...sessionData, activities })
+              sessionActivities={sessionData.sessionActivities}
+              setActivities={(sessionActivities) =>
+                setSessionData({ ...sessionData, sessionActivities })
               }
               onActivityChange={handleActivityChange}
               errors={errors}
@@ -276,7 +273,7 @@ const SessionPage = () => {
         </Grid>
         <Grid item md={8} sx={{ display: { xs: "none", md: "block" } }}>
           <SessionGantt
-            activities={sessionData.activities}
+            activities={sessionData.sessionActivities}
             yAxisLabels={true}
           />
         </Grid>

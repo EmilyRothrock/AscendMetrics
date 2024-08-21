@@ -8,8 +8,9 @@ export const sessionsManagerLoader = async () => {
   const endDate = DateTime.now().toISODate();
   const startDate = DateTime.now().minus({ months: 1 }).toISODate();
 
-  // TODO: fetch only missing range?
-  if (!isRangeLoaded(store.getState(), startDate, endDate)) {
+  const state = store.getState();
+
+  if (!isRangeLoaded(state, startDate, endDate)) {
     await store.dispatch(
       fetchMetricsWithSessionsForDateRange({
         startDate,

@@ -1,18 +1,25 @@
-import React, { MutableRefObject, RefObject, useEffect, useRef } from "react";
+import React, { useEffect, useRef } from "react";
 import { arc, select } from "d3";
 import { useResizeObserver } from "../hooks/useResizeObserver";
 
-const ReadinessGauge: React.FC<{
+interface ReadinessGaugeProps {
   value: number;
   color: string;
   defaultDimensions?: { width?: number; height?: number };
-}> = ({ value, color, defaultDimensions }) => {
-  const chartRef = useRef() as RefObject<SVGSVGElement>;
-  const wrapperRef = useRef() as MutableRefObject<HTMLDivElement>;
+}
+
+const ReadinessGauge: React.FC<ReadinessGaugeProps> = ({
+  value,
+  color,
+  defaultDimensions,
+}) => {
+  const chartRef = useRef<SVGSVGElement | null>(null);
+  const wrapperRef = useRef<HTMLDivElement | null>(null);
   const dimensions = useResizeObserver(wrapperRef, defaultDimensions);
 
   useEffect(() => {
     if (!chartRef.current || !dimensions) return;
+
     const radius = dimensions.width / 2;
     const maxValue = 100;
 
@@ -20,7 +27,8 @@ const ReadinessGauge: React.FC<{
       .attr("width", 2 * radius)
       .attr("height", radius)
       .style("overflow", "visible");
-    const myArc = arc()
+
+    const myArc = arc<{ endAngle: number }>()
       .innerRadius(radius / 2)
       .outerRadius(radius)
       .startAngle(-Math.PI / 2); // Start angle
@@ -55,7 +63,7 @@ const ReadinessGauge: React.FC<{
       .attr("text-anchor", "middle") // Center the text horizontally
       .attr("font-family", "'Roboto', sans-serif")
       .text(`${value}%`); // Set the text to the value
-  }, [dimensions, value]);
+  }, [dimensions, value, color]);
 
   return (
     <div ref={wrapperRef} style={{ width: "100%", height: "100%" }}>

@@ -1,30 +1,20 @@
 import { DateTime } from "luxon";
-import { Activity, defaultNewActivity } from "./activity";
-import { BodyPartMetrics } from "./bodyPartMetrics";
-
-export interface Session {
-  id: number;
-  completedOn: string; // ISO format
-  name?: string;
-  note?: string;
-  duration: number; // hours
-  activities: Activity[];
-  loads: BodyPartMetrics;
-}
+import { defaultNewActivity } from "./activity";
+import { TrainingSession } from "@shared/types";
 
 /**
  * Generates a default session with initialized values.
  * Useful for creating new session instances where no initial data is provided.
  * Ensures that each field in a Session has a safe initial value.
- * @returns {Session} A new session object with default values.
+ * @returns {TrainingSession} A new session object with default values.
  */
-export const defaultNewSession = (): Session => ({
+export const defaultNewSession = (): TrainingSession => ({
   id: -DateTime.now().valueOf(), // A temporary ID that cannot conflict with database given IDs
   completedOn: DateTime.now().toISO(), // Current date and time in ISO format
   name: "", // Default empty name
   note: "", // Default empty notes
   duration: 0, // Default duration of zero
-  activities: [defaultNewActivity()], // Empty activities array
+  sessionActivities: [defaultNewActivity()], // Empty activities array
   loads: {
     fingers: 0, // Default load for fingers
     upperBody: 0, // Default load for the upper body
@@ -33,7 +23,7 @@ export const defaultNewSession = (): Session => ({
 });
 
 export const generateDisplayName = (
-  session: Session,
+  session: TrainingSession,
   maxChars: number
 ): string => {
   const names = generateActivitiesString(session);
@@ -44,8 +34,8 @@ export const generateDisplayName = (
   return cutNames;
 };
 
-export const generateActivitiesString = (session: Session): string => {
-  if (!session.activities || session.activities.length === 0) {
+export const generateActivitiesString = (session: TrainingSession): string => {
+  if (!session.sessionActivities || session.sessionActivities.length === 0) {
     return "Session with no activities"; // Default text when there are no activities
   }
 
@@ -53,9 +43,9 @@ export const generateActivitiesString = (session: Session): string => {
   const uniqueNames = new Set();
 
   // Iterate over the activities and add unique names to the Set
-  session.activities.forEach((activity) => {
-    if (activity.name) {
-      uniqueNames.add(activity.name);
+  session.sessionActivities.forEach((sa) => {
+    if (sa.name) {
+      uniqueNames.add(sa.name);
     }
   });
 

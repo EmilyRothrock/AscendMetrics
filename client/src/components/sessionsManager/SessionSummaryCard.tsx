@@ -1,13 +1,16 @@
 import React from "react";
 import { Card, IconButton, Typography, Grid } from "@mui/material";
-import { Session, generateDisplayName } from "../../types"; // adjust the path to where your types are defined
+import { generateDisplayName } from "../../types/session"; // adjust the path to where your types are defined
+import { TrainingSession } from "@shared/types";
 import EditIcon from "@mui/icons-material/Edit";
 import { DateTime } from "luxon";
 import { useNavigate } from "react-router-dom";
 import LoadBarChart from "../charts/LoadBarChart";
 import SessionGantt from "../charts/SessionGantt";
 
-const SessionSummaryCard: React.FC<{ session: Session }> = ({ session }) => {
+const SessionSummaryCard: React.FC<{ session: TrainingSession }> = ({
+  session,
+}) => {
   const navigate = useNavigate();
   const formattedDateTime = DateTime.fromISO(
     session.completedOn
@@ -54,7 +57,7 @@ const SessionSummaryCard: React.FC<{ session: Session }> = ({ session }) => {
           <LoadBarChart data={session.loads} />
         </Grid>
         <Grid item xs={12} sm={8} sx={{ display: { xs: "none", md: "block" } }}>
-          <SessionGantt activities={session.activities} />
+          <SessionGantt activities={session.sessionActivities} />
         </Grid>
       </Grid>
     </Card>

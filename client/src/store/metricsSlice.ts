@@ -3,9 +3,7 @@ import {
   createSelector,
   createSlice,
 } from "@reduxjs/toolkit";
-import { DailyMetrics, MetricsTable } from "../types"; // Ensure this interface is defined correctly
 import { getMetricsWithSessionsForDateRange } from "../services/metricsService";
-import { DateTime, Interval } from "luxon";
 import { RootState } from "./store";
 import axios from "axios";
 import { MetricsState } from "../types/metricsState";
@@ -21,32 +19,9 @@ const initialState: MetricsState = {
 /* Selectors Definitions */
 
 export const selectMetricsByDate = createSelector(
-  (state: RootState, date: string) => state.metrics.metricsTable[date],
-  (metrics: DailyMetrics) => metrics
-);
-
-export const selectMetricsForDateRange = createSelector(
-  [
-    (state: RootState) => state.metrics.metricsTable,
-    (_: RootState, startDate: string) => startDate,
-    (_: RootState, endDate: string) => endDate,
-  ],
-  (metricsTable, startDate, endDate) => {
-    const start = DateTime.fromISO(startDate);
-    const end = DateTime.fromISO(endDate);
-    const range = Interval.fromDateTimes(start, end);
-    const aggregatedMetrics: MetricsTable = {};
-
-    for (const dt of range.splitBy({ days: 1 })) {
-      if (!dt.start || !dt.end) {
-        continue; // Skip this iteration if start or end is somehow null
-      }
-      const dateKey = dt.start.toISODate();
-      aggregatedMetrics[dateKey] = metricsTable[dateKey] || null;
-    }
-
-    return aggregatedMetrics;
-  }
+  (state: RootState) => state.metrics.metricsTable,
+  (_: RootState, date: string) => date,
+  (metricsTable, date) => metricsTable[date] || null
 );
 
 /* Thunks Definions */

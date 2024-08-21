@@ -1,16 +1,5 @@
 import { DateTime } from "luxon";
-import { BodyPartMetrics } from "./bodyPartMetrics";
-
-export interface Activity {
-  id: number;
-  name: string;
-  startTime: string; // ISO format
-  endTime: string; // ISO format
-  note?: string;
-  duration: number; // In minutes
-  intensities: BodyPartMetrics;
-  loads: BodyPartMetrics;
-}
+import { BodyPartMetrics, SessionActivity } from "@shared/types";
 
 export const calculateDuration = (
   startTime: string,
@@ -39,8 +28,8 @@ export function calculateLoads(
 }
 
 export function calculateActivityMetrics(
-  activity: Omit<Activity, "duration" | "loads" | "strains">
-): Activity {
+  activity: Omit<SessionActivity, "duration" | "loads" | "strains">
+): SessionActivity {
   const duration = calculateDuration(activity.startTime, activity.endTime);
   const loads = calculateLoads(activity.intensities, duration);
 
@@ -57,12 +46,12 @@ export function calculateActivityMetrics(
  * Ensures that each field in an Activity has a safe initial value.
  * @returns {Activity} A new activity object with default values.
  */
-export const defaultNewActivity = (): Activity => ({
+export const defaultNewActivity = (): SessionActivity => ({
   id: -Number(DateTime.now()), // A temporary ID that cannot conflict with database-assigned IDs
   name: "", // Default empty name
   startTime: DateTime.now().toISOTime(), // Default start time in ISO format
   endTime: DateTime.now().toISOTime(), // Default end time in ISO format
-  notes: "", // Default empty notes
+  note: "", // Default empty notes
   duration: 0, // Default duration of 0 minutes
   intensities: {
     fingers: 0, // Default intensity for fingers

@@ -1,8 +1,20 @@
+import { useAuth0 } from "@auth0/auth0-react";
 import axios from "axios";
 
-const api = axios.create({
-  baseURL: "http://localhost:3000/", // set this to the server's url
-  withCredentials: true,
-});
+// Utility function to get the API instance
+export const getApiInstance = async () => {
+  const { getAccessTokenSilently } = useAuth0();
 
-export default api;
+  const api = axios.create({
+    baseURL: import.meta.env.VITE_BACKEND_URL,
+  });
+
+  // Request interceptor to include the JWT in the Authorization header
+  api.interceptors.request.use(async (config) => {
+    const token = await getAccessTokenSilently();
+    config.headers.Authorization = `Bearer ${token}`;
+    return config;
+  });
+
+  return api;
+};

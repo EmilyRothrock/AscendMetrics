@@ -3,7 +3,10 @@
   "compilerOptions": {
     "outDir": "./dist",
     "moduleResolution": "node",
-    "allowJs": true
+    "allowJs": true,
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
+    "allowSyntheticDefaultImports": true
   },
   "include": ["src"],
   "exclude": ["node_modules", "**/*.spec.ts"]

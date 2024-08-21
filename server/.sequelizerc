@@ -1,8 +1,17 @@
-import path from 'path';
+import path from "path";
 
-export default {
-  'config': path.resolve('src', 'config', 'config.json'),
-  'migrations-path': path.resolve('src', 'db', 'migrations'),
-  'models-path': path.resolve('src', 'db', 'models'),
-  'seeders-path': path.resolve('src', 'db', 'seeders')
+interface SequelizePathsConfig {
+  config: string;
+  migrationsPath: string;
+  modelsPath: string;
+  seedersPath: string;
+}
+
+const sequelizePathsConfig: SequelizePathsConfig = {
+  config: path.resolve("src", "db", "config"),
+  migrationsPath: path.resolve("src", "db", "migrations"),
+  modelsPath: path.resolve("src", "db", "models"),
+  seedersPath: path.resolve("src", "db", "seeders"),
 };
+
+export default sequelizePathsConfig;

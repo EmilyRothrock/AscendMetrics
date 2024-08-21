@@ -1,23 +1,19 @@
 import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
-import db from "./db/database.js";
-import sessionsRouter from "./routes/sessionsRoutes.js";
-import metricsRouter from "./routes/metricsRoutes.js";
-import { checkJwt } from "./middlewares/authMiddleware.ts";
+import db from "./db/database";
+import sessionsRouter from "./routes/sessionsRoutes";
+import metricsRouter from "./routes/metricsRoutes";
+import { checkJwt } from "./middlewares/authMiddleware";
 
 // Load environment variables
 dotenv.config({ path: "../server/.env" });
 
-const { sequelize, syncDatabase } = db;
 const app = express();
 const port = process.env.PORT || 3000;
 
 // Global middlewares that run on every request
-const corsOptions = {
-  origin: "http://localhost:5173", // Allow only your frontend origin
-  credentials: true, // Allow cookies to be sent with requests
-};
+const corsOptions = { origin: "http://localhost:5173" };
 app.use(cors(corsOptions)); // Enable CORS for all routes
 app.use(express.json());
 

@@ -26,10 +26,6 @@ const BalanceLineChart: React.FC<{ metricsData: MetricsTable }> = ({
   const wrapperRef = useRef<HTMLDivElement | null>(null);
   const dimensions = useResizeObserver(wrapperRef, { width: 200, height: 100 });
 
-  if (!chartRef.current || !dimensions) return;
-
-  dimensions.height = dimensions.width / 2;
-
   const fontFamily = "'Roboto', sans-serif";
 
   const today = new Date();
@@ -77,6 +73,10 @@ const BalanceLineChart: React.FC<{ metricsData: MetricsTable }> = ({
   ];
 
   useEffect(() => {
+    if (!chartRef.current || !dimensions) return;
+
+    dimensions.height = dimensions.width / 2;
+
     const lineChart = select(chartRef.current)
       .attr("height", dimensions.height)
       .attr("width", dimensions.width)

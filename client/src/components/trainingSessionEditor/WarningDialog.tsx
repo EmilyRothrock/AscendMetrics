@@ -8,18 +8,18 @@ import {
 } from "@mui/material";
 
 interface WarningDialogProps {
-  open: boolean;
+  isOpen: boolean;
   warnings: string[];
   onClose: (confirm: boolean) => void;
 }
 
 const WarningDialog: React.FC<WarningDialogProps> = ({
-  open,
+  isOpen,
   warnings,
   onClose,
 }) => {
   return (
-    <Dialog open={open} onClose={() => onClose(false)}>
+    <Dialog open={isOpen} onClose={() => onClose(false)}>
       <DialogTitle>Warnings Detected</DialogTitle>
       <DialogContent>
         {warnings.map((warning, index) => (

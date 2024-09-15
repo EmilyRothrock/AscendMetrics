@@ -1,18 +1,7 @@
 import { fetchSessionById, selectSessionById } from "../store/sessionsSlice";
 import store from "../store/store";
-import { LoaderFunctionArgs } from "react-router-dom";
 
-interface SessionLoaderParams {
-  params: {
-    id: string;
-  };
-}
-
-export const sessionLoader = async ({
-  params,
-}: LoaderFunctionArgs<SessionLoaderParams["params"]>) => {
-  const { id } = params;
-
+export const sessionLoader = async (id: string) => {
   if (id === "new") return null;
 
   const sessionId = Number(id);

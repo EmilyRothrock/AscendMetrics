@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Card,
   CardContent,
@@ -36,6 +36,8 @@ const DashSessionSummaryCard: React.FC<{ session: TrainingSession }> = ({
     navigate(`/sessions/${session.id}`);
   };
 
+  useEffect(() => console.log(session));
+
   return (
     <Card elevation={2} sx={{ margin: 1, padding: 1 }}>
       <CardHeader
@@ -57,7 +59,7 @@ const DashSessionSummaryCard: React.FC<{ session: TrainingSession }> = ({
               {formattedDateTime}
             </Typography>
             <Typography variant="subtitle2" color="textSecondary">
-              Total Duration: {session.duration.toFixed(2)} hours
+              Total Duration: {session.duration?.toFixed(2) ?? "N/A"} hours
             </Typography>
           </>
         }

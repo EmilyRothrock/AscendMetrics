@@ -58,17 +58,17 @@ const SessionGantt: React.FC<SessionGanttProps> = ({
       .style("padding", `${padding}px`);
 
     // Safely get the minimum and maximum dates
-    const minDateTime = DateTime.min(
+    let minDateTime = DateTime.min(
       ...validActivities.map((a) => DateTime.fromISO(a.startTime))
     );
-    const maxDateTime = DateTime.max(
+    let maxDateTime = DateTime.max(
       ...validActivities.map((a) => DateTime.fromISO(a.endTime))
     );
 
     // Check if minDateTime or maxDateTime is invalid
     if (!minDateTime || !maxDateTime) {
-      console.error("Invalid date range");
-      return;
+      minDateTime = DateTime.now().minus({ hour: 1 });
+      maxDateTime = DateTime.now();
     }
 
     const xScale = scaleTime()
@@ -108,7 +108,7 @@ const SessionGantt: React.FC<SessionGanttProps> = ({
 
     const gridlines = axisTop<Date>(xScale)
       .tickSize(-(dimensions.height - 2 * padding)) // Full chart height
-      .tickFormat(null);
+      .tickFormat(() => "");
     ganttChart
       .select<SVGGElement>(".grid")
       .call(gridlines)

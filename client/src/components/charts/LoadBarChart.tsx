@@ -37,10 +37,7 @@ const LoadBarChart: React.FC<LoadBarChartProps> = ({ data }) => {
       lowerBody: "Lower Body",
     };
 
-    const barChart = select(chartRef.current)
-      .attr("width", dimensions.width)
-      .attr("height", dimensions.height)
-      .style("overflow", "visible");
+    const barChart = select(chartRef.current).style("overflow", "visible");
 
     const xScale = scaleLinear()
       .domain([0, max(metricsArray, (d) => d.load) || 0])
@@ -57,7 +54,7 @@ const LoadBarChart: React.FC<LoadBarChartProps> = ({ data }) => {
       .range([0, dimensions.height - 10])
       .padding(0.3);
 
-    const yAxis = axisLeft(yScale).tickFormat(null);
+    const yAxis = axisLeft(yScale).tickFormat(() => "");
     barChart
       .select<SVGGElement>(".y-axis")
       .call(yAxis)

@@ -24,7 +24,6 @@ export async function fetchSessionsForDateRange(
         where: {
           completedOn: { [Op.between]: [startDate, endDate] },
         },
-        attributes: ["id", "completedOn", "name", "note", "duration", "loads"],
         include: [
           {
             model: UserModel,
@@ -35,15 +34,6 @@ export async function fetchSessionsForDateRange(
           },
           {
             model: SessionActivityModel,
-            attributes: [
-              "id",
-              "note",
-              "startTime",
-              "endTime",
-              "intensities",
-              "duration",
-              "loads",
-            ],
             include: [
               {
                 model: ActivityModel,
@@ -53,7 +43,6 @@ export async function fetchSessionsForDateRange(
           },
         ],
       });
-
     return dbSessions;
   } catch (error) {
     console.error("Error fetching user sessions:", error);
@@ -73,26 +62,15 @@ export async function fetchSessionById(
       where: {
         id: sessionId,
       },
-      attributes: ["id", "completedOn", "name", "note", "duration", "loads"],
       include: [
         {
           model: UserModel,
           where: {
             auth0id,
           },
-          attributes: [], // Only filter by user, no need to select any user attributes
         },
         {
           model: SessionActivityModel,
-          attributes: [
-            "id",
-            "note",
-            "startTime",
-            "endTime",
-            "intensities",
-            "duration",
-            "loads",
-          ],
           include: [
             {
               model: ActivityModel,
@@ -140,7 +118,7 @@ export async function createTrainingSession(
         sessionData.sessionActivities.map(async (sa: SessionActivity) => ({
           activityId: await fetchActivityIdByName(sa.name),
           trainingSessionId: newSession.id,
-          fingersIntensity: sa.intensities.fingers,
+          fingerIntensity: sa.intensities.fingers,
           upperIntensity: sa.intensities.upperBody,
           lowerIntensity: sa.intensities.lowerBody,
           startTime: sa.startTime,
@@ -184,7 +162,7 @@ export async function updateTrainingSession(
           id: sa.id || undefined,
           activityId: await fetchActivityIdByName(sa.name),
           trainingSessionId: existingSession.id,
-          fingersIntensity: sa.intensities.fingers,
+          fingerIntensity: sa.intensities.fingers,
           upperIntensity: sa.intensities.upperBody,
           lowerIntensity: sa.intensities.lowerBody,
           startTime: sa.startTime,

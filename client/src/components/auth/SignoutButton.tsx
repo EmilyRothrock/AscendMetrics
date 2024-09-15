@@ -1,19 +1,14 @@
 import React from "react";
 import Button from "@mui/material/Button";
-import { useAuth0 } from "@auth0/auth0-react";
+import { logout } from "../../services/authService";
 
 const SignOutButton: React.FC = () => {
-  const { logout } = useAuth0();
+  const returnToUrl =
+    import.meta.env.VITE_AUTH0_LOGOUT_URL || "http://localhost:5173/signin";
 
   return (
-    <Button
-      color="inherit"
-      onClick={() =>
-        logout({ logoutParams: { returnTo: "http://localhost:5173/signin" } })
-      }
-      sx={{ mx: 1 }}
-    >
-      Signout
+    <Button color="inherit" onClick={() => logout(returnToUrl)} sx={{ mx: 1 }}>
+      Sign Out
     </Button>
   );
 };

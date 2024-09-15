@@ -1,12 +1,34 @@
+import React, { useState, useEffect } from "react";
 import { Navigate } from "react-router-dom";
-import React from "react";
-import { useAuth0 } from "@auth0/auth0-react";
 import Loading from "../common/Loading";
+import { initAuth0Client } from "../../services/auth0Client";
 
-const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({
-  children,
-}) => {
-  const { isAuthenticated, isLoading } = useAuth0();
+interface ProtectedRouteProps {
+  children: React.ReactNode;
+}
+
+const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
+  const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
+
+  useEffect(() => {
+    const checkAuthentication = async () => {
+      const auth0Client = await initAuth0Client();
+
+      try {
+        const isAuth = await auth0Client.isAuthenticated();
+        setIsAuthenticated(isAuth);
+      } catch (error) {
+        // Handle error
+        console.error("Error checking authentication", error);
+        setIsAuthenticated(false);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    checkAuthentication();
+  }, []);
 
   if (isLoading) {
     return <Loading />;
@@ -15,7 +37,7 @@ const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({
   if (isAuthenticated) {
     return <>{children}</>;
   } else {
-    return <Navigate to="/signin" />;
+    return <Navigate to="/signin" replace />;
   }
 };
 

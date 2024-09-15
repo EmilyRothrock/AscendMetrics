@@ -9,22 +9,24 @@ import { TrainingSession as TrainingSessionModel } from "../db/models";
 import mapTrainingSessionModelToObject from "../utils/mappings/mapTrainingSessionModelToObject";
 import { TrainingSession } from "@shared/types";
 import { getUserByAuth0Id } from "../services/userService";
+import { getAuth0IdFromReq } from "../middlewares/authMiddleware";
+import { DateTime } from "luxon";
 
 /**
  * Get a single session by ID for the authenticated user. Confirms that the user requesting it is the one who completed it.
  */
 export const getSessionById = async (req: any, res: any) => {
-  const { sessionId } = req.params;
-  const auth0id = req.user.sub;
-
   try {
+    const { sessionId } = req.params;
+    const auth0id = getAuth0IdFromReq(req);
     const dbSession: TrainingSessionModel = await fetchSessionById(
       sessionId,
       auth0id
     );
+    console.log(dbSession.sessionActivities);
     const mappedSession: TrainingSession =
       mapTrainingSessionModelToObject(dbSession);
-
+    console.log("sending session", mappedSession.sessionActivities);
     res.json(mappedSession);
   } catch (error) {
     console.error("Error fetching session:", error);
@@ -36,16 +38,21 @@ export const getSessionById = async (req: any, res: any) => {
  * Get sessions within a specified date range for the authenticated user. Does NOT also supply metrics calculations for that date range.
  */
 export const getSessionsForDateRange = async (req: any, res: any) => {
-  const { startDate, endDate } = req.query;
-  const userId = req.user.id;
-
   try {
-    const sessions: TrainingSessionModel[] = await fetchSessionsForDateRange(
-      userId,
-      startDate,
-      endDate
-    );
-    const mappedSessions: TrainingSession[] = sessions.map(
+    const auth0id = getAuth0IdFromReq(req);
+    const { startDate, endDate } = req.query;
+    const startDateObj = DateTime.fromISO(startDate);
+
+    if (!startDateObj.isValid) {
+      throw new Error("invalid date");
+    }
+
+    const earlyStart = startDateObj.minus({ months: 1 }).toISO();
+
+    const fetchedSessions: TrainingSessionModel[] =
+      await fetchSessionsForDateRange(auth0id, earlyStart, endDate);
+
+    const mappedSessions: TrainingSession[] = fetchedSessions.map(
       mapTrainingSessionModelToObject
     );
 
@@ -61,7 +68,7 @@ export const getSessionsForDateRange = async (req: any, res: any) => {
  */
 export const createSession = async (req: any, res: any) => {
   try {
-    const auth0id = req.user?.sub;
+    const auth0id = getAuth0IdFromReq(req);
     if (!auth0id) {
       return res.status(401).json({ error: "Unauthorized" });
     }
@@ -97,7 +104,7 @@ export const createSession = async (req: any, res: any) => {
  * Update an existing training session for the authenticated user.
  */
 export const updateSession = async (req: any, res: any) => {
-  const auth0id = req.user?.sub; // Assuming you're using Auth0 and the user is authenticated
+  const auth0id = getAuth0IdFromReq(req);
   if (!auth0id) {
     return res.status(401).json({ error: "Unauthorized" });
   }
@@ -130,7 +137,7 @@ export const updateSession = async (req: any, res: any) => {
  */
 export const deleteSession = async (req: any, res: any) => {
   const { sessionId } = req.params;
-  const auth0id = req.user.sub;
+  const auth0id = getAuth0IdFromReq(req);
 
   if (!auth0id) {
     return res.status(401).json({ error: "Unauthorized" });

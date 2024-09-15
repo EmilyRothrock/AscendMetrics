@@ -4,6 +4,7 @@ import { calculateMetricsForDateRange } from "../utils/calculations/metricsTable
 import { TrainingSession as TrainingSessionModel } from "../db/models";
 import { TrainingSession } from "@shared/types";
 import mapTrainingSessionModelToObject from "../utils/mappings/mapTrainingSessionModelToObject";
+import { getAuth0IdFromReq } from "../middlewares/authMiddleware";
 
 /**
  * Asynchronously fetches user sessions and calculates metrics for a specified date range.
@@ -15,7 +16,7 @@ export const getMetricsWithSessionsForDateRange = async (
   res: any
 ) => {
   try {
-    const auth0id = req.user.sub;
+    const auth0id = getAuth0IdFromReq(req);
     const { startDate, endDate } = req.query;
     const startDateObj = DateTime.fromISO(startDate);
 

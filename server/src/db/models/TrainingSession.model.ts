@@ -10,7 +10,7 @@ import {
 } from "sequelize-typescript";
 import { User } from "./User.model";
 import { SessionActivity } from "./SessionActivity.model";
-import { Optional } from "sequelize";
+import { DataTypes, NonAttribute, Optional } from "sequelize";
 import {
   BodyPartMetrics,
   TrainingSession as TrainingSessionInterface,
@@ -60,10 +60,12 @@ export class TrainingSession extends Model<
   get duration(): number {
     const sessionActivities = this.sessionActivities || [];
     const startTimes = sessionActivities.map(
-      (sessionActivity: SessionActivity) => sessionActivity.startTime
+      (sessionActivity: SessionActivity) =>
+        new Date(`1970-01-01T${sessionActivity.startTime}`)
     );
     const endTimes = sessionActivities.map(
-      (sessionActivity: SessionActivity) => sessionActivity.endTime
+      (sessionActivity: SessionActivity) =>
+        new Date(`1970-01-01T${sessionActivity.endTime}`)
     );
 
     if (startTimes.length === 0 || endTimes.length === 0) {
@@ -71,17 +73,19 @@ export class TrainingSession extends Model<
     }
 
     const earliestStartTime = Math.min(
-      ...startTimes.map((time: string) => new Date(time).getTime())
+      ...startTimes.map((time: Date) => time.getTime())
     );
     const latestEndTime = Math.max(
-      ...endTimes.map((time: string) => new Date(time).getTime())
+      ...endTimes.map((time: Date) => time.getTime())
     );
 
-    return (latestEndTime - earliestStartTime) / 3600000; // convert milliseconds to hours
+    return (latestEndTime - earliestStartTime) / (1000 * 60 * 60); // convert milliseconds to hours
   }
 
   @Column(DataType.VIRTUAL)
-  get loads(): Record<"fingers" | "upperBody" | "lowerBody", number> {
+  get loads(): NonAttribute<
+    Record<"fingers" | "upperBody" | "lowerBody", number>
+  > {
     const sessionActivities = this.sessionActivities || [];
     return sessionActivities.reduce(
       (acc: BodyPartMetrics, sessionActivity: SessionActivity) => {

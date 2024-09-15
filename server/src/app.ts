@@ -13,7 +13,7 @@ const app = express();
 const port = process.env.PORT || 3000;
 
 // Global middlewares that run on every request
-const corsOptions = { origin: "http://localhost:5173" };
+const corsOptions = { origin: "http://localhost:5173", credentials: true };
 app.use(cors(corsOptions)); // Enable CORS for all routes
 app.use(express.json());
 

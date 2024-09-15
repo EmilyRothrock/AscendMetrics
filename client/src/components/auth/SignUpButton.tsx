@@ -1,18 +1,19 @@
-import { useAuth0 } from "@auth0/auth0-react";
+import React from "react";
+import { initAuth0Client } from "../../services/auth0Client";
 import { Button } from "@mui/material";
 
-const SignUpButton = () => {
-  const { loginWithRedirect } = useAuth0();
-
+const SignUpButton: React.FC = () => {
   const handleSignUp = async () => {
-    await loginWithRedirect({
-      appState: {
-        returnTo: "/dashboard",
-      },
-      authorizationParams: {
-        screen_hint: "signup",
-      },
-    });
+    const auth0Client = await initAuth0Client();
+    if (auth0Client) {
+      await auth0Client.loginWithRedirect({
+        authorizationParams: {
+          screen_hint: "signup",
+        },
+      });
+    } else {
+      console.error("Auth0Client not initialized");
+    }
   };
 
   return (

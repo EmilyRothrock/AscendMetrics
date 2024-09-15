@@ -10,13 +10,17 @@ export const checkJwt = auth({
   tokenSigningAlg: "RS256",
 });
 
+export function getAuth0IdFromReq(req: any) {
+  return req.auth.payload.sub;
+}
+
 export async function verifyOwnership(
   req: any,
   res: any,
   next: NextFunction
 ): Promise<void> {
   const { sessionId } = req.params;
-  const auth0id = req.user?.sub;
+  const auth0id = getAuth0IdFromReq(req);
 
   if (!auth0id) {
     return res.status(401).json({ error: "Unauthorized" });

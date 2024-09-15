@@ -1,11 +1,9 @@
-import { useAuth0 } from "@auth0/auth0-react";
 import { Button } from "@mui/material";
+import { login } from "../../services/authService";
 
 const SignInButton = () => {
-  const { loginWithRedirect } = useAuth0();
-
   const handleSignIn = async () => {
-    await loginWithRedirect({
+    await login({
       appState: {
         returnTo: "/dashboard",
       },

@@ -1,5 +1,5 @@
 import { DateTime } from "luxon";
-import { defaultNewActivity } from "./activity";
+import { defaultNewSessionActivity } from "./activity";
 import { TrainingSession } from "@shared/types";
 
 /**
@@ -8,13 +8,13 @@ import { TrainingSession } from "@shared/types";
  * Ensures that each field in a Session has a safe initial value.
  * @returns {TrainingSession} A new session object with default values.
  */
-export const defaultNewSession = (): TrainingSession => ({
+export const defaultNewTrainingSession = (): TrainingSession => ({
   id: -DateTime.now().valueOf(), // A temporary ID that cannot conflict with database given IDs
   completedOn: DateTime.now().toISO(), // Current date and time in ISO format
   name: "", // Default empty name
   note: "", // Default empty notes
   duration: 0, // Default duration of zero
-  sessionActivities: [defaultNewActivity()], // Empty activities array
+  sessionActivities: [defaultNewSessionActivity()], // Empty activities array
   loads: {
     fingers: 0, // Default load for fingers
     upperBody: 0, // Default load for the upper body

@@ -10,13 +10,10 @@ import {
   strainNormalization,
 } from "./normalizations";
 import { calculateBurnoutRiskIndex } from "./metrics/burnoutRiskIndex";
-import {
-  BodyPart,
-  MetricByDate,
-  MetricsTable,
-  TrainingSession,
-} from "@shared/types";
-import BODY_PARTS from "@shared/types/BODYPARTS";
+import { MetricByDate, MetricsTable, TrainingSession } from "@shared/types";
+import { updateEWMA } from "./ewma";
+
+const BodyPart = (await import("@shared/types/bodyPart")).default;
 
 export function calculateMetricsForDateRange(
   startDate: string,
@@ -97,7 +94,7 @@ export function calculateMetricsForDateRange(
     const readiness = { fingers: 0, upperBody: 0, lowerBody: 0 };
 
     // Calculations
-    BODY_PARTS.forEach((part) => {
+    Object.values(BodyPart).forEach((part) => {
       EWMA.WL[dateString][part] = updateEWMA(
         alpha7,
         getMetricValue(dailyLoads, yesterdayDateString, part),
@@ -125,7 +122,7 @@ export function calculateMetricsForDateRange(
     });
 
     if (currentDate >= start.minus({ days: 7 })) {
-      BODY_PARTS.forEach((part) => {
+      Object.values(BodyPart).forEach((part) => {
         loadSeverity[part] =
           getMetricValue(dailyLoads, dateString, part) /
           getMetricValue(EWMA.ML, dateString, part);
@@ -154,7 +151,7 @@ export function calculateMetricsForDateRange(
     }
 
     if (currentDate >= start) {
-      BODY_PARTS.forEach((part) => {
+      Object.values(BodyPart).forEach((part) => {
         loadBalance[part] =
           getMetricValue(EWMA.WL, dateString, part) /
           getMetricValue(EWMA.ML, dateString, part);
@@ -173,7 +170,7 @@ export function calculateMetricsForDateRange(
         EWMA.WL[dateString]
       );
 
-      BODY_PARTS.forEach((part) => {
+      Object.values(BodyPart).forEach((part) => {
         const normalizedValues = {
           loadBalance: quarticNormalization(2, loadBalance[part]),
           averageLoadSeverity: severityNormalization(
@@ -213,7 +210,9 @@ export function calculateMetricsForDateRange(
         averageLoadSeverity: EWMA.WLS[dateString],
         weeklyLoadChange: weeklyLoadChange,
         averageWeeklyLoadChange: EWMA.WLChange[dateString],
-        fatigue: fatigues[dateString],
+        fatigue: fatigues[dateString]
+          ? fatigues[dateString]
+          : { fingers: 0, upperBody: 0, lowerBody: 0 },
         fatigueSeverity: fatigueSeverity,
         dailyStrain: dailyStrain,
         weeklyStrain: EWMA.WS[dateString],
@@ -230,6 +229,10 @@ export function calculateMetricsForDateRange(
   return metricsTable;
 }
 
-function getMetricValue(metrics: MetricByDate, date: string, part: BodyPart) {
-  return metrics[date]?.[part] ?? 0;
+function getMetricValue(
+  metricsObject: MetricByDate,
+  date: string,
+  part: keyof typeof BodyPart
+): number {
+  return metricsObject[date]?.[part] ?? 0;
 }

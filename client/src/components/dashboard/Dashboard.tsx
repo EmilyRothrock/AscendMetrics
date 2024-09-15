@@ -12,8 +12,8 @@ import { bodyPartLabels } from "../../styles/bodyPartLabels";
 import { bodyPartColors } from "../../styles/bodyPartColors";
 import { DateTime, Interval } from "luxon";
 import BodyPartMetrics from "@shared/types/bodyPartMetrics";
-import BODY_PARTS from "@shared/types/BODYPARTS";
 import { MetricsTable } from "@shared/types";
+import BodyPart from "@shared/types/bodyPart";
 
 const Dashboard: React.FC = () => {
   const sessions = useSelector(
@@ -29,7 +29,7 @@ const Dashboard: React.FC = () => {
 
   const start = DateTime.now().minus({ days: 30 });
   const end = DateTime.now();
-  const range = Interval.fromDateTimes(start, end);
+  const range = Interval.fromDateTimes(start, end.plus({ day: 1 }));
   const metricsData = range
     .splitBy({ days: 1 })
     .reduce<MetricsTable>((acc, dt) => {
@@ -39,8 +39,6 @@ const Dashboard: React.FC = () => {
       }
       return acc;
     }, {} as MetricsTable);
-
-  console.log(sessions, sessionIds, metricsData);
 
   const readinessValues: BodyPartMetrics = metricsData[
     DateTime.now().toISODate()
@@ -52,7 +50,7 @@ const Dashboard: React.FC = () => {
         lowerBody: 0,
       };
 
-  const readinessData = BODY_PARTS.map((bodyPart) => ({
+  const readinessData = Object.values(BodyPart).map((bodyPart) => ({
     title: bodyPartLabels[bodyPart],
     value: Math.round(readinessValues[bodyPart] * 100),
     feedback: "Textual feedback on training patterns coming soon!",

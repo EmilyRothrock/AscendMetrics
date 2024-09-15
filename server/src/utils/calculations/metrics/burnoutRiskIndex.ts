@@ -1,6 +1,6 @@
+import BodyPart from "@shared/types/bodyPart";
 import BodyPartMetrics from "@shared/types/bodyPartMetrics";
 import MetricsTable from "@shared/types/metricsTable";
-import BODY_PARTS from "@shared/types/BODYPARTS";
 import { DateTime } from "luxon";
 
 export function calculateBurnoutRiskIndex(
@@ -12,7 +12,7 @@ export function calculateBurnoutRiskIndex(
   weeklyLoad: BodyPartMetrics
 ) {
   let stDev: BodyPartMetrics = { fingers: 0, upperBody: 0, lowerBody: 0 };
-  BODY_PARTS.forEach((part) => {
+  Object.values(BodyPart).forEach((part) => {
     const pastWeekLoads = [];
     let currentDate = DateTime.fromISO(date).minus({ days: 6 });
 
@@ -33,8 +33,8 @@ export function calculateBurnoutRiskIndex(
 
   // Calculate the BRI for each body part
   let result: BodyPartMetrics = { fingers: 0, upperBody: 0, lowerBody: 0 };
-  BODY_PARTS.forEach((part) => {
-    result[part] = stDev[part] > 0 ? weeklyLoad[part] / sd[part] : 0;
+  Object.values(BodyPart).forEach((part) => {
+    result[part] = stDev[part] > 0 ? weeklyLoad[part] / stDev[part] : 0;
   });
 
   return result;

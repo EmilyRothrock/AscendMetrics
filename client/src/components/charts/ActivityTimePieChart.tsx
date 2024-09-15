@@ -12,12 +12,13 @@ interface ActivityDuration {
 const ActivityTimePieChart: React.FC<{ activities: SessionActivity[] }> = ({
   activities,
 }) => {
-  const chartRef = useRef<SVGSVGElement>(null);
-  const wrapperRef = useRef<HTMLDivElement>(null);
-  const dimensions = useResizeObserver(wrapperRef, { width: 200, height: 200 });
+  const chartRef = useRef<SVGSVGElement>(null); // for content
+  const wrapperRef = useRef<HTMLDivElement>(null); // for sizing
+  const dimensions = useResizeObserver(wrapperRef, { width: 200, height: 200 }); // sizing logic handled by custom hook
   const [selectedActivity, setSelectedActivity] =
-    useState<ActivityDuration | null>(null);
+    useState<ActivityDuration | null>(null); // used for interactive central text element
 
+  // Process Data
   const data = useMemo(() => {
     return activities.reduce((acc: ActivityDuration[], activity) => {
       const existing = acc.find((a) => a.activity === activity.name);
@@ -30,25 +31,33 @@ const ActivityTimePieChart: React.FC<{ activities: SessionActivity[] }> = ({
     }, [] as ActivityDuration[]);
   }, [activities]);
 
+  // Render Chart
   useEffect(() => {
+    // Safety checks
     if (!chartRef.current || !dimensions) return;
 
+    // Calculate dimensions
     const { width, height } = dimensions;
     const radius = Math.min(height, width) / 2;
 
+    // Overflow allows chart to fill wrapper without resizing svg directly
     const svg = select(chartRef.current).style("overflow", "visible");
 
+    // Position pie centrally within wrapper
     const pieChart = svg
       .append("g")
       .attr("class", "pie-chart")
       .attr("transform", `translate(${width / 2}, ${height / 2})`);
 
+    // Create pie generator based on total duration of each activity
     const myPie = pie<ActivityDuration>().value((d) => d.totalDuration);
 
+    // Create arc generator
     const myArc = arc<PieArcDatum<ActivityDuration>>()
       .innerRadius(radius * 0.67)
       .outerRadius(radius);
 
+    // Render arc groups for each pie piece
     const myArcs = pieChart
       .selectAll(".arc")
       .data(myPie(data))
@@ -56,6 +65,7 @@ const ActivityTimePieChart: React.FC<{ activities: SessionActivity[] }> = ({
       .append("g")
       .attr("class", "arc");
 
+    // Render arc paths for each pie piece w/ event handlers for interactive central text
     myArcs
       .append("path")
       .attr("d", myArc)
@@ -64,10 +74,12 @@ const ActivityTimePieChart: React.FC<{ activities: SessionActivity[] }> = ({
       .on("mouseout", () => setSelectedActivity(null))
       .on("click", (_, d) => setSelectedActivity(d.data));
 
+    // Initialize central text - not modified here
     svg
       .append("text")
       .attr("class", "center-text")
       .attr("text-anchor", "middle")
+      .attr("transform", `translate(${width / 2}, ${height / 2})`)
       .style("font-size", "14px");
 
     return () => {
@@ -75,13 +87,18 @@ const ActivityTimePieChart: React.FC<{ activities: SessionActivity[] }> = ({
     };
   }, [data, dimensions]);
 
+  // Render interactive central text of chart
   useEffect(() => {
+    // Safety check
     if (!chartRef.current) return;
 
+    // Select the svg and central text element within
     const svg = select(chartRef.current);
     const centralText = svg.select(".center-text");
+
     centralText.selectAll("tspan").remove(); // Clear previous texts
 
+    // Render selected activity name with duration (multiline) or a default tooltip
     if (selectedActivity) {
       const lines = [
         `${selectedActivity.activity}:`,
@@ -115,6 +132,7 @@ const ActivityTimePieChart: React.FC<{ activities: SessionActivity[] }> = ({
   }, [selectedActivity]);
 
   return (
+    // TODO: Factor out common wrapper in-line styles.
     <div ref={wrapperRef} style={{ width: "100%", height: "100%" }}>
       <svg ref={chartRef} />
     </div>

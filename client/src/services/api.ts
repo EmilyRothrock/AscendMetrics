@@ -1,20 +1,25 @@
-import { useAuth0 } from "@auth0/auth0-react";
+// api.js
 import axios from "axios";
+import { getAccessToken } from "./authService";
 
-// Utility function to get the API instance
-export const getApiInstance = async () => {
-  const { getAccessTokenSilently } = useAuth0();
+const api = axios.create({
+  baseURL: import.meta.env.VITE_BACKEND_URL,
+});
 
-  const api = axios.create({
-    baseURL: import.meta.env.VITE_BACKEND_URL,
-  });
+// Request interceptor to include the JWT in the Authorization header
+api.interceptors.request.use(
+  async (config) => {
+    try {
+      const token = await getAccessToken();
+      if (token) {
+        config.headers.Authorization = `Bearer ${token}`;
+      }
+      return config;
+    } catch (error) {
+      return Promise.reject(error);
+    }
+  },
+  (error) => Promise.reject(error)
+);
 
-  // Request interceptor to include the JWT in the Authorization header
-  api.interceptors.request.use(async (config) => {
-    const token = await getAccessTokenSilently();
-    config.headers.Authorization = `Bearer ${token}`;
-    return config;
-  });
-
-  return api;
-};
+export default api;

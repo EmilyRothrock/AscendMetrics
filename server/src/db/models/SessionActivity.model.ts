@@ -22,7 +22,7 @@ export interface SessionActivityAttributes
   > {
   activityId: number;
   trainingSessionId: number;
-  fingersIntensity: number;
+  fingerIntensity: number;
   upperIntensity: number;
   lowerIntensity: number;
 }
@@ -78,31 +78,46 @@ export class SessionActivity extends Model<
 
   @Column(DataType.VIRTUAL)
   get duration(): number {
-    const startTime = new Date(this.startTime).getTime();
-    const endTime = new Date(this.endTime).getTime();
-    return (endTime - startTime) / 60000; // convert milliseconds to minutes
+    // Helper function to convert time string "HH:MM:SS" to minutes
+    const timeToMinutes = (time: string) => {
+      const [hours, minutes, seconds] = time.split(":").map(Number);
+      return hours * 60 + minutes + seconds / 60;
+    };
+
+    const startTimeMinutes = timeToMinutes(this.startTime);
+    const endTimeMinutes = timeToMinutes(this.endTime);
+
+    // Calculate duration in minutes
+    let duration = endTimeMinutes - startTimeMinutes;
+
+    // Handle cases where endTime is past midnight and startTime is before midnight
+    if (duration < 0) {
+      duration += 24 * 60; // add 24 hours in minutes
+    }
+
+    return duration;
   }
 
   @Column(DataType.VIRTUAL)
   get intensities(): BodyPartMetrics {
     return {
-      fingers: this.fingerIntensity,
-      upperBody: this.upperIntensity,
-      lowerBody: this.lowerIntensity,
+      fingers: this.getDataValue("fingerIntensity"),
+      upperBody: this.getDataValue("upperIntensity"),
+      lowerBody: this.getDataValue("lowerIntensity"),
     };
   }
   set intensities(value: BodyPartMetrics) {
-    this.fingerIntensity = value.fingers;
-    this.upperIntensity = value.upperBody;
-    this.lowerIntensity = value.lowerBody;
+    this.setDataValue("fingerIntensity", value.fingers);
+    this.setDataValue("upperIntensity", value.upperBody);
+    this.setDataValue("lowerIntensity", value.lowerBody);
   }
 
   @Column(DataType.VIRTUAL)
   get loads(): BodyPartMetrics {
     return {
-      fingers: this.fingerIntensity * this.duration,
-      upperBody: this.upperIntensity * this.duration,
-      lowerBody: this.lowerIntensity * this.duration,
+      fingers: (this.fingerIntensity * this.duration) / 60,
+      upperBody: (this.upperIntensity * this.duration) / 60,
+      lowerBody: (this.lowerIntensity * this.duration) / 60,
     };
   }
 }

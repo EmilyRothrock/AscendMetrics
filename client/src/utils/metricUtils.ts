@@ -1,5 +1,5 @@
 import { DateTime } from "luxon";
-import { MetricsTable } from "../types";
+import { MetricsTable } from "@shared/types";
 import { DateRange } from "../types/dateRange";
 import { RootState } from "../store/store";
 

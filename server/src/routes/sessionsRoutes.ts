@@ -6,8 +6,8 @@ import {
   updateSession,
   deleteSession,
   getSessionById,
-} from "../controllers/sessionsController";
-import { verifyOwnership } from "../middlewares/authMiddleware";
+} from "../controllers/sessionsController.js";
+import { verifyOwnership } from "../middlewares/authMiddleware.js";
 
 router.get("/:sessionId", verifyOwnership, getSessionById);
 router.get("/", getSessionsForDateRange); // e.g., /api/sessions?startDate=2024-04-01&endDate=2024-06-01

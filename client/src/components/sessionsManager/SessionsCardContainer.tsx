@@ -8,9 +8,11 @@ import { Button } from "@mui/material";
 
 const SessionCardsContainer = () => {
   const { sortAscending, selectedField, filterValue } = useControlPanel();
-  const sessions = useSelector((state: RootState) => state.sessions.sessions);
+  const sessions = useSelector(
+    (state: RootState) => state.sessionMetrics.sessions
+  );
   const sessionIds = useSelector(
-    (state: RootState) => state.sessions.sessionIds
+    (state: RootState) => state.sessionMetrics.sessionIds
   );
   const filteredSessionIds = filterSessions(
     sessionIds,

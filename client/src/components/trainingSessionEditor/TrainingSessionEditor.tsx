@@ -20,7 +20,7 @@ import {
   updateSession as updateSessionInStore,
   deleteSession as deleteSessionInStore,
   selectSessionById,
-} from "../../store/sessionsSlice";
+} from "../../store/sessionMetricsSlice";
 
 const TrainingSessionEditor: React.FC = () => {
   // Initialize training session state

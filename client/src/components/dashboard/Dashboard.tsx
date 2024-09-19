@@ -17,14 +17,14 @@ import BodyPart from "@shared/types/bodyPart";
 
 const Dashboard: React.FC = () => {
   const sessions = useSelector(
-    (state: RootState) => state.sessions.sessions || {}
+    (state: RootState) => state.sessionMetrics.sessions || {}
   );
   const sessionIds = useSelector(
-    (state: RootState) => state.sessions.sessionIds || []
+    (state: RootState) => state.sessionMetrics.sessionIds || []
   );
 
   const metricsTable: MetricsTable = useSelector(
-    (state: RootState) => state.metrics.metricsTable || {}
+    (state: RootState) => state.sessionMetrics.metricsTable || {}
   );
 
   const start = DateTime.now().minus({ days: 30 });

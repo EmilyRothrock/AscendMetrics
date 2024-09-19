@@ -1,4 +1,7 @@
-import { fetchSessionById, selectSessionById } from "../store/sessionsSlice";
+import {
+  fetchSessionById,
+  selectSessionById,
+} from "../store/sessionMetricsSlice";
 import store from "../store/store";
 
 export const sessionLoader = async (id: string) => {

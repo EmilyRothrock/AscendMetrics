@@ -1,9 +1,8 @@
 import { DateTime } from "luxon";
 import { BodyPartMetrics, TrainingSession } from "@shared/types";
-import { SessionsState } from "../types/sessionState";
 import { FieldName } from "../types/fieldOptions";
 import { FilterValueType } from "../types/filterValueType";
-import { compareDates, fieldComparer } from "./comparisons";
+import { fieldComparer } from "./comparisons";
 import { fieldFilterer } from "./filters";
 
 export function updateSessionCalculations(session: TrainingSession) {
@@ -57,60 +56,6 @@ export function calculateLoads(
     upperBody: intensities.upperBody * durationInHours,
     lowerBody: intensities.lowerBody * durationInHours,
   };
-}
-
-export function insertSessionId(
-  state: SessionsState,
-  newSession: TrainingSession
-): null {
-  const index = findIndexByDate(state, newSession.completedOn);
-  if (state.sessionIds[index] !== newSession.id) {
-    state.sessionIds.splice(index, 0, newSession.id);
-  }
-  return null;
-}
-
-export const findIndexByDate = (state: SessionsState, targetDate: string) => {
-  const array = state.sessionIds;
-  let low = 0,
-    high = array.length - 1;
-  while (low <= high) {
-    const mid = Math.floor((low + high) / 2);
-    const midDate = DateTime.fromISO(state.sessions[array[mid]].completedOn);
-    const comparisonDate = DateTime.fromISO(targetDate);
-
-    if (midDate < comparisonDate) {
-      high = mid - 1;
-    } else if (midDate > comparisonDate) {
-      low = mid + 1;
-    } else {
-      return mid; // Found the exact date
-    }
-  }
-  return low; // Suitable index for the start of the range
-};
-
-/**
- * Merges new sessions into the existing state and re-sorts the session IDs.
- * @param state The current state of sessions.
- * @param newSessions New sessions to be added.
- */
-export function updateSessionsState(
-  state: SessionsState,
-  newSessions: TrainingSession[]
-): void {
-  const sessionIdsSet = new Set(state.sessionIds);
-
-  newSessions.forEach((session: TrainingSession) => {
-    state.sessions[session.id] = session;
-    sessionIdsSet.add(session.id);
-  });
-
-  state.sessionIds = Array.from(sessionIdsSet);
-  // TODO: custom sort which removes dupes for lower run time?
-  state.sessionIds.sort((a, b) =>
-    compareDates(state.sessions[a].completedOn, state.sessions[b].completedOn)
-  );
 }
 
 export function sortSessions(

@@ -1,11 +1,9 @@
 import { configureStore } from "@reduxjs/toolkit";
 import { combineReducers } from "redux";
-import sessionsReducer from "./sessionsSlice";
-import metricsReducer from "./metricsSlice";
+import sessionMetricsReducer from "./sessionMetricsSlice";
 
 const rootReducer = combineReducers({
-  sessions: sessionsReducer,
-  metrics: metricsReducer,
+  sessionMetrics: sessionMetricsReducer,
 });
 
 const store = configureStore({

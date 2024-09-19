@@ -1,7 +1,7 @@
 import { DateTime } from "luxon";
-import { fetchMetricsWithSessionsForDateRange } from "../store/metricsSlice";
 import store from "../store/store";
-import { isRangeLoaded } from "../utils/metricUtils";
+import { isRangeLoaded } from "../store/helpers";
+import { fetchMetricsWithSessionsForDateRange } from "../store/sessionMetricsSlice";
 
 export const dashboardLoader = async () => {
   const endDate = DateTime.now().toISODate();

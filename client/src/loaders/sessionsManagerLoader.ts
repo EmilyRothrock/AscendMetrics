@@ -1,7 +1,7 @@
 import { DateTime } from "luxon";
-import { fetchMetricsWithSessionsForDateRange } from "../store/metricsSlice";
+import { fetchMetricsWithSessionsForDateRange } from "../store/sessionMetricsSlice";
 import store from "../store/store";
-import { isRangeLoaded } from "../utils/metricUtils";
+import { isRangeLoaded } from "../store/helpers";
 
 // TODO: check for at least past month of sessions and fetch if you don't have them
 export const sessionsManagerLoader = async () => {

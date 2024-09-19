@@ -19,25 +19,25 @@ import { useNavigate } from "react-router-dom";
 
 interface TrainingSessionFormProps {
   trainingSessionData: TrainingSession;
-  onSessionChange: (newSessionData: Partial<TrainingSession>) => void;
-  onActivityChange: (
+  onTrainingSessionChange: (newSessionData: Partial<TrainingSession>) => void;
+  onSessionActivityChange: (
     id: number,
     newActivityData: Partial<SessionActivity>
   ) => void;
-  addActivity: () => void;
-  removeActivity: (id: number) => void;
-  saveSession: () => Promise<void>;
-  deleteSession: () => void;
+  addSessionActivity: () => void;
+  removeSessionActivity: (id: number) => void;
+  saveTrainingSession: () => Promise<void>;
+  deleteTrainingSession: () => void;
 }
 
 const TrainingSessionForm: React.FC<TrainingSessionFormProps> = ({
   trainingSessionData,
-  onSessionChange,
-  onActivityChange,
-  addActivity,
-  removeActivity,
-  saveSession,
-  deleteSession,
+  onTrainingSessionChange,
+  onSessionActivityChange,
+  addSessionActivity,
+  removeSessionActivity,
+  saveTrainingSession,
+  deleteTrainingSession,
 }) => {
   const navigate = useNavigate();
   // Form validation - set errors and warnings
@@ -153,7 +153,7 @@ const TrainingSessionForm: React.FC<TrainingSessionFormProps> = ({
         setShowWarningDialog(true);
       } else {
         try {
-          await saveSession();
+          await saveTrainingSession();
           setSnackbar({
             open: true,
             message: "Session saved successfully!",
@@ -174,7 +174,7 @@ const TrainingSessionForm: React.FC<TrainingSessionFormProps> = ({
     setShowWarningDialog(false);
     if (confirm) {
       try {
-        await saveSession();
+        await saveTrainingSession();
         setSnackbar({
           open: true,
           message: "Session saved successfully!",
@@ -208,7 +208,9 @@ const TrainingSessionForm: React.FC<TrainingSessionFormProps> = ({
           name="completedOn"
           type="date"
           value={DateTime.fromISO(trainingSessionData.completedOn).toISODate()}
-          onChange={(e) => onSessionChange({ completedOn: e.target.value })}
+          onChange={(e) =>
+            onTrainingSessionChange({ completedOn: e.target.value })
+          }
           fullWidth
           margin="normal"
           error={!!errors.completedOn}
@@ -219,7 +221,7 @@ const TrainingSessionForm: React.FC<TrainingSessionFormProps> = ({
           label="Name"
           name="name"
           value={trainingSessionData.name}
-          onChange={(e) => onSessionChange({ name: e.target.value })}
+          onChange={(e) => onTrainingSessionChange({ name: e.target.value })}
           fullWidth
           margin="normal"
           error={!!errors.name}
@@ -229,7 +231,7 @@ const TrainingSessionForm: React.FC<TrainingSessionFormProps> = ({
           label="Session Note"
           name="note"
           value={trainingSessionData.note}
-          onChange={(e) => onSessionChange({ note: e.target.value })}
+          onChange={(e) => onTrainingSessionChange({ note: e.target.value })}
           fullWidth
           multiline
           margin="normal"
@@ -237,17 +239,17 @@ const TrainingSessionForm: React.FC<TrainingSessionFormProps> = ({
           helperText={errors.note}
         />
 
-        {trainingSessionData.sessionActivities.map((activity) => (
+        {trainingSessionData.sessionActivities.map((sa) => (
           <SessionActivityForm
-            key={activity.id}
-            sessionActivity={activity}
-            onActivityChange={(newData) =>
-              onActivityChange(activity.id, newData)
+            key={sa.id}
+            sessionActivity={sa}
+            onSessionActivityChange={(newData) =>
+              onSessionActivityChange(sa.id, newData)
             }
-            removeActivity={() => removeActivity(activity.id)}
+            removeSessionActivity={() => removeSessionActivity(sa.id)}
             errors={
-              errors.activities && errors.activities[activity.id]
-                ? errors.activities[activity.id]
+              errors.activities && errors.activities[sa.id]
+                ? errors.activities[sa.id]
                 : {}
             }
           />
@@ -256,7 +258,7 @@ const TrainingSessionForm: React.FC<TrainingSessionFormProps> = ({
         <Button
           fullWidth
           variant="outlined"
-          onClick={addActivity}
+          onClick={addSessionActivity}
           sx={{ mt: 2, mb: 2 }}
         >
           Add Activity
@@ -274,7 +276,7 @@ const TrainingSessionForm: React.FC<TrainingSessionFormProps> = ({
             Save
           </Button>
           {trainingSessionData.id > 0 ? (
-            <Button onClick={deleteSession} color="secondary">
+            <Button onClick={deleteTrainingSession} color="secondary">
               Delete
             </Button>
           ) : (

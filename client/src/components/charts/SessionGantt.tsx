@@ -13,7 +13,7 @@ import { useResizeObserver } from "../hooks/useResizeObserver";
 import { activityNameToColor } from "../../utils/activityNameToColor";
 
 interface SessionGanttProps {
-  activities: SessionActivity[];
+  sessionActivities: SessionActivity[];
   yAxisLabels?: boolean;
 }
 
@@ -25,7 +25,7 @@ interface TooltipState {
 }
 
 const SessionGantt: React.FC<SessionGanttProps> = ({
-  activities,
+  sessionActivities,
   yAxisLabels,
 }) => {
   const chartRef = useRef<SVGSVGElement | null>(null);
@@ -38,7 +38,7 @@ const SessionGantt: React.FC<SessionGanttProps> = ({
     content: "",
   });
 
-  const validActivities = activities.filter(
+  const validSAList = sessionActivities.filter(
     (d) =>
       d.startTime &&
       d.endTime &&
@@ -59,10 +59,10 @@ const SessionGantt: React.FC<SessionGanttProps> = ({
 
     // Safely get the minimum and maximum dates
     let minDateTime = DateTime.min(
-      ...validActivities.map((a) => DateTime.fromISO(a.startTime))
+      ...validSAList.map((a) => DateTime.fromISO(a.startTime))
     );
     let maxDateTime = DateTime.max(
-      ...validActivities.map((a) => DateTime.fromISO(a.endTime))
+      ...validSAList.map((a) => DateTime.fromISO(a.endTime))
     );
 
     // Check if minDateTime or maxDateTime is invalid
@@ -76,7 +76,7 @@ const SessionGantt: React.FC<SessionGanttProps> = ({
       .range([0, dimensions.width - 2 * padding]);
 
     const yScale = scaleBand<string>()
-      .domain(validActivities.map((a) => a.name))
+      .domain(validSAList.map((a) => a.name))
       .range([0, dimensions.height - 2 * padding])
       .padding(0.2);
 
@@ -118,7 +118,7 @@ const SessionGantt: React.FC<SessionGanttProps> = ({
 
     ganttChart
       .selectAll<SVGRectElement, SessionActivity>(".bar")
-      .data(validActivities)
+      .data(validSAList)
       .join("rect")
       .attr("class", "bar")
       .attr("x", (d) => xScale(DateTime.fromISO(d.startTime).toJSDate())!)
@@ -148,7 +148,7 @@ const SessionGantt: React.FC<SessionGanttProps> = ({
       .on("mouseout", () =>
         setTooltip((prev) => ({ ...prev, visible: false }))
       );
-  }, [activities, dimensions, validActivities, yAxisLabels]);
+  }, [sessionActivities, dimensions, validSAList, yAxisLabels]);
 
   return (
     <div ref={wrapperRef} style={{ width: "100%", height: "100%" }}>

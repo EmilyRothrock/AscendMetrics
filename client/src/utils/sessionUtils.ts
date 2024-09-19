@@ -5,8 +5,8 @@ import { FilterValueType } from "../types/filterValueType";
 import { fieldComparer } from "./comparisons";
 import { fieldFilterer } from "./filters";
 
-export function updateSessionCalculations(session: TrainingSession) {
-  const results = session.sessionActivities.reduce(
+export function updateSessionCalculations(trainingSession: TrainingSession) {
+  const results = trainingSession.sessionActivities.reduce(
     (accumulator, activity) => {
       const activityDurationInHours = calculateDurationInHours(
         activity.startTime,
@@ -32,10 +32,10 @@ export function updateSessionCalculations(session: TrainingSession) {
     { duration: 0, loads: { fingers: 0, upperBody: 0, lowerBody: 0 } }
   );
 
-  session.duration = results.duration;
-  session.loads = results.loads;
+  trainingSession.duration = results.duration;
+  trainingSession.loads = results.loads;
 
-  return session;
+  return trainingSession;
 }
 
 export function calculateDurationInHours(

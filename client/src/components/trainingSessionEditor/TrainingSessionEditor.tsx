@@ -39,14 +39,16 @@ const TrainingSessionEditor: React.FC = () => {
     );
   console.log(trainingSessionData);
 
-  const handleSessionChange = (newSessionData: Partial<TrainingSession>) => {
+  const handleTrainingSessionChange = (
+    newSessionData: Partial<TrainingSession>
+  ) => {
     setTrainingSessionData((prevState) => ({
       ...prevState,
       ...newSessionData,
     }));
   };
 
-  const handleActivityChange = (
+  const handleSessionActivityChange = (
     id: number,
     newActivityData: Partial<SessionActivity>
   ) => {
@@ -58,7 +60,7 @@ const TrainingSessionEditor: React.FC = () => {
     }));
   };
 
-  const addActivity = () => {
+  const addSessionActivity = () => {
     const newActivity = defaultNewSessionActivity();
     setTrainingSessionData((prevState) => ({
       ...prevState,
@@ -66,7 +68,7 @@ const TrainingSessionEditor: React.FC = () => {
     }));
   };
 
-  const removeActivity = (id: number) => {
+  const removeSessionActivity = (id: number) => {
     setTrainingSessionData((prevState) => ({
       ...prevState,
       sessionActivities: prevState.sessionActivities.filter(
@@ -75,7 +77,7 @@ const TrainingSessionEditor: React.FC = () => {
     }));
   };
 
-  const saveSession = async (): Promise<void> => {
+  const saveTrainingSession = async (): Promise<void> => {
     try {
       if (trainingSessionData.id < 0) {
         const createdSession = await createSessionInAPI(trainingSessionData);
@@ -103,7 +105,7 @@ const TrainingSessionEditor: React.FC = () => {
     }
   };
 
-  const deleteSession = () => {
+  const deleteTrainingSession = () => {
     deleteSessionInAPI(Number(id));
     dispatch(deleteSessionInStore(Number(id)));
     navigate(-1);
@@ -116,17 +118,17 @@ const TrainingSessionEditor: React.FC = () => {
         <Grid item xs={12} md={4}>
           <TrainingSessionForm
             trainingSessionData={trainingSessionData}
-            onSessionChange={handleSessionChange}
-            onActivityChange={handleActivityChange}
-            addActivity={addActivity}
-            removeActivity={removeActivity}
-            saveSession={saveSession}
-            deleteSession={deleteSession}
+            onTrainingSessionChange={handleTrainingSessionChange}
+            onSessionActivityChange={handleSessionActivityChange}
+            addSessionActivity={addSessionActivity}
+            removeSessionActivity={removeSessionActivity}
+            saveTrainingSession={saveTrainingSession}
+            deleteTrainingSession={deleteTrainingSession}
           />
         </Grid>
         <Grid item md={8} sx={{ display: { xs: "none", md: "block" } }}>
           <SessionGantt
-            activities={trainingSessionData.sessionActivities}
+            sessionActivities={trainingSessionData.sessionActivities}
             yAxisLabels={true}
           />
         </Grid>

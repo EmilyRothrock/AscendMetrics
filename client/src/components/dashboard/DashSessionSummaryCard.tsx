@@ -36,8 +36,6 @@ const DashSessionSummaryCard: React.FC<{ session: TrainingSession }> = ({
     navigate(`/sessions/${session.id}`);
   };
 
-  useEffect(() => console.log(session));
-
   return (
     <Card elevation={2} sx={{ margin: 1, padding: 1 }}>
       <CardHeader
@@ -78,7 +76,9 @@ const DashSessionSummaryCard: React.FC<{ session: TrainingSession }> = ({
         <CardContent>
           <Grid container spacing={1}>
             <Grid item xs={12} sm={6} sx={{ aspectRatio: "1" }}>
-              <ActivityTimePieChart activities={session.sessionActivities} />
+              <ActivityTimePieChart
+                sessionActivities={session.sessionActivities}
+              />
             </Grid>
             <Grid item xs={12} sm={6} sx={{ aspectRatio: "1" }}>
               <LoadBarChart data={session.loads} />

@@ -57,7 +57,7 @@ const SessionSummaryCard: React.FC<{ session: TrainingSession }> = ({
           <LoadBarChart data={session.loads} />
         </Grid>
         <Grid item xs={12} sm={8} sx={{ display: { xs: "none", md: "block" } }}>
-          <SessionGantt activities={session.sessionActivities} />
+          <SessionGantt sessionActivities={session.sessionActivities} />
         </Grid>
       </Grid>
     </Card>

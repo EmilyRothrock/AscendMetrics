@@ -28,13 +28,16 @@ export function calculateLoads(
 }
 
 export function calculateActivityMetrics(
-  activity: Omit<SessionActivity, "duration" | "loads" | "strains">
+  sessionActivity: Omit<SessionActivity, "duration" | "loads" | "strains">
 ): SessionActivity {
-  const duration = calculateDuration(activity.startTime, activity.endTime);
-  const loads = calculateLoads(activity.intensities, duration);
+  const duration = calculateDuration(
+    sessionActivity.startTime,
+    sessionActivity.endTime
+  );
+  const loads = calculateLoads(sessionActivity.intensities, duration);
 
   return {
-    ...activity,
+    ...sessionActivity,
     duration,
     loads,
   };

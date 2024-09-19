@@ -24,8 +24,8 @@ import { SessionActivity, BodyPartMetrics } from "@shared/types";
 
 interface SessionActivityFormProps {
   sessionActivity: SessionActivity;
-  onActivityChange: (newData: Partial<SessionActivity>) => void;
-  removeActivity: () => void;
+  onSessionActivityChange: (newData: Partial<SessionActivity>) => void;
+  removeSessionActivity: () => void;
   errors: { [key: string]: string };
 }
 
@@ -170,8 +170,8 @@ const IntensityInput: React.FC<{
 
 const SessionActivityForm: React.FC<SessionActivityFormProps> = ({
   sessionActivity,
-  onActivityChange,
-  removeActivity,
+  onSessionActivityChange,
+  removeSessionActivity,
   errors,
 }) => {
   const [isExpanded, setIsExpanded] = useState<boolean>(true); // default open
@@ -185,13 +185,13 @@ const SessionActivityForm: React.FC<SessionActivityFormProps> = ({
     setAnchorEl(null);
   };
 
-  const toggleExpandActivity = () => {
+  const toggleExpand = () => {
     setIsExpanded(!isExpanded);
     handleMenuClose();
   };
 
   const handleDeleteActivity = () => {
-    removeActivity();
+    removeSessionActivity();
     handleMenuClose();
   };
 
@@ -200,14 +200,14 @@ const SessionActivityForm: React.FC<SessionActivityFormProps> = ({
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
     const { name, value } = e.target;
-    onActivityChange({ [name]: value });
+    onSessionActivityChange({ [name]: value });
   };
 
   const handleIntensityChange = (
     bodyPart: keyof BodyPartMetrics,
     value: number
   ) => {
-    onActivityChange({
+    onSessionActivityChange({
       intensities: {
         ...sessionActivity.intensities,
         [bodyPart]: value,
@@ -242,7 +242,7 @@ const SessionActivityForm: React.FC<SessionActivityFormProps> = ({
         open={Boolean(anchorEl)}
         onClose={handleMenuClose}
       >
-        <MenuItem onClick={toggleExpandActivity}>
+        <MenuItem onClick={toggleExpand}>
           {isExpanded ? "Collapse" : "Expand"}
         </MenuItem>
         <MenuItem onClick={handleDeleteActivity}>Delete</MenuItem>
@@ -254,7 +254,7 @@ const SessionActivityForm: React.FC<SessionActivityFormProps> = ({
             options={activityOptions}
             value={sessionActivity.name}
             onChange={(event, value) => {
-              onActivityChange({ name: value || "" });
+              onSessionActivityChange({ name: value || "" });
             }}
             renderInput={(params) => (
               <TextField

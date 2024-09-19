@@ -4,32 +4,32 @@ import { select, pie, arc, PieArcDatum } from "d3";
 import { useResizeObserver } from "../hooks/useResizeObserver";
 import { activityNameToColor } from "../../utils/activityNameToColor";
 
-interface ActivityDuration {
-  activity: string;
-  totalDuration: number;
+interface NameAndDuration {
+  name: string;
+  duration: number;
 }
 
-const ActivityTimePieChart: React.FC<{ activities: SessionActivity[] }> = ({
-  activities,
-}) => {
+const ActivityTimePieChart: React.FC<{
+  sessionActivities: SessionActivity[];
+}> = ({ sessionActivities }) => {
   const chartRef = useRef<SVGSVGElement>(null); // for content
   const wrapperRef = useRef<HTMLDivElement>(null); // for sizing
   const dimensions = useResizeObserver(wrapperRef, { width: 200, height: 200 }); // sizing logic handled by custom hook
-  const [selectedActivity, setSelectedActivity] =
-    useState<ActivityDuration | null>(null); // used for interactive central text element
+  const [selectedSessionActivity, setSelectedSessionActivity] =
+    useState<NameAndDuration | null>(null); // used for interactive central text element
 
   // Process Data
   const data = useMemo(() => {
-    return activities.reduce((acc: ActivityDuration[], activity) => {
-      const existing = acc.find((a) => a.activity === activity.name);
+    return sessionActivities.reduce((acc: NameAndDuration[], sa) => {
+      const existing = acc.find((a) => a.name === sa.name);
       if (existing) {
-        existing.totalDuration += activity.duration;
+        existing.duration += sa.duration;
       } else {
-        acc.push({ activity: activity.name, totalDuration: activity.duration });
+        acc.push({ name: sa.name, duration: sa.duration });
       }
       return acc;
-    }, [] as ActivityDuration[]);
-  }, [activities]);
+    }, [] as NameAndDuration[]);
+  }, [sessionActivities]);
 
   // Render Chart
   useEffect(() => {
@@ -50,10 +50,10 @@ const ActivityTimePieChart: React.FC<{ activities: SessionActivity[] }> = ({
       .attr("transform", `translate(${width / 2}, ${height / 2})`);
 
     // Create pie generator based on total duration of each activity
-    const myPie = pie<ActivityDuration>().value((d) => d.totalDuration);
+    const myPie = pie<NameAndDuration>().value((d) => d.duration);
 
     // Create arc generator
-    const myArc = arc<PieArcDatum<ActivityDuration>>()
+    const myArc = arc<PieArcDatum<NameAndDuration>>()
       .innerRadius(radius * 0.67)
       .outerRadius(radius);
 
@@ -69,10 +69,10 @@ const ActivityTimePieChart: React.FC<{ activities: SessionActivity[] }> = ({
     myArcs
       .append("path")
       .attr("d", myArc)
-      .attr("fill", (d) => activityNameToColor(d.data.activity))
-      .on("mouseover", (_, d) => setSelectedActivity(d.data))
-      .on("mouseout", () => setSelectedActivity(null))
-      .on("click", (_, d) => setSelectedActivity(d.data));
+      .attr("fill", (d) => activityNameToColor(d.data.name))
+      .on("mouseover", (_, d) => setSelectedSessionActivity(d.data))
+      .on("mouseout", () => setSelectedSessionActivity(null))
+      .on("click", (_, d) => setSelectedSessionActivity(d.data));
 
     // Initialize central text - not modified here
     svg
@@ -99,10 +99,11 @@ const ActivityTimePieChart: React.FC<{ activities: SessionActivity[] }> = ({
     centralText.selectAll("tspan").remove(); // Clear previous texts
 
     // Render selected activity name with duration (multiline) or a default tooltip
-    if (selectedActivity) {
+    if (selectedSessionActivity) {
+      // Render selected sessionActivity info
       const lines = [
-        `${selectedActivity.activity}:`,
-        `${selectedActivity.totalDuration.toFixed(0)} min.`,
+        `${selectedSessionActivity.name}:`,
+        `${selectedSessionActivity.duration.toFixed(0)} min.`,
       ];
       const lineHeight = 1.2; // Line height in em units
       const initialY = -((lines.length - 1) * lineHeight) / 2;
@@ -114,14 +115,15 @@ const ActivityTimePieChart: React.FC<{ activities: SessionActivity[] }> = ({
           .text(line);
       });
     } else {
-      centralText
+      // Append a default central text tool tip
+      centralText // Append first line
         .append("tspan")
         .attr("x", 0)
         .attr("dy", "-0.6em")
         .style("fill", "grey")
         .style("font-style", "italic")
         .text("hover/click");
-      centralText
+      centralText // Append second line
         .append("tspan")
         .attr("x", 0)
         .attr("dy", "1.2em")
@@ -129,10 +131,9 @@ const ActivityTimePieChart: React.FC<{ activities: SessionActivity[] }> = ({
         .style("font-style", "italic")
         .text("for details");
     }
-  }, [selectedActivity]);
+  }, [selectedSessionActivity]);
 
   return (
-    // TODO: Factor out common wrapper in-line styles.
     <div ref={wrapperRef} style={{ width: "100%", height: "100%" }}>
       <svg ref={chartRef} />
     </div>

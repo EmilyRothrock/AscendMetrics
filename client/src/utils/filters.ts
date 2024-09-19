@@ -1,4 +1,4 @@
-import { Activity, BodyPartMetrics } from "../types";
+import { SessionActivity, BodyPartMetrics } from "@shared/types";
 import { FieldName } from "../types/fieldOptions";
 import { FilterValueType } from "../types/filterValueType";
 
@@ -30,12 +30,12 @@ export const filterStrings = (
 };
 
 export const filterStringsArray = (
-  arr: Activity[],
+  arr: SessionActivity[],
   filterValue: FilterValueType
 ) => {
   const substring = filterValue.text;
   if (arr && substring)
-    return arr.some((element: Activity) =>
+    return arr.some((element: SessionActivity) =>
       element.name.toLowerCase().includes(substring.toLowerCase())
     );
   else return false;

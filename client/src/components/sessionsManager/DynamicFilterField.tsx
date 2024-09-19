@@ -37,7 +37,6 @@ export const FilterField: React.FC<FilterFieldProps> = ({ selection }) => {
         </Grid>
       );
     case "activities":
-      // click enter to begin typing an additional activity
       return (
         <Grid item xs={9} sm={3}>
           <Autocomplete

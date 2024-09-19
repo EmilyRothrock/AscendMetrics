@@ -3,8 +3,9 @@ import Button from "@mui/material/Button";
 import { logout } from "../../services/authService";
 
 const SignOutButton: React.FC = () => {
-  const returnToUrl =
-    import.meta.env.VITE_AUTH0_LOGOUT_URL || "http://localhost:5173/signin";
+  const frontendURL = import.meta.env.VITE_BASE_URL;
+
+  const returnToUrl = frontendURL + "/signin";
 
   return (
     <Button color="inherit" onClick={() => logout(returnToUrl)} sx={{ mx: 1 }}>

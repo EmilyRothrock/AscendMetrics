@@ -19,7 +19,6 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
         const isAuth = await auth0Client.isAuthenticated();
         setIsAuthenticated(isAuth);
       } catch (error) {
-        // Handle error
         console.error("Error checking authentication", error);
         setIsAuthenticated(false);
       } finally {

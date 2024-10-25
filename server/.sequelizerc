@@ -1,4 +1,4 @@
-import path from "path";
+const path = require('path');
 
 interface SequelizePathsConfig {
   config: string;
@@ -12,6 +12,11 @@ const sequelizePathsConfig: SequelizePathsConfig = {
   migrationsPath: path.resolve("src", "db", "migrations"),
   modelsPath: path.resolve("src", "db", "models"),
   seedersPath: path.resolve("src", "db", "seeders"),
+};
+
+// NEED TO FIT THAT
+module.exports = {
+  "seeders-path": path.resolve('./yourdirectory/seeders'),
 };
 
 export default sequelizePathsConfig;

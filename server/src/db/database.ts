@@ -5,12 +5,13 @@ import { configJson } from "./config/config";
 const env = (process.env.NODE_ENV || "development") as keyof typeof configJson;
 const config: SequelizeOptions = configJson[env] as SequelizeOptions;
 
-if (!config.database || !config.username || !config.password) {
-  throw new Error(
-    "Database configuration is incomplete. Please check your environment variables."
-  );
-}
+console.log(config);
 
+// if (!config.database || !config.username || !config.password) {
+//   throw new Error(
+//     "Database configuration is incomplete. Please check your environment variables."
+//   );
+// }
 // Create a Sequelize instance using sequelize-typescript
 const sequelize = new Sequelize({
   ...config,

@@ -14,9 +14,4 @@ const sequelizePathsConfig: SequelizePathsConfig = {
   seedersPath: path.resolve("src", "db", "seeders"),
 };
 
-// NEED TO FIT THAT
-module.exports = {
-  "seeders-path": path.resolve('./yourdirectory/seeders'),
-};
-
 export default sequelizePathsConfig;

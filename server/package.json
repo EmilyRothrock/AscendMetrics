@@ -32,7 +32,8 @@
     "date-fns": "^4.1.0",
     "nodemon": "^3.1.4",
     "sequelize-cli": "^6.6.2",
+    "ts-node": "^10.9.2",
     "tsx": "^4.17.0",
-    "typescript": "^5.5.4"
+    "typescript": "^5.6.3"
   }
 }

@@ -1,17 +1,10 @@
 const path = require('path');
 
-interface SequelizePathsConfig {
-  config: string;
-  migrationsPath: string;
-  modelsPath: string;
-  seedersPath: string;
-}
-
-const sequelizePathsConfig: SequelizePathsConfig = {
+module.exports = {
   config: path.resolve("src", "db", "config"),
-  migrationsPath: path.resolve("src", "db", "migrations"),
-  modelsPath: path.resolve("src", "db", "models"),
-  seedersPath: path.resolve("src", "db", "seeders"),
+  'migrations-path': path.resolve("src", "db", "migrations"),
+  'models-path': path.resolve("src", "db", "models"),
+  'seeders-path': path.resolve("src", "db", "seeders"),
 };
 
 export default sequelizePathsConfig;

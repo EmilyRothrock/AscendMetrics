@@ -6,6 +6,7 @@ import sessionsRouter from "./routes/sessionsRoutes";
 import metricsRouter from "./routes/metricsRoutes";
 import { checkJwt } from "./middlewares/authMiddleware";
 import { SessionActivity } from "./db/models/SessionActivity.model";
+import sessionActivitiesData from "./db/data/default-session-activities.json"; // Import the JSON file
 
 // Load environment variables
 dotenv.config({ path: "../server/.env" });
@@ -18,19 +19,6 @@ const corsOptions = { origin: "http://localhost:5173", credentials: true };
 app.use(cors(corsOptions)); // Enable CORS for all routes
 app.use(express.json());
 
-const seedData = {
-  activityId: 1, // Replace with the actual Activity ID from your database
-  trainingSessionId: 1, // Replace with the actual TrainingSession ID from your database
-  startTime: "16:00:00",
-  endTime: "16:15:00",
-  fingerIntensity: 9.0,
-  upperIntensity: 6.0,
-  lowerIntensity: 2.0,
-  note: "5.11 double, fell 1/3 way on second lap",
-  createdAt: new Date("2024-11-15T00:00:00Z"),
-  updatedAt: new Date("2024-11-15T00:00:00Z"),
-};
-
 // Sync the database and start the server
 db.sequelize
   .sync()
@@ -38,18 +26,27 @@ db.sequelize
     console.log("Database synchronized!");
 
     try {
-      const existingActivity = await SessionActivity.findOne({
-        where: { startTime: seedData.startTime, endTime: seedData.endTime },
-      });
+      // Format the JSON data to match the model attributes
+      const formattedData = sessionActivitiesData.map((activity) => ({
+        activityId: 1, // Replace with the actual Activity ID from your database
+        trainingSessionId: 1, // Replace with the actual TrainingSession ID from your database
+        startTime: activity["Start Time"],
+        endTime: activity["End Time"],
+        fingerIntensity: activity["F-RPE"],
+        upperIntensity: activity["U-RPE"],
+        lowerIntensity: activity["L-RPE"],
+        note: activity.Notes,
+        createdAt: new Date(activity.createdAt),
+        updatedAt: new Date(activity.updatedAt),
+      }));
 
-      if (!existingActivity) {
-        await SessionActivity.create(seedData);
-        console.log("Seed data inserted successfully!");
-      } else {
-        console.log("Seed data already exists, skipping insertion.");
-      }
+      // Perform bulk insert
+      await SessionActivity.bulkCreate(formattedData, {
+        ignoreDuplicates: true, // Prevent duplicate entries
+      });
+      console.log("Bulk data inserted successfully!");
     } catch (error) {
-      console.error("Error inserting seed data:", error);
+      console.error("Error inserting bulk data:", error);
     }
 
     // Define routes

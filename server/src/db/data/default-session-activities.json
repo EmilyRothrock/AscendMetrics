@@ -1,0 +1,69 @@
+[
+    {
+        "Activity": "Warm-Up",
+        "Start Time": "1:15 PM",
+        "End Time": "1:30 PM",
+        "F-RPE": 0.0,
+        "U-RPE": 3.0,
+        "L-RPE": 3.0,
+        "Notes": null,
+        "createdAt": "2024-11-15T00:00:00Z",
+        "updatedAt": "2024-11-15T00:00:00Z"
+    },
+    {
+        "Activity": "Movement Practice",
+        "Start Time": "1:30 PM",
+        "End Time": "2:00 PM",
+        "F-RPE": 5.0,
+        "U-RPE": 5.0,
+        "L-RPE": 2.0,
+        "Notes": null,
+        "createdAt": "2024-11-15T00:00:00Z",
+        "updatedAt": "2024-11-15T00:00:00Z"
+    },
+    {
+        "Activity": "Power",
+        "Start Time": "2:00 PM",
+        "End Time": "2:30 PM",
+        "F-RPE": 7.0,
+        "U-RPE": 8.0,
+        "L-RPE": 2.0,
+        "Notes": "red tag slopey move, horrible heel, green tag comitting at top",
+        "createdAt": "2024-11-15T00:00:00Z",
+        "updatedAt": "2024-11-15T00:00:00Z"
+    },
+    {
+        "Activity": "Performance",
+        "Start Time": "2:40 PM",
+        "End Time": "2:50 PM",
+        "F-RPE": 7.0,
+        "U-RPE": 6.0,
+        "L-RPE": 2.0,
+        "Notes": "5.12 red onsight, fell making poor beta choice, needed to roll through undercling... even if tired",
+        "createdAt": "2024-11-15T00:00:00Z",
+        "updatedAt": "2024-11-15T00:00:00Z"
+    },
+    {
+        "Activity": "Performance",
+        "Start Time": "3:20 PM",
+        "End Time": "3:30 PM",
+        "F-RPE": 8.0,
+        "U-RPE": 6.0,
+        "L-RPE": 2.0,
+        "Notes": "5.12 green onsight, fingers gave out on crimps both falls",
+        "createdAt": "2024-11-15T00:00:00Z",
+        "updatedAt": "2024-11-15T00:00:00Z"
+    },
+    
+    {
+        "Activity": "PumpCap/AnCap",
+        "Start Time": "4:30 PM",
+        "End Time": "5:00 PM",
+        "F-RPE": 9.0,
+        "U-RPE": 3.0,
+        "L-RPE": 2.0,
+        "Notes": "feet on campus descenders, lots of failure but always close to time. noticed ease of full crimping when very tired",
+        "createdAt": "2024-11-15T00:00:00Z",
+        "updatedAt": "2024-11-15T00:00:00Z"
+    }
+]
